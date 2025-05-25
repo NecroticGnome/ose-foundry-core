@@ -155,6 +155,35 @@ export default class OseDataModelCharacterEncumbranceItemBased
         );
   }
 
+  get equippedSteps() {
+    return Object.values(
+          OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
+        );
+  }
+
+  get packedSteps() {
+    return Object.values(
+          OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
+        );
+  }
+
+  get equippedPct() {
+    return Math.clamp((100 * this.#equippedWeight) / this.#equippedMax, 0, 100);
+  }
+
+  get packedPct() {
+    return Math.clamp((100 * (this.#packedWeight - this.#weightMod)) / this.#packedMax, 0, 100);
+  }
+
+  get equippedLabel() : string {
+    return this.#equippedWeight + "/" + this.#equippedMax;
+  }
+
+  get packedLabel() : string {
+    return this.#packedWeight + "/" + (this.#packedMax + this.#weightMod)
+  }
+
+
   get usingEquippedEncumbrance() {
     const equippedValues = Object.values(
       OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
