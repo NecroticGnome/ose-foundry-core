@@ -407,21 +407,45 @@
 </section>
 {{#unless (eq @root.system.encumbrance.variant 'disabled')}}
 <section>
-  
-  {{#with @root.system.encumbrance}}
-  <div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
 
-    <span class="encumbrance-bar" style="width:{{pct}}%"></span>
-    {{#if @root.config.encumbranceStrengthMod}}
-    <span class="encumbrance-label">{{value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
-    {{else}}
-    <span class="encumbrance-label">{{value}} / {{max}}</span>
-    {{/if}}
-    {{#each steps as |s|}}
-    <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
-    <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
-    {{/each}}
-  </div>
+  {{#with @root.system.encumbrance}}
+  {{#if (eq @root.config.encumbrance "itembased")}}
+    <!-- Equipped bar -->
+    <div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
+
+      <span class="encumbrance-bar" style="width:{{equippedPct}}%"></span>
+      <span class="encumbrance-label">Equipped {{equippedLabel}}</span>
+      {{#each equippedSteps as |s|}}
+      <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
+      <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
+      {{/each}}
+    </div>
+
+    <!-- Packed bar-->
+    <div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
+
+      <span class="encumbrance-bar" style="width:{{packedPct}}%"></span>
+      <span class="encumbrance-label">Packed {{packedLabel}}</span>
+      {{#each packedSteps as |s|}}
+      <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
+      <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
+
+      <span class="encumbrance-bar" style="width:{{pct}}%"></span>
+      {{#if @root.config.encumbranceStrengthMod}}
+      <span class="encumbrance-label">{{value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
+      {{else}}
+      <span class="encumbrance-label">{{value}} / {{max}}</span>
+      {{/if}}
+      {{#each steps as |s|}}
+      <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
+      <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
+      {{/each}}
+    </div>
+  {{/if}}  
   {{/with}}
 </section>
 {{/unless}}
