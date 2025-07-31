@@ -273,7 +273,7 @@ export default ({
         expect(OseDice.attackIsSuccess(roll, target, bonus)).equal(true);
       });
 
-      it("Roll + bnous under target is unsuccessful", () => {
+      it("Roll + bonus under target is unsuccessful", () => {
         const roll = createMockRoll(10);
         const target = 21;
         const bonus = 10;
@@ -361,7 +361,7 @@ export default ({
         ).equal(true);
       });
 
-      it("Attack rolls with a modified result of 1 are allowed to succeeed if hits target AC. Issue#340", () => {
+      it("Attack rolls with a modified result of 1 are allowed to succeed if hits target AC. Issue#340", () => {
         const attackBonus = -1;
         const targetData = {
           roll: {
