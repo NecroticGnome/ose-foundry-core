@@ -103,6 +103,19 @@
   "manifest": "AUTOMATICALLY REPLACED BY GITHUB WORKFLOW ACTION",
   "download": "AUTOMATICALLY REPLACED BY GITHUB WORKFLOW ACTION",
   "bugs": "https://github.com/NecroticGnome/ose-foundry-core/issues",
+  "media": [
+    {
+      "type": "cover",
+      "loop": false,
+      "flags": {}
+    },
+    {
+      "type": "setup",
+      "url": "systems/ose-dev/assets/ose-system.webp",
+      "thumbnail": "systems/ose-dev/assets/ose-system-thumbnail.webp"
+    }
+  ],
+  "background": "systems/ose-dev/assets/ose-system.webp",
   "flags": {
     "allowBugReporter": true
   },
@@ -112,9 +125,8 @@
         "id": "ose-advancedfantasytome",
         "type": "module",
         "compatibility": {
-          "minimum": "0.1.0",
-          "verified": "1.0.99",
-          "maximum": "1.99.99"
+          "minimum": "25.07.01",
+          "verified": "25.07.03"
         }
       },
       {
@@ -122,8 +134,7 @@
         "type": "module",
         "compatibility": {
           "minimum": "1.0.0",
-          "verified": "1.0.99",
-          "maximum": "1.99.99"
+          "verified": "1.0.99"
         }
       }
     ]
