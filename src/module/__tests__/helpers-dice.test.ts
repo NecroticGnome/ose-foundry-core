@@ -387,27 +387,24 @@ export default ({
       });
 
       it("Lower than target AC is unsuccessful", () => {
-        const attackBonus = 19 - data.roll.thac0;
         const roll = createMockRoll(
-          data.roll.target.actor.system.aac.value - attackBonus - 1
+          data.roll.target.actor.system.aac.value - 1
         );
         expect(OseDice.digestAttackResult(data, roll).isSuccess).equal(false);
         expect(OseDice.digestAttackResult(data, roll).isFailure).equal(true);
       });
 
       it("Equal than target AC is successful", () => {
-        const attackBonus = 19 - data.roll.thac0;
         const roll = createMockRoll(
-          data.roll.target.actor.system.aac.value - attackBonus
+          data.roll.target.actor.system.aac.value
         );
         expect(OseDice.digestAttackResult(data, roll).isSuccess).equal(true);
         expect(OseDice.digestAttackResult(data, roll).isFailure).equal(false);
       });
 
       it("Higher than target AC is successful", () => {
-        const attackBonus = 19 - data.roll.thac0;
         const roll = createMockRoll(
-          data.roll.target.actor.system.aac.value - attackBonus + 1
+          data.roll.target.actor.system.aac.value + 1
         );
         expect(OseDice.digestAttackResult(data, roll).isSuccess).equal(true);
         expect(OseDice.digestAttackResult(data, roll).isFailure).equal(false);
