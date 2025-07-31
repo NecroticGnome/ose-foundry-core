@@ -214,7 +214,7 @@ const OseDice = {
     result.victim = data.roll.target || null;
 
     if (game.settings.get(game.system.id, "ascendingAC")) {
-      const attackBonus = 19 - data.roll.thac0;
+      const attackBonus = 0; // Attack bonus is already included in the roll
       if (
         this.attackIsSuccess(roll, targetAac, attackBonus) ||
         result.victim == null
