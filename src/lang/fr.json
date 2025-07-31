@@ -27,6 +27,8 @@
   "OSE.dialog.generateScore": "Création: {score} ({count})",
   "OSE.dialog.deleteContainer": "Supprimer le conteneur?",
   "OSE.dialog.confirmDeleteContainer": "Voulez-vous vraiment supprimer le conteneur?",
+  "OSE.dialog.deleteItem": "Supprimer l'élément?",
+  "OSE.dialog.confirmDeleteItem": "Êtes-vous sûr de vouloir supprimer \"{name}\"?",
 
   "OSE.Formula": "Formule",
   "OSE.SitMod": "Mod. de situation",

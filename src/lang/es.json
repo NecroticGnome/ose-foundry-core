@@ -29,6 +29,8 @@
   "OSE.dialog.purchaseFor": "Comprar por {totalCost} MO",
   "OSE.dialog.deleteContainer": "¿Eliminar recipiente?",
   "OSE.dialog.confirmDeleteContainer": "¿Estás seguro de que quieres eliminar el recipiente?",
+  "OSE.dialog.deleteItem": "¿Eliminar elemento?",
+  "OSE.dialog.confirmDeleteItem": "¿Estás seguro de que quieres eliminar \"{name}\"?",
   "OSE.Formula": "Fórmula",
   "OSE.SitMod": "Modificador situacional",
   "OSE.Modifier": "Modificador",

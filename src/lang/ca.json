@@ -26,6 +26,8 @@
   "OSE.dialog.generateScore": "Tirant {score} ({count})",
   "OSE.dialog.shoppingCart": "Cistella de compra",
   "OSE.dialog.purchaseFor": "Compres per {totalCost} po",
+  "OSE.dialog.deleteItem": "Suprimir l'element?",
+  "OSE.dialog.confirmDeleteItem": "Esteu segur que voleu suprimir \"{name}\"?",
   "OSE.Formula": "Fórmula",
   "OSE.SitMod": "Modificador situacional",
   "OSE.Modifier": "Modificador",

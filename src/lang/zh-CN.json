@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "购物花费 {totalCost} GP",
   "OSE.dialog.deleteContainer": "删除容器？",
   "OSE.dialog.confirmDeleteContainer": "你确定要删除该容器吗？",
+  "OSE.dialog.deleteItem": "删除项目？",
+  "OSE.dialog.confirmDeleteItem": "您确定要删除“{name}”吗？",
   "OSE.Formula": "公式",
   "OSE.SitMod": "环境调整值",
   "OSE.Modifier": "调整值",

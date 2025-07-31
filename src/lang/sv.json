@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "Köp för {totalCost}GP",
   "OSE.dialog.deleteContainer": "Ta bort behållare?",
   "OSE.dialog.confirmDeleteContainer": "Är du säker på att du vill ta bort den här behållaren?",
+  "OSE.dialog.deleteItem": "Ta bort objekt?",
+  "OSE.dialog.confirmDeleteItem": "Är du säker på att du vill ta bort \"{name}\"?",
   "OSE.Formula": "Formel",
   "OSE.SitMod": "Situationell modifiering",
   "OSE.Modifier": "Modifierare",

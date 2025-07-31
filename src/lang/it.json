@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "Compra per {totalCost}MO",
   "OSE.dialog.deleteContainer": "Eliminare il contenitore?",
   "OSE.dialog.confirmDeleteContainer": "Sei sicuro di voler eliminare il contenitore?",
+  "OSE.dialog.deleteItem": "Eliminare l'elemento?",
+  "OSE.dialog.confirmDeleteItem": "Sei sicuro di voler eliminare \"{name}\"?",
   "OSE.Formula": "Formula",
   "OSE.SitMod": "Modificatore di Circostanza",
   "OSE.Modifier": "Modificatore",

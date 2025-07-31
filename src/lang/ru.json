@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "Купить {totalCost}GP",
   "OSE.dialog.deleteContainer": "Удалить контейнер?",
   "OSE.dialog.confirmDeleteContainer": "Вы уверены что хотите удалить этот контейнер?",
+  "OSE.dialog.deleteItem": "Удалить элемент?",
+  "OSE.dialog.confirmDeleteItem": "Вы уверены, что хотите удалить \"{name}\"?",
   "OSE.Formula": "Формула",
   "OSE.SitMod": "Ситуационный модификатор",
   "OSE.Modifier": "Модификатор",

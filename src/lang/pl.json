@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "Kup za {totalCost} złota",
   "OSE.dialog.deleteContainer": "Usunąć pojemnik?",
   "OSE.dialog.confirmDeleteContainer": "Czy na pewno chcesz usunąć pojemnik?",
+  "OSE.dialog.deleteItem": "Usunąć element?",
+  "OSE.dialog.confirmDeleteItem": "Czy na pewno chcesz usunąć \"{name}\"?",
   "OSE.Formula": "Wzór",
   "OSE.SitMod": "Modyfikator sytuacyjny",
   "OSE.Modifier": "Modyfikator",

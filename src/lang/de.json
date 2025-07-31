@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "Einkauf für {totalCost}GP",
   "OSE.dialog.deleteContainer": "Container löschen?",
   "OSE.dialog.confirmDeleteContainer": "Sind Sie sicher, dass Sie den Container löschen möchten?",
+  "OSE.dialog.deleteItem": "Eintrag löschen?",
+  "OSE.dialog.confirmDeleteItem": "Sind Sie sicher, dass Sie \"{name}\" löschen möchten?",
   "OSE.Formula": "Formel",
   "OSE.SitMod": "Situationsmodifikator",
   "OSE.Modifier": "Modifikator",

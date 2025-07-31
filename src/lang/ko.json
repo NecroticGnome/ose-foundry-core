@@ -28,6 +28,8 @@
   "OSE.dialog.purchaseFor": "{totalCost}GP 지불",
   "OSE.dialog.deleteContainer": "컨테이너 삭제",
   "OSE.dialog.confirmDeleteContainer": "이 컨테이너를 삭제하시겠습니까?",
+  "OSE.dialog.deleteItem": "항목을 삭제하시겠습니까?",
+  "OSE.dialog.confirmDeleteItem": "\"{name}\"을(를) 정말로 삭제하시겠습니까?",
   "OSE.Formula": "수식",
   "OSE.SitMod": "환경 수정치",
   "OSE.Modifier": "수정치",

@@ -642,14 +642,18 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".item-delete").click((event) => {
       const item = this._getItemFromActor(event);
 
-      if (item?.type !== "container" || !item?.system?.itemIds?.length > 0)
-        return this._removeItemFromActor(item);
-
-      Dialog.confirm({
-        title: game.i18n.localize("OSE.dialog.deleteContainer"),
-        content: game.i18n.localize("OSE.dialog.confirmDeleteContainer"),
-        yes: () => {
-          this._removeItemFromActor(item);
+      foundry.applications.api.DialogV2.confirm({
+        window: {
+          title: game.i18n.localize("OSE.dialog.deleteItem"),
+        },
+        content: game.i18n.format("OSE.dialog.confirmDeleteItem", {
+          name: item.name,
+        }),
+        yes: {
+          default: false,
+          callback: () => {
+            this._removeItemFromActor(item);
+          },
         },
         defaultYes: false,
       });
