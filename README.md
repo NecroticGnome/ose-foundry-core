@@ -35,7 +35,7 @@ The free Community-Made Classic Fantasy Compendium is a Foundry VTT module separ
 You may also copy the manifest link below and paste it into the manifest link input box.
 
 ```console
-https://github.com/unifiedfantasytoolkit/classicfantasycompendium/releases/latest/download/module.json
+https://github.com/unitedfantasytoolkit/classicfantasycompendium/releases/latest/download/module.json
 ```
 
 ## Your Support
