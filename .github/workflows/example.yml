@@ -1,0 +1,16 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run workflow
+        run: echo "Workflow ran successfully."
