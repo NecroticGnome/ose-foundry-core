@@ -1,9 +1,14 @@
+# EXAMPLE:
+# git tag 2.1.2
+# git push origin main
+# git push origin 2.1.2
+# .github/workflows/release.yml
 name: Release Creation
 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'  # Release tags
 
 jobs:
   build:
@@ -46,10 +51,10 @@ jobs:
         env:
           id: ose
           title: "Old-School Essentials"
-          version: ${{github.event.release.tag_name}}
+          version: ${{github.ref_name}}
           url: https://github.com/${{github.repository}}
-          manifest: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.json
-          download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.zip
+          manifest: https://github.com/${{github.repository}}/releases/download/${{github.ref_name}}/system.json
+          download: https://github.com/${{github.repository}}/releases/download/${{github.ref_name}}/system.zip
 
       # Replace "ose-dev" with "ose" in all files inside the dist folder
       - name: Replace 'ose-dev' with 'ose' in dist folder
@@ -61,16 +66,24 @@ jobs:
         # Remember to update the below line when there's a change in repository files/directories
         run: zip -r ./system.zip system.json template.json dist/ assets/ LICENSE.OGL LICENSE.GPL LICENSE.OTHER.OSE_THIRD_PARTY_V1_5 AUTHORS
 
+      - name: Prepare release notes
+        id: prepare_notes
+        run: |
+          echo "" > release_notes.txt
+          echo "" >> release_notes.txt
+          echo "To install manually, use this URL:" >> release_notes.txt
+          echo "https://github.com/${{github.repository}}/releases/download/${{github.ref_name}}/system.json" >> release_notes.txt
+
       # Create a release for this specific version
       - name: Update Release with Files
         id: create_version_release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Set this to false if you want to prevent updating existing releases
-          name: ${{ github.event.release.name }}
+          name: ${{ github.ref_name }}
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "./system.json, ./system.zip"
-          tag: ${{ github.event.release.tag_name }}
-          body: ${{ github.event.release.body }}
+          tag: ${{ github.ref_name }}
+          bodyfile: release_notes.txt
