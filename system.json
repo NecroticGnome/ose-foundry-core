@@ -111,11 +111,11 @@
     },
     {
       "type": "setup",
-      "url": "systems/ose-dev/assets/ose-system.webp",
-      "thumbnail": "systems/ose-dev/assets/ose-system-thumbnail.webp"
+      "url": "systems/ose/assets/ose-system.webp",
+      "thumbnail": "systems/ose/assets/ose-system-thumbnail.webp"
     }
   ],
-  "background": "systems/ose-dev/assets/ose-system.webp",
+  "background": "systems/ose/assets/ose-system.webp",
   "flags": {
     "allowBugReporter": true
   },
