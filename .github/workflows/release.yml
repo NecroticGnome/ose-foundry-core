@@ -1,8 +1,12 @@
 name: Release Creation
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number for the release'
+        required: true
+        default: '2.1.0'
 
 jobs:
   build:
@@ -45,10 +49,10 @@ jobs:
         env:
           id: ose
           title: "Old-School Essentials"
-          version: ${{github.event.release.tag_name}}
+          version: ${{github.event.inputs.version}}
           url: https://github.com/${{github.repository}}
-          manifest: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.json
-          download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.zip
+          manifest: https://github.com/${{github.repository}}/releases/download/${{github.event.inputs.version}}/system.json
+          download: https://github.com/${{github.repository}}/releases/download/${{github.event.inputs.version}}/system.zip
 
       # Replace "ose-dev" with "ose" in all files inside the dist folder
       - name: Replace 'ose-dev' with 'ose' in dist folder
@@ -66,10 +70,10 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Set this to false if you want to prevent updating existing releases
-          name: ${{ github.event.release.name }}
+          name: "Release v${{ github.event.inputs.version }}"
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "./system.json, ./system.zip"
-          tag: ${{ github.event.release.tag_name }}
+          tag: ${{ github.event.inputs.version }}
           body: ${{ github.event.release.body }}
