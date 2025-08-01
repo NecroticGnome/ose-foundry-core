@@ -1,12 +1,8 @@
 name: Release Creation
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number for the release'
-        required: true
-        default: '2.1.0'
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -14,22 +10,13 @@ jobs:
     steps:
       # Standard required steps for a Node.js package
       - name: Checkout repository to add to workspace
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js version 22
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      # # Caching to improve build speed
-      - name: Enable caching for Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: .npm
-          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-
-            ${{ runner.OS }}-
+          node-version: 22
+          cache: 'npm'
 
       # Get dev dependencies for the package, including Gulp and Rollup
       - name: Install dev dependencies
@@ -49,10 +36,10 @@ jobs:
         env:
           id: ose
           title: "Old-School Essentials"
-          version: ${{github.event.inputs.version}}
+          version: ${{github.event.release.tag_name}}
           url: https://github.com/${{github.repository}}
-          manifest: https://github.com/${{github.repository}}/releases/download/${{github.event.inputs.version}}/system.json
-          download: https://github.com/${{github.repository}}/releases/download/${{github.event.inputs.version}}/system.zip
+          manifest: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.json
+          download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/system.zip
 
       # Replace "ose-dev" with "ose" in all files inside the dist folder
       - name: Replace 'ose-dev' with 'ose' in dist folder
@@ -70,10 +57,10 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # Set this to false if you want to prevent updating existing releases
-          name: "Release v${{ github.event.inputs.version }}"
+          name: ${{ github.event.release.name }}
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "./system.json, ./system.zip"
-          tag: ${{ github.event.inputs.version }}
+          tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
