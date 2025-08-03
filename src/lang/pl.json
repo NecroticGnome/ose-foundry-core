@@ -38,6 +38,7 @@
   "OSE.RollExample": "np. +1d4",
   "OSE.roll.formula": "Rzut na: {label}",
   "OSE.roll.appearing": "Appearing roll ({type})",
+  "OSE.roll.loyalty": "Rzut na Lojalność",
   "OSE.roll.morale": "Rzut na Morale",
   "OSE.roll.hd": "Rzut na Trafienie",
   "OSE.roll.attacksWith": "Atakuje za pomocą {name}",

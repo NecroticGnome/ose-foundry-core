@@ -36,6 +36,7 @@
   "OSE.RollExample": "p. ex. +1d4",
   "OSE.roll.formula": "Tirada {label}",
   "OSE.roll.appearing": "Tirada d'atacants ({type})",
+  "OSE.roll.loyalty": "Prova de lealdade",
   "OSE.roll.morale": "Prova de moral",
   "OSE.roll.hd": "Tirada de Daus de Cop",
   "OSE.roll.attacksWith": "Ataca amb {name}",

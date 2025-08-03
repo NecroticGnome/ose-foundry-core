@@ -38,6 +38,7 @@
   "OSE.RollExample": "예시: +1d4",
   "OSE.roll.formula": "{label} 굴림",
   "OSE.roll.appearing": "({type}) 공개 굴림",
+  "OSE.roll.loyalty": "충의 체크",
   "OSE.roll.morale": "사기 체크",
   "OSE.roll.hd": "히트 다이스 굴림",
   "OSE.roll.attacksWith": "{name} 으로 공격",
