@@ -38,6 +38,7 @@
   "OSE.RollExample": "напр. +1d4",
   "OSE.roll.formula": "{label} ролл",
   "OSE.roll.appearing": "Появление ролла ({type})",
+  "OSE.roll.loyalty": "Верность проверка",
   "OSE.roll.morale": "Моральная проверка",
   "OSE.roll.hd": "Ролл кубиков",
   "OSE.roll.attacksWith": "Атаки с {name}",

@@ -38,6 +38,7 @@
   "OSE.RollExample": "ex. +1d4",
   "OSE.roll.formula": "Rolagem de {label}",
   "OSE.roll.appearing": "Aparecimento da rolagem ({type})",
+  "OSE.roll.loyalty": "Teste de Lealdade",
   "OSE.roll.morale": "Teste de Moral",
   "OSE.roll.hd": "Rolar Dado de Vida",
   "OSE.roll.attacksWith": "Ataca com {name}",

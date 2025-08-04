@@ -38,6 +38,7 @@
   "OSE.RollExample": "z.B. +1W4",
   "OSE.roll.formula": "{label} würfeln",
   "OSE.roll.appearing": "Anzahl würfeln ({type})",
+  "OSE.roll.loyalty": "Treueprobe",
   "OSE.roll.morale": "Moralprobe",
   "OSE.roll.hd": "Trefferwürfel wurf",
   "OSE.roll.attacksWith": "Angriffe mit {name}",

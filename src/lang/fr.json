@@ -39,6 +39,7 @@
 
   "OSE.roll.formula": "Jet de {label}",
   "OSE.roll.appearing": "Nombre Apparaissant",
+  "OSE.roll.loyalty": "Jet de Loyauté",
   "OSE.roll.morale": "Jet de Moral",
   "OSE.roll.hd": "Lancer de Dé de Vie",
   "OSE.roll.attacksWith": "Attaque avec {name}",

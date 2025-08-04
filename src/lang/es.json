@@ -39,6 +39,7 @@
   "OSE.RollExample": "ej. +1d4",
   "OSE.roll.formula": "Tira {label}",
   "OSE.roll.appearing": "Tirada de atacantes ({type})",
+  "OSE.roll.loyalty": "Chequeo de Lealtad",
   "OSE.roll.morale": "Chequeo de Moral",
   "OSE.roll.hd": "Tirada de Dados de Golpe",
   "OSE.roll.attacksWith": "Ataca con {name}",
