@@ -35,9 +35,6 @@ import { OSECombatant } from "./module/combat/combatant";
 import TokenRulerOSE from "./module/actor/token-ruler";
 
 import "./e2e";
-import polyfill from "./module/polyfill";
-
-polyfill();
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
