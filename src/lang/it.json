@@ -38,6 +38,7 @@
   "OSE.RollExample": "es. +1d4",
   "OSE.roll.formula": "{label} tiro",
   "OSE.roll.appearing": "Tiro nr. Mostri ({type})",
+  "OSE.roll.loyalty": "Tiro sul Fedeltà",
   "OSE.roll.morale": "Tiro sul Morale",
   "OSE.roll.hd": "Tiro dei Dadi Vita",
   "OSE.roll.attacksWith": "Attacca con {name}",

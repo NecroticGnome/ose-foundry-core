@@ -42,6 +42,7 @@
 
   "OSE.roll.formula": "{label} roll",
   "OSE.roll.appearing": "Appearing roll ({type})",
+  "OSE.roll.loyalty": "Loyalty check",
   "OSE.roll.morale": "Morale check",
   "OSE.roll.hd": "Hit Dice roll",
   "OSE.roll.attacksWith": "Attacks with {name}",

@@ -38,6 +38,7 @@
   "OSE.RollExample": "例如，+1d4",
   "OSE.roll.formula": "{label} 投骰",
   "OSE.roll.appearing": "出现数量投骰 ({type})",
+  "OSE.roll.loyalty": "忠诚度检查",
   "OSE.roll.morale": "士气检定",
   "OSE.roll.hd": "生命骰投骰",
   "OSE.roll.attacksWith": "用 {name} 发起攻击",

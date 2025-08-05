@@ -30,7 +30,6 @@
 		"jsdoc/empty-tags": 1, // Recommended
 		"jsdoc/implements-on-classes": 1, // Recommended
 		"jsdoc/multiline-blocks": 1, // Recommended
-		"jsdoc/newline-after-description": 1, // Recommended
 		"jsdoc/no-bad-blocks": 1,
 		"jsdoc/no-multi-asterisks": 1, // Recommended
 		"jsdoc/no-undefined-types": 1, // Recommended
@@ -53,7 +52,7 @@
 		"jsdoc/require-returns-type": 1, // Recommended
 		"jsdoc/require-yields": 1, // Recommended
 		"jsdoc/require-yields-check": 1, // Recommended
-		"jsdoc/tag-lines": 1, // Recommended
+		"jsdoc/tag-lines": 1, // for "eslint-plugin-jsdoc": "^52.0.2", this replaces "jsdoc/newline-after-description": 1 
 		"jsdoc/valid-types": 1, // Recommended
 		"ecmascript-compat/compat": "off", // Disabled because core uses async
 		"unicorn/no-array-reduce": "off", // Disabled because Array#reduce is helpful

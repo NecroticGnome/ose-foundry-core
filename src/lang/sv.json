@@ -38,6 +38,7 @@
   "OSE.RollExample": "Till exempel +1d4",
   "OSE.roll.formula": "Rulla {label}",
   "OSE.roll.appearing": "Rullar antal som dyker upp ({type})",
+  "OSE.roll.loyalty": "Leialtasunakontroll",
   "OSE.roll.morale": "Moralkontroll",
   "OSE.roll.hd": "Rullar hälsotärning",
   "OSE.roll.attacksWith": "Attackerar med {name}",
