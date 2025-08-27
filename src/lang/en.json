@@ -344,6 +344,7 @@
   "TYPES.Item.ability": "Ability",
   "TYPES.Item.armor": "Armor",
   "TYPES.Item.container": "Container",
+  "TYPES.Item.item": "Item",
   "TYPES.Item.spell": "Spell",
   "TYPES.Item.weapon": "Weapon"
 }
