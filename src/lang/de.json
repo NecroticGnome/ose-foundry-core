@@ -303,5 +303,12 @@
   "OSE.error.noTokenControlled": "Sie müssen über ein oder mehrere kontrollierte Token verfügen, um diese Option nutzen zu können.",
   "OSE.error.noGP": "Sie benötigen einen GM-Artikel, um diese Funktion zu nutzen.",
   "OSE.error.unexpectedSettings": "unerwartete OSE-Einstellung {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "Kann {nameOrId} keinen Schaden zufügen"
+  "OSE.error.cantDealDamageTo": "Kann {nameOrId} keinen Schaden zufügen",
+  "TYPES.Base": "Basis",
+  "TYPES.Item.ability": "Fähigkeit",
+  "TYPES.Item.armor": "Rüstung",
+  "TYPES.Item.container": "Behälter",
+  "TYPES.Item.item": "Gegenstand",
+  "TYPES.Item.spell": "Zauber",
+  "TYPES.Item.weapon": "Waffe"
 }

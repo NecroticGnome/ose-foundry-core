@@ -299,5 +299,12 @@
   "OSE.error.noTokenControlled": "Для использования этой опции необходимо иметь один или несколько контролируемых токенов.",
   "OSE.error.noGP": "Для использования этой функции необходим GP предмет.",
   "OSE.error.unexpectedSettings": "неожиданная настройка OSE {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "Невозможно нанести урон {nameOrId}"
+  "OSE.error.cantDealDamageTo": "Невозможно нанести урон {nameOrId}",
+  "TYPES.Base": "База",
+  "TYPES.Item.ability": "Способность",
+  "TYPES.Item.armor": "Доспехи",
+  "TYPES.Item.container": "Контейнер",
+  "TYPES.Item.item": "Предмет",
+  "TYPES.Item.spell": "Заклинание",
+  "TYPES.Item.weapon": "Оружие"
 }

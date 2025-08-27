@@ -303,5 +303,12 @@
   "OSE.error.noTokenControlled": "Per poter utilizzare questa opzione, devi controllare almeno un Token.",
   "OSE.error.noGP": "Devi possedere un oggetto \"MO\" per poter utilizzare questa funzione.",
   "OSE.error.unexpectedSettings": "impostazione OSE non prevista {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "Impossibile infliggere il danno a {nameOrId}"
+  "OSE.error.cantDealDamageTo": "Impossibile infliggere il danno a {nameOrId}",
+  "TYPES.Base": "Base",
+  "TYPES.Item.ability": "Abilità",
+  "TYPES.Item.armor": "Armatura",
+  "TYPES.Item.container": "Contenitore",
+  "TYPES.Item.item": "Oggetto",
+  "TYPES.Item.spell": "Incantesimo",
+  "TYPES.Item.weapon": "Arma"
 }

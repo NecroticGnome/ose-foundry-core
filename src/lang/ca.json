@@ -287,5 +287,12 @@
   "OSE.error.notEnoughGP": "Aquest actor no té prou peces d'or per pagar el seu inventari.",
   "OSE.error.itemNoLongerExistsOnActor": "L'objecte {itemId} solicitat ja no existeix en l'actor {actorName}.",
   "OSE.error.noTokenControlled": "Cal controlar un o més avatars per poder fer servir aquesta opció.",
-  "OSE.error.noGP": "Necessites peces d'or per fer servir aquesta característica."
+  "OSE.error.noGP": "Necessites peces d'or per fer servir aquesta característica.",
+  "TYPES.Base": "Base",
+  "TYPES.Item.ability": "Habilitat",
+  "TYPES.Item.armor": "Armadura",
+  "TYPES.Item.container": "Contenidor",
+  "TYPES.Item.item": "Objecte",
+  "TYPES.Item.spell": "Encantament",
+  "TYPES.Item.weapon": "Arma"
 }
