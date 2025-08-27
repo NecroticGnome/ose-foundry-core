@@ -299,5 +299,12 @@
   "OSE.error.noTokenControlled": "이 옵션을 사용하려면 하나 이상의 제어 토큰이 있어야 합니다.",
   "OSE.error.noGP": "이 기능을 사용하려면 GP가 필요합니다.",
   "OSE.error.unexpectedSettings": "예기치 않은 OSE 설정 {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "{nameOrId}에게 피해를 입힐 수 없습니다"
+  "OSE.error.cantDealDamageTo": "{nameOrId}에게 피해를 입힐 수 없습니다",
+  "TYPES.Base": "기본",
+  "TYPES.Item.ability": "능력",
+  "TYPES.Item.armor": "방어구",
+  "TYPES.Item.container": "컨테이너",
+  "TYPES.Item.item": "아이템",
+  "TYPES.Item.spell": "주문",
+  "TYPES.Item.weapon": "무기"
 }

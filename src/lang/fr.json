@@ -292,5 +292,13 @@
   "OSE.reaction.Unfriendly": "{name} est Inamical",
   "OSE.reaction.Neutral": "{name} est Neutre",
   "OSE.reaction.Indifferent": "{name} est Indifférent",
-  "OSE.reaction.Friendly": "{name} est Amical"
+  "OSE.reaction.Friendly": "{name} est Amical",
+
+  "TYPES.Base": "Base",
+  "TYPES.Item.ability": "Aptitude",
+  "TYPES.Item.armor": "Armure",
+  "TYPES.Item.container": "Conteneur",
+  "TYPES.Item.item": "Objet",
+  "TYPES.Item.spell": "Sort",
+  "TYPES.Item.weapon": "Arme"
 }

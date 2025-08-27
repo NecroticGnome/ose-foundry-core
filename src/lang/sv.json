@@ -293,5 +293,12 @@
   "OSE.error.notEnoughGP": "Denna aktör har inte tillräckligt med GP för att betala för sin varukorg.",
   "OSE.error.itemNoLongerExistsOnActor": "Den begärda artikeln {itemId} finns inte längre på aktör {actorName}.",
   "OSE.error.noTokenControlled": "Du måste ha en eller flera kontrollerade aktörtokens för att kunna använda detta alternativ.",
-  "OSE.error.noGP": "Du behöver ett GP objekt för att använda denna funktion."
+  "OSE.error.noGP": "Du behöver ett GP objekt för att använda denna funktion.",
+  "TYPES.Base": "Bas",
+  "TYPES.Item.ability": "Färdighet",
+  "TYPES.Item.armor": "Rustning",
+  "TYPES.Item.container": "Behållare",
+  "TYPES.Item.item": "Föremål",
+  "TYPES.Item.spell": "Besvärjelse",
+  "TYPES.Item.weapon": "Vapen"
 }
