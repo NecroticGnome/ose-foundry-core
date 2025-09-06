@@ -30,12 +30,12 @@ https://github.com/NecroticGnome/ose-foundry-core/releases/latest/download/syste
 
 ### Open Game Content Compendium
 
-The free Community-Made Classic Fantasy Compendium is a Foundry VTT module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `classicfantasy`. It is 100% Open Game Content, and free for all.
+The free Community-Made [Classic Fantasy Compendium](https://foundryvtt.com/packages/classicfantasycompendium) is a Foundry VTT module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `classicfantasy`. It is 100% Open Game Content, and free for all.
 
 You may also copy the manifest link below and paste it into the manifest link input box.
 
 ```console
-https://github.com/unitedfantasytoolkit/classicfantasycompendium/releases/latest/download/module.json
+https://github.com/NecroticGnome/ose-foundry-content/releases/latest/download/module.json
 ```
 
 ## Your Support
