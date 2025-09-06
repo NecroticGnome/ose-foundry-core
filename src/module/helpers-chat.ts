@@ -73,6 +73,8 @@ function applyChatCardDamage(html: HTMLElement, multiplier: 1 | -1) {
  * @param {HTMLElement} html - The chat card HTML element
  */
 function canApplyDamage(html: HTMLElement) {
+  if (!game.user?.isGM) return false;
+
   if (!html.querySelector(".dice-total")) return false;
   const applyDamageOption = game.settings.get(
     game.system.id,
