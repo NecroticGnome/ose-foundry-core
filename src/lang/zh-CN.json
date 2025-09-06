@@ -303,5 +303,12 @@
   "OSE.error.noTokenControlled": "您必须有一个或多个受控指示物才能使用此选项。",
   "OSE.error.noGP": "你需要 GP 物品来使用此功能。",
   "OSE.error.unexpectedSettings": "未预期的 OSE 设置 {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "无法对 {nameOrId} 造成伤害"
+  "OSE.error.cantDealDamageTo": "无法对 {nameOrId} 造成伤害",
+  "TYPES.Base": "基础",
+  "TYPES.Item.ability": "能力",
+  "TYPES.Item.armor": "护甲",
+  "TYPES.Item.container": "容器",
+  "TYPES.Item.item": "物品",
+  "TYPES.Item.spell": "法术",
+  "TYPES.Item.weapon": "武器"
 }

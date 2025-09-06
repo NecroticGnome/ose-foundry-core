@@ -299,5 +299,12 @@
   "OSE.error.noTokenControlled": "Musisz mieć jedną lub więcej kontrolowanych postaci, aby użyć tej opcji.",
   "OSE.error.noGP": "Potrzebujesz SZ, aby tego użyć.",
   "OSE.error.unexpectedSettings": "nieoczekiwane ustawienie OSE {configName}: {configValue}",
-  "OSE.error.cantDealDamageTo": "Nie można zadać obrażeń dla {nameOrId}"
+  "OSE.error.cantDealDamageTo": "Nie można zadać obrażeń dla {nameOrId}",
+  "TYPES.Base": "Baza",
+  "TYPES.Item.ability": "Umiejętność",
+  "TYPES.Item.armor": "Zbroja",
+  "TYPES.Item.container": "Pojemnik",
+  "TYPES.Item.item": "Przedmiot",
+  "TYPES.Item.spell": "Zaklęcie",
+  "TYPES.Item.weapon": "Broń"
 }

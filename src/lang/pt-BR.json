@@ -299,5 +299,12 @@
   "OSE.error.noTokenControlled": "Você deve ter um ou mais Tokens controlados para poder usar esta opção.",
   "OSE.error.noGP": "Você precisa do item PO para usar este recurso.",
   "OSE.error.unexpectedSettings": "configuração OSE inesperada {configName}{configValue}",
-  "OSE.error.cantDealDamageTo": "Não é possível causar dano em {nameOrId}"
+  "OSE.error.cantDealDamageTo": "Não é possível causar dano em {nameOrId}",
+  "TYPES.Base": "Base",
+  "TYPES.Item.ability": "Habilidade",
+  "TYPES.Item.armor": "Armadura",
+  "TYPES.Item.container": "Contêiner",
+  "TYPES.Item.item": "Item",
+  "TYPES.Item.spell": "Magia",
+  "TYPES.Item.weapon": "Arma"
 }
