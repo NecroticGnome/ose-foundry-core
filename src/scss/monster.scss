@@ -17,7 +17,7 @@
           line-height: 35px;
           flex: 0 0 20px;
           position: absolute;
-          font-size: 12px;
+          font-size: var(--font-size-12);
           &:hover {
             color: $colorDark;
           }
@@ -59,7 +59,7 @@
     .attribute.health {
       position: relative;
       .attribute-name .hp-roll {
-        font-size: 12px;
+        font-size: var(--font-size-12);
         position: absolute;
         right: 5px;
         top: 5px;

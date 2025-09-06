@@ -79,7 +79,7 @@
         }
 
         .field-short {
-          font-size: 12px;
+          font-size: var(--font-size-12);
           flex-basis: 45px;
           flex-grow: 0;
           text-align: center;
@@ -109,7 +109,7 @@
       text-align: center;
       border: 1px solid $colorFaint;
       background: $colorOlive;
-      font-size: 10px;
+      font-size: var(--font-size-10);
       color: whitesmoke;
       border-radius: 3px;
       box-shadow: 0 0 1px $colorFaint;
@@ -190,11 +190,11 @@
 
       .fas {
         padding: 0 2px;
-        font-size: 10px;
+        font-size: var(--font-size-10);
       }
 
       margin-bottom: 2px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
       text-align: center;
 
       .fields .field-row {
@@ -231,7 +231,7 @@
           button {
             display: none;
             cursor: pointer;
-            font-size: 10px;
+            font-size: var(--font-size-10);
             height: 18px;
             width: 14px;
             line-height: 13px;
@@ -358,7 +358,7 @@
         line-height: 34px;
         margin: 0;
         text-indent: 10px;
-        font-size: 16px;
+        font-size: var(--font-size-16);
         word-break: break-all;
         color: white;
       }
@@ -378,11 +378,11 @@
 
   .chat-details {
     padding: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .roll-result {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     text-align: center;
 
     &.roll-success {
@@ -427,7 +427,7 @@
 
 .ose.chat-card {
   font-style: normal;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
   .card-header {
     padding: 3px 0;
@@ -530,7 +530,7 @@
 
         div {
           text-indent: 10px;
-          font-size: 14px;
+          font-size: var(--font-size-14);
           font-weight: bold;
         }
 
@@ -548,13 +548,13 @@
 
         div {
           text-indent: 10px;
-          font-size: 14px;
+          font-size: var(--font-size-14);
         }
       }
     }
 
     h3 {
-      font-size: 12px;
+      font-size: var(--font-size-12);
       margin: 0;
       font-weight: bold;
     }
@@ -578,7 +578,7 @@
     }
 
     button {
-      font-size: 12px;
+      font-size: var(--font-size-12);
       height: 24px;
       line-height: 20px;
       margin: 2px 0;
@@ -592,7 +592,7 @@
     span {
       border-right: 2px groove #fff;
       padding: 0 5px 0 0;
-      font-size: 10px;
+      font-size: var(--font-size-10);
 
       &:last-child {
         border-right: none;
@@ -642,7 +642,7 @@
       pointer-events: none;
       white-space: nowrap;
       margin: 1px;
-      font-size: 10px;
+      font-size: var(--font-size-10);
       line-height: 12px;
       background: $colorOlive;
       padding: 1px 3px;
@@ -672,7 +672,7 @@
         pointer-events: none;
         white-space: nowrap;
         margin: 0 1px;
-        font-size: 10px;
+        font-size: var(--font-size-10);
         line-height: 12px;
         background: $colorOlive;
         padding: 1px 3px;

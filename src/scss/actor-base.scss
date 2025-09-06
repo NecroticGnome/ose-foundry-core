@@ -38,7 +38,7 @@
         flex: 1;
       }
       .item-controls {
-        font-size: 12px;
+        font-size: var(--font-size-12);
         flex: 0 0 18px;
       }
     }
@@ -121,7 +121,7 @@
       border-top-left-radius: 80px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.15);
       box-shadow: 0 0 6px 1px $colorDark;
-      font-size: 12px;
+      font-size: var(--font-size-12);
       filter: brightness(0.9);
       &.active {
         filter: none;
@@ -219,7 +219,7 @@
         box-shadow: 0 0 5px $colorDark;
         line-height: 16px;
         font-weight: 300;
-        font-size: 13px;
+        font-size: var(--font-size-13);
         background: $darkBackground;
         color: white;
         cursor: pointer;
@@ -253,7 +253,7 @@
           }
         }
         .item-description {
-          font-size: 13px;
+          font-size: var(--font-size-13);
           padding: 0 4px;
           line-height: 20px;
           border-bottom: 1px solid $colorTan;
@@ -363,34 +363,34 @@
           flex: 0 0 24px;
         }
         span {
-          font-size: 12px;
+          font-size: var(--font-size-12);
           flex-grow: 0;
         }
       }
       .field-flex {
         flex: 1;
         text-align: left;
-        font-size: 12px;
+        font-size: var(--font-size-12);
         text-indent: 8px;
       }
       .field-longer {
         text-indent: 8px;
         text-align: left;
         flex-basis: 90px;
-        font-size: 12px;
+        font-size: var(--font-size-12);
       }
       .field-long {
         flex-basis: 65px;
         flex-grow: 0;
         text-align: center;
-        font-size: 12px;
+        font-size: var(--font-size-12);
         &.memorize input {
           border-bottom: none;
           margin: 3px 0;
         }
       }
       .field-short {
-        font-size: 12px;
+        font-size: var(--font-size-12);
         flex-basis: 45px;
         flex-grow: 0;
         text-align: center;
@@ -408,7 +408,7 @@
         cursor: pointer;
       }
       .item-controls {
-        font-size: 12px;
+        font-size: var(--font-size-12);
         flex-basis: 60px;
         flex-grow: 0;
         text-align: right;
