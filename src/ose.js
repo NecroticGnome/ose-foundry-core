@@ -203,7 +203,12 @@ Hooks.on("renderCombatTracker", (app, html) =>
 );
 /** @param {OSECombatant} combatant */
 Hooks.on("createCombatant", (combatant) => {
-  if (game.settings.get(game.system.id, "initiative") !== "group") return;
+  if (
+    game.settings.get(game.system.id, "initiative") !== "group" ||
+    !game.user.isGM
+  ) {
+    return;
+  }
   combatant.assignGroup();
 });
 
