@@ -308,51 +308,51 @@ export default class OseItem extends Item {
     }
     const newData = {};
     const regExp = /\(([^)]+)\)/;
-    if (update) {
-      values.forEach((val) => {
-        // Catch infos in brackets
-        const matches = regExp.exec(val);
-        let title = "";
-        if (matches) {
-          title = matches[1];
-          val = val.slice(0, Math.max(0, matches.index)).trim();
-        } else {
-          val = val.trim();
-          title = val;
-        }
-        // Auto fill checkboxes
-        switch (title.toLowerCase()) {
-          case CONFIG.OSE.tags.melee.toLowerCase(): {
-            newData.melee = true;
-            break;
-          }
-
-          case CONFIG.OSE.tags.slow.toLowerCase(): {
-            newData.slow = true;
-            break;
-          }
-
-          case CONFIG.OSE.tags.missile.toLowerCase(): {
-            newData.missile = true;
-            break;
-          }
+    values.forEach((val) => {
+      // Catch infos in brackets
+      const matches = regExp.exec(val);
+      let title = "";
+      if (matches) {
+        title = matches[1];
+        val = val.slice(0, Math.max(0, matches.index)).trim();
+      } else {
+        val = val.trim();
+        title = val;
+      }
+      // Auto fill checkboxes
+      switch (title.toLowerCase()) {
+        case CONFIG.OSE.tags.melee.toLowerCase(): {
+          newData.melee = true;
+          break;
         }
 
-        // Add the tag if it has a specific title or if it is not a checkbox
-        if (
-          title !== val ||
-          (!newData.melee && !newData.slow && !newData.missile)
-        ) {
-          update.push({
-            title,
-            value: val,
-            label: val,
-          });
+        case CONFIG.OSE.tags.slow.toLowerCase(): {
+          newData.slow = true;
+          break;
         }
-      });
-    } else {
-      update = values;
-    }
+
+        case CONFIG.OSE.tags.missile.toLowerCase(): {
+          newData.missile = true;
+          break;
+        }
+      }
+
+      // Add the tag if it has a specific title or if it is not a checkbox
+      if (
+        title !== val ||
+        (!newData.melee && !newData.slow && !newData.missile)
+      ) {
+        update.push({
+          title,
+          value: val,
+          label: val,
+        });
+      }
+
+      if (val === "Two-handed" && this.type === "weapon") {
+        newData.itemslots = 2;
+      }
+    });
     newData.tags = update;
     return this.update({ system: newData });
   }

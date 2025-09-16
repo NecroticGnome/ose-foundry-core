@@ -47,6 +47,10 @@ export default class OseDataModelCharacterEncumbranceComplete
     );
   }
 
+  static defineSchema() {
+    return super.defineSchema();
+  }
+
   // eslint-disable-next-line class-methods-use-this
   get steps() {
     return Object.values(OseDataModelCharacterEncumbrance.encumbranceSteps);

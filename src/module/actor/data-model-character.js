@@ -17,7 +17,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
 
     // eslint-disable-next-line new-cap
     this.encumbrance = new CONFIG.OSE.encumbrance(
-      this.encumbrance.max,
+      new CONFIG.OSE.encumbrance().max,
       [...this.parent.items],
       {
         significantTreasure: game.settings.get(
@@ -56,8 +56,13 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
 
   // @todo define schema options; stuff like min/max values and so on.
   static defineSchema() {
-    const { StringField, NumberField, BooleanField, ObjectField, SchemaField } =
-      foundry.data.fields;
+    const {
+      BooleanField,
+      NumberField,
+      ObjectField,
+      SchemaField,
+      StringField,
+    } = foundry.data.fields;
 
     return {
       spells: new ObjectField(),
@@ -65,7 +70,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
       details: new ObjectField(),
       ac: new ObjectField(),
       aac: new ObjectField(),
-      encumbrance: new ObjectField(),
+      encumbrance: CONFIG.OSE.encumbrance.defineSchema(),
       movement: new ObjectField(),
       config: new ObjectField(),
       initiative: new SchemaField({

@@ -1,0 +1,12 @@
+<div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
+  <span class="encumbrance-bar" style="width:{{pct}}%"></span>
+  {{#each steps as |s|}}
+  <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
+  <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
+  {{/each}}
+</div>
+{{#if @root.config.encumbranceStrengthMod}}
+<span class="encumbrance-label">{{value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
+{{else}}
+<span class="encumbrance-label">{{value}} / {{max}}</span>
+{{/if}}

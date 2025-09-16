@@ -49,6 +49,24 @@ export default class OseDataModelCharacterEncumbrance
     this.#max = max;
   }
 
+  static defineSchema() {
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
+      foundry.data.fields;
+
+    return new SchemaField({
+      variant: new StringField({ initial: "disabled" }),
+      enabled: new BooleanField({ initial: true }),
+      encumbered: new BooleanField({ initial: false }),
+      pct: new NumberField({ integer: false, initial: 0, min: 0, max: 100 }),
+      steps: new ArrayField(new NumberField()),
+      value: new NumberField({ integer: false }),
+      max: new NumberField({ integer: false }),
+      atFirstBreakpoint: new BooleanField({ initial: false }),
+      atSecondBreakpoint: new BooleanField({ initial: false }),
+      atThirdBreakpoint: new BooleanField({ initial: false }),
+    });
+  }
+
   get variant() {
     return this.#encumbranceVariant;
   }

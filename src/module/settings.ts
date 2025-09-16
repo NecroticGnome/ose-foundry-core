@@ -60,6 +60,7 @@ const registerSettings = () => {
     scope: "world",
     type: String,
     config: true,
+    requiresReload: true,
     choices: Object.values(CONFIG.OSE.encumbranceOptions).reduce((obj, enc) => {
       return { ...obj, [enc.type]: enc.localizedLabel };
     }, {}) as SettingConfig<EncumbranceOption>["choices"],

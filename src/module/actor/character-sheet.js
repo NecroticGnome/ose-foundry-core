@@ -95,6 +95,10 @@ export default class OseActorSheetCharacter extends OseActorSheet {
         { async: true }
       );
 
+    data.encumbranceTemplate =
+      OSE.encumbrance?.templateEncumbranceBar ||
+      `${OSE.systemPath()}/templates/actors/partials/character-encumbrance.html`;
+
     return data;
   }
 
