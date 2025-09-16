@@ -26,15 +26,16 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
       itemslots: new NumberField({ min: 0, initial: 0 }),
     };
   }
-  get cumulativeWeight(){
+
+  get cumulativeWeight() {
     return this.weight * this.quantity.value;
   }
 
-  get cumulativeCost(){
+  get cumulativeCost() {
     return this.cost * this.quantity.value;
   }
 
-  get cumulativeItemslots(){
+  get cumulativeItemslots() {
     return Math.ceil(this.itemslots * this.quantity.value);
   }
 
@@ -63,5 +64,28 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
     );
 
     return [...autoTags, ...this.manualTags].flat().filter((t) => !!t);
+  }
+
+  get isCoinsOrGems() {
+    if (!this.treasure) return false;
+
+    if (this.tags?.some((t) => t.value === "gems")) return true;
+
+    if (!this.parent?.name) return false;
+
+    const itemName = this.parent.name.toLowerCase();
+    if (itemName.endsWith(" coins")) return true;
+
+    const coins = [
+      "cp",
+      "sp",
+      "ep",
+      "gp",
+      "pp",
+      game.i18n.localize("OSE.items.gp.short").toLowerCase(),
+      game.i18n.localize("OSE.items.gp.long").toLowerCase(),
+    ];
+
+    return coins.includes(itemName);
   }
 }

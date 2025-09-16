@@ -388,7 +388,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     if (!alreadyExistsInContainer) {
       const newList = [...target.system.itemIds, latestItem.id];
       await target.update({ system: { itemIds: newList } });
-      await latestItem.update({ system: { containerId: target.id } });
+      await latestItem.update({ system: { containerId: target.id, equipped: false } });
     }
   }
 

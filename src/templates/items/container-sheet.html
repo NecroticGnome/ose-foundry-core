@@ -35,7 +35,9 @@
         </div>
         {{else}}
         <div class="form-group">
-          <label>{{localize 'OSE.items.ItemBasedEncumbrance'}}</label>
+          <label data-tooltip aria-label="{{localize 'OSE.items.ItemBasedEncumbranceLong'}}">
+            {{localize 'OSE.items.ItemBasedEncumbrance'}}
+          </label>
           <div class="form-fields">
             <input
               type="text"

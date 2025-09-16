@@ -413,116 +413,246 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       const enc = new EncumbranceItemBased();
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(enc.steps).to.have.members(
-        Object.values(OseDataModelCharacterEncumbrance.encumbranceSteps)
+        Object.values(EncumbranceItemBased.equippedEncumbranceSteps)
       );
     });
     describe("Returns current carried weight", () => {
-      it("As Percentage", () => {
-        const max = 1600;
-        const pct25 = 400;
-        const pct50 = 800;
-        const pct75 = 1200;
+      it("Equipped Slots", () => {
+        const matrix = [
+          {
+            quantity: 1,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 2,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 3,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 4,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 5,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 6,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 7,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 8,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: false,
+          },
+          {
+            quantity: 9,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: false,
+          },
+          {
+            quantity: 10,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: true,
+          },
+        ];
 
-        let enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct25, 1, { treasure: true }),
-        ]);
-        expect(enc.pct).to.equal(toPct(pct25, max));
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct50, 1, { treasure: true }),
-        ]);
-        expect(enc.pct).to.equal(toPct(pct50, max));
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct75, 1, { treasure: true }),
-        ]);
-        expect(enc.pct).to.equal(toPct(pct75, max));
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", max, 1, { treasure: true }),
-        ]);
-        expect(enc.pct).to.equal(100);
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", max, 1, { treasure: false }),
-        ]);
-        expect(enc.pct).to.equal(100);
-      });
-      it("As Value", () => {
-        const max = 1600;
-        const pct25 = 400;
-        const pct50 = 800;
-        const pct75 = 1200;
-
-        let enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct25, 1, { treasure: true }),
-        ]);
-        expect(enc.value).to.equal(pct25);
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct50, 1, { treasure: true }),
-        ]);
-        expect(enc.value).to.equal(pct50);
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", pct75, 1, { treasure: true }),
-        ]);
-        expect(enc.value).to.equal(pct75);
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", max, 1, { treasure: true }),
-        ]);
-        expect(enc.value).to.equal(max);
-
-        enc = new EncumbranceItemBased(max, [
-          createMockItem("item", max, 1, { treasure: false }),
-        ]);
-        expect(enc.value).to.equal(max);
-      });
-      describe("As fully encumbered flag", () => {
-        it("Encumbered over full load (1600.1)", () => {
-          let enc = new EncumbranceItemBased(1600, [
-            createMockItem("item", 1600.1, 1, { treasure: true }),
+        for (const row of matrix) {
+          const enc = new EncumbranceItemBased(0, [
+            createMockItem("item", 0, row.quantity, {
+              itemslots: 1,
+              equipped: true,
+            }),
           ]);
-          expect(enc.encumbered).to.be.true;
-          enc = new EncumbranceItemBased(1600, [
-            createMockItem("item", 1600.1, 1, { treasure: false }),
+          expect(enc.value, `equipped value (${row.quantity})`).to.equal(
+            row.quantity
+          );
+          expect(enc.atFirstBreakpoint, "atFirstBreakpoint").to.equal(
+            row.atFirstBreakpoint
+          );
+          expect(enc.atSecondBreakpoint, "atSecondBreakpoint").to.equal(
+            row.atSecondBreakpoint
+          );
+          expect(enc.atThirdBreakpoint, "atThirdBreakpoint").to.equal(
+            row.atThirdBreakpoint
+          );
+          expect(enc.encumbered, "encumbered flag").to.equal(row.encumbered);
+        }
+      });
+      it("Packed Slots", () => {
+        const matrix = [
+          {
+            quantity: 1,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 2,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 9,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 10,
+            atFirstBreakpoint: false,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 11,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 12,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: false,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 13,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 14,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: false,
+            encumbered: false,
+          },
+          {
+            quantity: 15,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: false,
+          },
+          {
+            quantity: 16,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: false,
+          },
+          {
+            quantity: 17,
+            atFirstBreakpoint: true,
+            atSecondBreakpoint: true,
+            atThirdBreakpoint: true,
+            encumbered: true,
+          },
+        ];
+
+        for (const row of matrix) {
+          const enc = new EncumbranceItemBased(0, [
+            createMockItem("item", 0, row.quantity, {
+              itemslots: 1,
+            }),
           ]);
-          expect(enc.encumbered).to.be.true;
-        });
-        describe("Not encumbered", () => {
-          it("from a partial load", () => {
-            const enc = new EncumbranceItemBased(1600, [
-              createMockItem("item", 400, 1, { treasure: true }),
-            ]);
-            expect(enc.encumbered).to.be.false;
-          });
-          it("from a full load", () => {
-            let enc = new EncumbranceItemBased(1600, [
-              createMockItem("item", 1600, 1, { treasure: true }),
-            ]);
-            expect(enc.encumbered).to.be.false;
-            enc = new EncumbranceItemBased(1600, [
-              createMockItem("item", 1600, 1, { treasure: false }),
-            ]);
-            console.info(enc);
-            expect(enc.encumbered).to.be.false;
-          });
-        });
+          expect(enc.packedValue, `packed value (${row.quantity})`).to.equal(
+            row.quantity
+          );
+          expect(enc.atFirstBreakpoint, "atFirstBreakpoint").to.equal(
+            row.atFirstBreakpoint
+          );
+          expect(enc.atSecondBreakpoint, "atSecondBreakpoint").to.equal(
+            row.atSecondBreakpoint
+          );
+          expect(enc.atThirdBreakpoint, "atThirdBreakpoint").to.equal(
+            row.atThirdBreakpoint
+          );
+          expect(enc.encumbered, "encumbered flag").to.equal(row.encumbered);
+        }
+      });
+      it("Coins and Gems", () => {
+        const matrix = [
+          {
+            quantity: 1,
+            value: 1,
+          },
+          {
+            quantity: 50,
+            value: 1,
+          },
+          {
+            quantity: 100,
+            value: 1,
+          },
+          {
+            quantity: 101,
+            value: 2,
+          },
+        ];
+
+        for (const row of matrix) {
+          const enc = new EncumbranceItemBased(0, [
+            createMockItem("item", 0, row.quantity, {
+              treasure: true,
+              tags: [{ value: "gems" }],
+            }),
+          ]);
+          expect(enc.packedValue, `packed value (${row.quantity})`).to.equal(
+            row.value
+          );
+          expect(enc.encumbered, "encumbered flag").to.be.false;
+        }
       });
     });
 
     it("Returns max carry weight", () => {
-      const setMax = 2000;
-
-      let enc = new EncumbranceItemBased(setMax);
-      expect(enc.max).to.equal(setMax);
-
-      enc = new EncumbranceItemBased();
-
-      expect(enc.max).to.equal(
-        OseDataModelCharacterEncumbrance.baseEncumbranceCap
-      );
+      const enc = new EncumbranceItemBased();
+      expect(enc.max).to.equal(9); // Equipped Max is always 9
     });
   });
 };

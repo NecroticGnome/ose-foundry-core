@@ -34,6 +34,10 @@ export default class OseDataModelCharacterEncumbranceDisabled
     super(OseDataModelCharacterEncumbranceDisabled.type);
   }
 
+  static defineSchema() {
+    return super.defineSchema();
+  }
+
   // eslint-disable-next-line class-methods-use-this
   get value(): number {
     return 0;

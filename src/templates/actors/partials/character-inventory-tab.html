@@ -1,4 +1,4 @@
-<section class="inventory resizable" data-base-size="310">
+<section class="inventory resizable" data-base-size="{{#if (eq @root.config.encumbrance "itembased")}}300{{else}}320{{/if}}">
   <div id="weapons" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Weapons"}}</div>
@@ -427,22 +427,7 @@
   </ol>
 </section>
 {{#unless (eq @root.system.encumbrance.variant 'disabled')}}
-<section>
-  
-  {{#with @root.system.encumbrance}}
-  <div class="encumbrance {{#if encumbered}}encumbered{{/if}}">
-
-    <span class="encumbrance-bar" style="width:{{pct}}%"></span>
-    {{#if @root.config.encumbranceStrengthMod}}
-    <span class="encumbrance-label">{{value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
-    {{else}}
-    <span class="encumbrance-label">{{value}} / {{max}}</span>
-    {{/if}}
-    {{#each steps as |s|}}
-    <i class="encumbrance-breakpoint arrow-up" style="left:{{s}}%"></i>
-    <i class="encumbrance-breakpoint arrow-down" style="left:{{s}}%"></i>
-    {{/each}}
-  </div>
-  {{/with}}
+<section class="encumbrance-wrapper">
+  {{> (lookup . "encumbranceTemplate") @root.system.encumbrance }}
 </section>
 {{/unless}}
