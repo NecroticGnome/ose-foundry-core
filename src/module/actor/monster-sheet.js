@@ -76,6 +76,10 @@ export default class OseActorSheetMonster extends OseActorSheet {
         this.object.system.details.biography,
         { async: true }
       );
+
+    // Monsters don't show an encumbrance bar
+    data.encumbranceTemplate = "";
+
     return data;
   }
 

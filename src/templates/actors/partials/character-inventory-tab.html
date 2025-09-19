@@ -428,6 +428,8 @@
 </section>
 {{#unless (eq @root.system.encumbrance.variant 'disabled')}}
 <section class="encumbrance-wrapper">
+  {{#if encumbranceTemplate }}
   {{> (lookup . "encumbranceTemplate") @root.system.encumbrance }}
+  {{/if}}
 </section>
 {{/unless}}

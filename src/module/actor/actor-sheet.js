@@ -43,6 +43,10 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     };
     data.isNew = this.actor.isNew();
 
+    data.encumbranceTemplate =
+      OSE.encumbrance?.templateEncumbranceBar ||
+      `${OSE.systemPath()}/templates/actors/partials/character-encumbrance.html`;
+
     return data;
   }
 
