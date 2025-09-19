@@ -80,7 +80,10 @@ export default class OseDataModelCharacterEncumbranceItemBased
             return acc;
           }
           if (item.type === "item" && !item.equipped) {
-            return acc + item.system.quantity.value * item.system.itemslots;
+            return (
+              acc +
+              Math.ceil(item.system.quantity.value * item.system.itemslots)
+            );
           }
           if (item.type === "container") {
             // Containers only count when they are not in use, i.e. are empty
@@ -112,7 +115,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
       items.reduce(
         (acc, { type, system: { quantity, itemslots, equipped } }: Item) => {
           if (type === "item" && equipped)
-            return acc + quantity.value * itemslots;
+            return acc + Math.ceil(quantity.value * itemslots);
           if (["weapon", "armor"].includes(type) && equipped)
             return acc + itemslots;
           return acc;

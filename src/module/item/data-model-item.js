@@ -69,7 +69,9 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   get isCoinsOrGems() {
     if (!this.treasure) return false;
 
-    if (this.tags?.some((t) => t.value === "gems")) return true;
+    if (this.tags?.some((t) => t.value === "gem" || t.value === "gems")) {
+      return true;
+    }
 
     if (!this.parent?.name) return false;
 
@@ -84,6 +86,11 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
       "pp",
       game.i18n.localize("OSE.items.gp.short").toLowerCase(),
       game.i18n.localize("OSE.items.gp.long").toLowerCase(),
+      "[00.01] copper (cp)",
+      "[00.10] silver (sp)",
+      "[00.50] electrum (ep)",
+      "[01.00] gold (gp)",
+      "[10.00] platinum (pp)",
     ];
 
     return coins.includes(itemName);
