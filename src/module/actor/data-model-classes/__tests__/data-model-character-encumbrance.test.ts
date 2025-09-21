@@ -406,11 +406,11 @@ export default ({ describe, it, expect }: QuenchMethods) => {
 
   describe("Item-based Encumbrance", () => {
     it("Is enabled", () => {
-      const enc = new EncumbranceItemBased();
+      const enc = new EncumbranceItemBased(0);
       expect(enc.enabled).to.be.true;
     });
     it("Returns the appropriate encumbrance steps", () => {
-      const enc = new EncumbranceItemBased();
+      const enc = new EncumbranceItemBased(0);
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(enc.steps).to.have.members(
         Object.values(EncumbranceItemBased.equippedEncumbranceSteps)
@@ -651,7 +651,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
     });
 
     it("Returns max carry weight", () => {
-      const enc = new EncumbranceItemBased();
+      const enc = new EncumbranceItemBased(0);
       expect(enc.max).to.equal(9); // Equipped Max is always 9
     });
   });

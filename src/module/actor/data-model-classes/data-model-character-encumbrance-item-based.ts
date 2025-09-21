@@ -13,16 +13,20 @@ export default class OseDataModelCharacterEncumbranceItemBased
   extends OseDataModelCharacterEncumbrance
   implements CharacterEncumbrance
 {
+  static baseEncumbranceCap = 9;
+
+  static alternateBaseEncumbranceCap = 16;
+
   static packedEncumbranceSteps = {
-    fiveEighths: 62.5, // 10/16
-    threeQuarters: 75, // 12/16
-    sevenEighths: 87.5, // 14/16
+    fiveEighths: (10 / 16) * 100,
+    threeQuarters: (12 / 16) * 100,
+    sevenEighths: (14 / 16) * 100,
   };
 
   static equippedEncumbranceSteps = {
-    oneThird: 33.33, // 3/9
-    fiveNinths: 55.55, // 5/9
-    sevenNinths: 77.77, // 7/9
+    oneThird: (3 / 9) * 100,
+    fiveNinths: (5 / 9) * 100,
+    sevenNinths: (7 / 9) * 100,
   };
 
   #equippedMax;
@@ -32,11 +36,15 @@ export default class OseDataModelCharacterEncumbranceItemBased
   #max;
 
   #atFiveEighths;
+
   #atThreeQuarters;
+
   #atSevenEights;
 
   #atOneThird;
+
   #atFiveNinths;
+
   #atSevenNinths;
 
   static templateEncumbranceBar = "";
@@ -70,8 +78,15 @@ export default class OseDataModelCharacterEncumbranceItemBased
     } else {
       this.#weightMod = 0;
     }
-    this.#packedMax = 16;
-    this.#equippedMax = 9;
+
+    const isDefaultMax =
+      !max ||
+      max === OseDataModelCharacterEncumbrance.baseEncumbranceCap ||
+      max ===
+        OseDataModelCharacterEncumbranceItemBased.alternateBaseEncumbranceCap;
+
+    this.#packedMax = isDefaultMax ? 16 : max;
+    this.#equippedMax = isDefaultMax ? 9 : max;
     this.#packedWeight =
       Math.ceil(
         items.reduce((acc, item: OseItem) => {
@@ -131,14 +146,31 @@ export default class OseDataModelCharacterEncumbranceItemBased
       ? this.#equippedMax
       : this.#packedMax;
 
-    // Use raw values rather than percentages due to floating point precision issues.
-    this.#atFiveEighths = this.#weight - this.#weightMod > 10;
-    this.#atThreeQuarters = this.#weight - this.#weightMod > 12;
-    this.#atSevenEights = this.#weight - this.#weightMod > 14;
+    this.#atFiveEighths =
+      this.packedPct >
+      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
+        .fiveEighths;
+    this.#atThreeQuarters =
+      this.packedPct >
+      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
+        .threeQuarters;
+    this.#atSevenEights =
+      this.packedPct >
+      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
+        .sevenEighths;
 
-    this.#atOneThird = this.#weight > 3;
-    this.#atFiveNinths = this.#weight > 5;
-    this.#atSevenNinths = this.#weight > 7;
+    this.#atOneThird =
+      this.equippedPct >
+      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
+        .oneThird;
+    this.#atFiveNinths =
+      this.equippedPct >
+      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
+        .fiveNinths;
+    this.#atSevenNinths =
+      this.equippedPct >
+      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
+        .sevenNinths;
   }
 
   static defineSchema() {
@@ -146,13 +178,18 @@ export default class OseDataModelCharacterEncumbranceItemBased
       foundry.data.fields;
 
     return new SchemaField({
-      variant: new StringField({ initial: "disabled" }),
+      variant: new StringField({
+        initial: OseDataModelCharacterEncumbranceItemBased.type,
+      }),
       enabled: new BooleanField({ initial: true }),
       encumbered: new BooleanField({ initial: false }),
       pct: new NumberField({ integer: false, initial: 0, min: 0, max: 100 }),
       steps: new ArrayField(new NumberField()),
       value: new NumberField({ integer: false }),
-      max: new NumberField({ integer: false }),
+      max: new NumberField({
+        integer: false,
+        initial: OseDataModelCharacterEncumbranceItemBased.baseEncumbranceCap,
+      }),
       atFirstBreakpoint: new BooleanField({ initial: false }),
       atSecondBreakpoint: new BooleanField({ initial: false }),
       atThirdBreakpoint: new BooleanField({ initial: false }),
@@ -252,12 +289,12 @@ export default class OseDataModelCharacterEncumbranceItemBased
   }
 
   get equippedPct() {
-    return Math.clamp((100 * this.#equippedWeight) / this.#equippedMax, 0, 100);
+    return Math.clamp((this.#equippedWeight / this.#equippedMax) * 100, 0, 100);
   }
 
   get packedPct() {
     return Math.clamp(
-      (100 * (this.#packedWeight - this.#weightMod)) / this.#packedMax,
+      ((this.#packedWeight - this.#weightMod) / this.#packedMax) * 100,
       0,
       100
     );
@@ -277,5 +314,10 @@ export default class OseDataModelCharacterEncumbranceItemBased
 
   get packedLabel(): string {
     return `${this.#packedWeight}/${this.#packedMax + this.#weightMod}`;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  get alternateMax() {
+    return OseDataModelCharacterEncumbranceItemBased.alternateBaseEncumbranceCap;
   }
 }

@@ -61,6 +61,20 @@ export default class OseEntityTweaks extends FormApplication {
   // eslint-disable-next-line no-underscore-dangle
   async _updateObject(event, formData) {
     event.preventDefault();
+
+    // Item-based encumbrance tracks two separate values by default.
+    // If the user hasn't changed the value, we null it out
+    // so that the default value is used.
+    const encumbranceMax = "system.encumbrance.max";
+    if (
+      CONFIG.OSE.encumbrance.type === "itembased" &&
+      (formData[encumbranceMax] === this.object.system.encumbrance.defaultMax ||
+        formData[encumbranceMax] ===
+          this.object.system.encumbrance.alternateMax)
+    ) {
+      formData[encumbranceMax] = null;
+    }
+
     // Update the actor
     await this.object.update(formData);
     // Re-draw the updated sheet

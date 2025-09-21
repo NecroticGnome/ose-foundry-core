@@ -66,7 +66,26 @@ export default class OseDataModelCharacterEncumbranceDetailed
   }
 
   static defineSchema() {
-    return super.defineSchema();
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
+      foundry.data.fields;
+
+    return new SchemaField({
+      variant: new StringField({
+        initial: OseDataModelCharacterEncumbranceDetailed.type,
+      }),
+      enabled: new BooleanField({ initial: true }),
+      encumbered: new BooleanField({ initial: false }),
+      pct: new NumberField({ integer: false, initial: 0, min: 0, max: 100 }),
+      steps: new ArrayField(new NumberField()),
+      value: new NumberField({ integer: false }),
+      max: new NumberField({
+        integer: false,
+        initial: OseDataModelCharacterEncumbrance.baseEncumbranceCap,
+      }),
+      atFirstBreakpoint: new BooleanField({ initial: false }),
+      atSecondBreakpoint: new BooleanField({ initial: false }),
+      atThirdBreakpoint: new BooleanField({ initial: false }),
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
