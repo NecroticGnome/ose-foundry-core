@@ -32,6 +32,8 @@
   "OSE.dialog.confirmDeleteContainer": "Are you sure you want to delete the container?",
   "OSE.dialog.deleteItem": "Delete item?",
   "OSE.dialog.confirmDeleteItem": "Are you sure you want to delete \"{name}\"?",
+  "OSE.dialog.TokenRingPrompt.Title": "Replace Dynamic Token Ring?",
+  "OSE.dialog.TokenRingPrompt.Content": "Do you wish to use the OSE token ring for Dynamic Token Rings? You can change this later in the Core Game Settings. You must reload for the change to take effect.",
 
   "OSE.Formula": "Formula",
   "OSE.SitMod": "Situational Modifier",
@@ -313,7 +315,8 @@
   "OSE.colors.orange": "Orange",
   "OSE.colors.white": "White",
 
-  "OSE.colors.black": "Black",
+  "OSE.rings.BlackWhite": "OSE Black/White",
+
   "OSE.reaction.check": "Reaction Check",
   "OSE.reaction.Hostile": "{name} is Hostile",
   "OSE.reaction.Unfriendly": "{name} is Unfriendly",

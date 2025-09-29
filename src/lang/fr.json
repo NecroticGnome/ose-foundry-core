@@ -29,7 +29,8 @@
   "OSE.dialog.confirmDeleteContainer": "Voulez-vous vraiment supprimer le conteneur?",
   "OSE.dialog.deleteItem": "Supprimer l'élément?",
   "OSE.dialog.confirmDeleteItem": "Êtes-vous sûr de vouloir supprimer \"{name}\"?",
-
+  "OSE.dialog.TokenRingPrompt.Title": "Remplacer l'anneau de jeton dynamique ?",
+  "OSE.dialog.TokenRingPrompt.Content": "Souhaitez-vous utiliser l'anneau de jeton OSE pour les Dynamic Token Rings ? Vous pourrez changer plus tard dans les Paramètres principaux du jeu. Un rechargement est nécessaire pour appliquer le changement.",
   "OSE.Formula": "Formule",
   "OSE.SitMod": "Mod. de situation",
   "OSE.Modifier": "Modificateur",
@@ -290,6 +291,8 @@
   "OSE.colors.blue": "Bleu",
   "OSE.colors.orange": "Orange",
   "OSE.colors.white": "Blanc",
+
+  "OSE.rings.BlackWhite": "OSE Noir/Blanc",
 
   "OSE.reaction.Hostile": "{name} est Hostile",
   "OSE.reaction.Unfriendly": "{name} est Inamical",
