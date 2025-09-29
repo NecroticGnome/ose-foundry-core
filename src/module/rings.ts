@@ -30,9 +30,9 @@ export async function promptTokenRingSelection() {
   if (
     await foundry.applications.api.DialogV2.confirm({
       window: {
-        title: game.i18n.localize("OSE.Dialog.TokenRingPrompt.Title"),
+        title: game.i18n.localize("OSE.dialog.TokenRingPrompt.Title"),
       },
-      content: game.i18n.localize("OSE.Dialog.TokenRingPrompt.Content"),
+      content: game.i18n.localize("OSE.dialog.TokenRingPrompt.Content"),
     })
   ) {
     await game.settings.set(
