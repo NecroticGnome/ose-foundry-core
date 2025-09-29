@@ -113,6 +113,11 @@ const registerSettings = () => {
     type: Boolean,
     config: true,
   });
+  game.settings.register(game.system.id, "hasPromptedDefaultOSETokenRing", {
+    default: false,
+    scope: "world",
+    type: Boolean,
+  });
 };
 
 declare global {

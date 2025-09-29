@@ -27,6 +27,7 @@ import * as treasure from "./module/helpers-treasure";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
+import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
 
 import { OSECombat } from "./module/combat/combat";
@@ -170,6 +171,8 @@ Hooks.once("ready", async () => {
     // Returning false to stop the rest of hotbarDrop handling.
     return false;
   });
+
+  await promptTokenRingSelection();
 });
 
 // Party sheet control
@@ -216,3 +219,4 @@ Hooks.on("renderCompendium", renderList.RenderCompendium);
 Hooks.on("activateItemDirectory", renderList.RenderItemDirectory);
 
 Hooks.on("OSE.Party.showSheet", OsePartySheet.showPartySheet);
+Hooks.once("initializeDynamicTokenRingConfig", initializeTokenRing);
