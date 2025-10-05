@@ -94,7 +94,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
             // Coins and gems are handled below
             return acc;
           }
-          if (item.type === "item" && !item.equipped) {
+          if (item.type === "item" && !item.system.equipped) {
             return (
               acc +
               Math.ceil(item.system.quantity.value * item.system.itemslots)
