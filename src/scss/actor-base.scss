@@ -183,18 +183,15 @@
           .attribute-name {
             width: 40px;
             margin: 0;
-            line-height: 35px;
+            line-height: 2.5;
             a {
               margin: auto;
             }
           }
           &.saving-throw {
             .attribute-name {
-              line-height: 16px;
+              line-height: 1.2;
               width: 80px;
-            }
-            .attribute-value {
-              line-height: 29px;
             }
           }
           .attribute-value {
@@ -210,14 +207,14 @@
     .inventory {
       overflow: auto;
       .header-spells {
-        line-height: 30px;
+        line-height: 1.9rem;
       }
       .item-category-title {
         text-align: center;
         padding: 4px 0;
         border: 1px solid $colorDark;
         box-shadow: 0 0 5px $colorDark;
-        line-height: 16px;
+        line-height: 1.2;
         font-weight: 300;
         font-size: var(--font-size-13);
         background: $darkBackground;
@@ -232,7 +229,7 @@
           text-align: left;
           overflow: hidden;
           margin: 0;
-          height: 16px;
+          height: 1rem;
           flex-basis: 90px;
         }
       }
@@ -255,7 +252,7 @@
         .item-description {
           font-size: var(--font-size-13);
           padding: 0 4px;
-          line-height: 20px;
+          line-height: 1.2;
           border-bottom: 1px solid $colorTan;
           div > p {
             padding: 0.5em 0;
@@ -271,8 +268,8 @@
             .tag {
               margin: 1px 2px;
               border: 1px solid $colorFaint;
-              font-size: 11px;
-              line-height: 14px;
+              font-size: var(--font-size-11);
+              line-height: 1.4;
               background: $colorOlive;
               padding: 1px 4px;
               color: whitesmoke;
@@ -285,10 +282,10 @@
           @extend %header-field !optional;
           padding: 0px;
           margin-bottom: 0px;
-          height: 30px;
+          height: 1.9rem;
 
           .item-image {
-            flex-basis: 30px;
+            flex-basis: 1.9rem;
             flex-grow: 0;
             background-size: contain;
             background-repeat: no-repeat;
@@ -299,7 +296,7 @@
             text-align: left;
             overflow: hidden;
             margin: 0;
-            line-height: 30px;
+            line-height: 1.9rem;
             flex-basis: 90px;
             cursor: pointer;
             text-overflow: ellipsis;
@@ -308,7 +305,7 @@
         }
         .item-entry {
           box-shadow: inset 1px 0 0 0 $colorTan;
-          line-height: 30px;
+          line-height: 1.9rem;
           &:nth-child(even) {
             .item-header {
               background: rgba(0, 0, 0, 0.1);
@@ -330,10 +327,10 @@
         }
 
         .consumable-counter {
-          height: 14px;
+          height: 0.9rem;
           display: flex;
           flex-wrap: wrap;
-          line-height: 14px;
+          line-height: 0.9rem;
           label {
             flex: 0 30px;
             font-size: 11px;
@@ -399,6 +396,7 @@
           input {
             margin: 3px 0;
             border-bottom: none;
+            height: 1.5rem;
           }
         }
       }
@@ -409,7 +407,7 @@
       }
       .item-controls {
         font-size: var(--font-size-12);
-        flex-basis: 60px;
+        flex-basis: 3.6rem;
         flex-grow: 0;
         text-align: right;
         margin-right: 4px;
@@ -424,10 +422,10 @@
       }
       &.spells {
         .item-category-title {
-          line-height: 24px;
+          line-height: 1rem;
         }
         .item-controls {
-          flex-basis: 45px;
+          flex-basis: 2.7rem;
         }
       }
     }
