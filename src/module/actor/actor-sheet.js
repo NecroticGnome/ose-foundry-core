@@ -32,6 +32,11 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     data.owner = this.actor.isOwner;
     data.editable = this.actor.sheet.isEditable;
 
+    // Store flag if the full character sheet is to be shown
+    data.isOwnerOrObserver =
+      this.actor.testUserPermission(game.user, "OWNER") === true ||
+      this.actor.testUserPermission(game.user, "OBSERVER") === true;
+
     data.config = {
       ...CONFIG.OSE,
       ascendingAC: game.settings.get(game.system.id, "ascendingAC"),

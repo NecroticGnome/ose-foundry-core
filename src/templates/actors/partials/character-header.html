@@ -1,22 +1,24 @@
 <div class="profile">
   <img class="profile-img" src="{{img}}" data-edit="img" title="{{name}}" />
-  <div class="modifiers-btn">
-    {{#unless isNew}}
-    <a data-action="modifiers" title="{{localize 'OSE.Modifiers'}}"
-      ><i class="fas fa-book"></i
-    ></a>
-    <a data-action="gp-cost" title="{{localize 'OSE.dialog.shoppingCart'}}"
-      ><i class="fas fa-coins"></i
-    ></a>
-    {{else}}
-    <a
-      class="blinking"
-      data-action="generate-scores"
-      title="{{localize 'OSE.dialog.generateScores'}}"
-      ><i class="fa fa-dice"></i
-    ></a>
-    {{/unless}}
-  </div>
+  {{#if isOwnerOrObserver}}
+    <div class="modifiers-btn">
+      {{#unless isNew}}
+      <a data-action="modifiers" title="{{localize 'OSE.Modifiers'}}"
+        ><i class="fas fa-book"></i
+      ></a>
+      <a data-action="gp-cost" title="{{localize 'OSE.dialog.shoppingCart'}}"
+        ><i class="fas fa-coins"></i
+      ></a>
+      {{else}}
+      <a
+        class="blinking"
+        data-action="generate-scores"
+        title="{{localize 'OSE.dialog.generateScores'}}"
+        ><i class="fa fa-dice"></i
+      ></a>
+      {{/unless}}
+    </div>
+  {{/if}}
 </div>
 <section class="header-details flexrow">
   <h1 class="charname">
@@ -50,48 +52,52 @@
       <label>{{localize 'OSE.details.title'}}</label>
     </li>
     {{/if}}
-    <li>
-      <input
-        type="text"
-        name="system.details.alignment"
-        value="{{system.details.alignment}}"
-        data-dtype="String"
-      />
-      <label>{{localize 'OSE.details.alignment'}}</label>
-    </li>
+    {{#if isOwnerOrObserver}}
+      <li>
+        <input
+          type="text"
+          name="system.details.alignment"
+          value="{{system.details.alignment}}"
+          data-dtype="String"
+        />
+        <label>{{localize 'OSE.details.alignment'}}</label>
+      </li>
+    {{/if}}
   </ul>
-  <ul class="summary flexrow">
-    <li class="flex3">
-      <input
-        type="text"
-        name="system.details.class"
-        value="{{system.details.class}}"
-        data-dtype="String"
-      />
-      <label>{{localize 'OSE.details.class'}}</label>
-    </li>
-    <li
-      class="{{#if (gte system.details.xp.value system.details.xp.next)}}notify{{/if}}"
-    >
-      <input
-        type="text"
-        name="system.details.level"
-        value="{{system.details.level}}"
-        data-dtype="Number"
-      />
-      <label>{{localize 'OSE.details.level'}}</label>
-    </li>
-    <li class="flex2">
-      <input
-        type="text"
-        name="system.details.xp.value"
-        value="{{system.details.xp.value}}"
-        data-dtype="Number"
-      />
-      <label>{{localize 'OSE.details.experience.base'}}</label>
-      {{#if system.details.xp.bonus}}
-      <span class="xp-bonus">+{{system.details.xp.bonus}}%</span>
-      {{/if}}
-    </li>
-  </ul>
+  {{#if isOwnerOrObserver}}
+    <ul class="summary flexrow">
+      <li class="flex3">
+        <input
+          type="text"
+          name="system.details.class"
+          value="{{system.details.class}}"
+          data-dtype="String"
+        />
+        <label>{{localize 'OSE.details.class'}}</label>
+      </li>
+      <li
+        class="{{#if (gte system.details.xp.value system.details.xp.next)}}notify{{/if}}"
+      >
+        <input
+          type="text"
+          name="system.details.level"
+          value="{{system.details.level}}"
+          data-dtype="Number"
+        />
+        <label>{{localize 'OSE.details.level'}}</label>
+      </li>
+      <li class="flex2">
+        <input
+          type="text"
+          name="system.details.xp.value"
+          value="{{system.details.xp.value}}"
+          data-dtype="Number"
+        />
+        <label>{{localize 'OSE.details.experience.base'}}</label>
+        {{#if system.details.xp.bonus}}
+        <span class="xp-bonus">+{{system.details.xp.bonus}}%</span>
+        {{/if}}
+      </li>
+    </ul>
+  {{/if}}
 </section>
