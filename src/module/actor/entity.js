@@ -524,8 +524,12 @@ export default class OseActor extends Actor {
       // Weapon damage roll value
       attData.item?.system?.damage ?? "1d6",
     ]);
-    if (!this.system.config?.ignoreBonusDamage && attData.item?.system?.bonus)
-      // Weapon Damage Bonus
+
+    // Weapon Damage Bonus
+    const globalIgnoreAttackBonusOnDamageRoll = game.settings.get(game.system.id, "ignoreAttackBonusOnDamageRoll");
+
+    // Global and per-actor flag to ignore bonus dmg are set
+    if (!globalIgnoreAttackBonusOnDamageRoll && !this.system.config?.ignoreBonusDamage && attData.item?.system?.bonus)
       dmgParts.push(attData.item?.system?.bonus);
 
     const rollParts = ["1d20"];
