@@ -214,6 +214,8 @@
   "OSE.Setting.InvertedCtrlBehaviorHint": "Reverses behavior for holding Ctrl/Meta when clicking on a roll.",
   "OSE.Setting.EncumbranceItemStrengthMod": "Enable Strength Modifier for Item-based Encumbrance",
   "OSE.Setting.EncumbranceItemStrengthModHint": "Strength modifier is applied to the item-based encumbrance calculation.",
+  "OSE.Setting.ignoreAttackBonusOnDamageRoll": "Globally Ignore Attack Bonus For Damage Rolls",
+  "OSE.Setting.ignoreAttackBonusOnDamageRollHint": "Can also be enabled or disabled on a per actor basis via their sheet.",
 
   "OSE.items.Equip": "Equip",
   "OSE.items.Unequip": "Unequip",
