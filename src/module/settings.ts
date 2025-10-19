@@ -141,7 +141,7 @@ declare global {
       "ose.significantTreasure": number;
       "ose.languages": string;
       "ose.applyDamageOption": ApplyDamageOption;
-      "ose.applyBonusToDamageRoll": boolean;
+      "ose.ignoreAttackBonusOnDamageRoll": boolean;
     }
   }
 }
