@@ -10,97 +10,98 @@
       placeholder="{{localize 'OSE.Name'}}"
     />
   </h1>
-  <ul class="summary flexrow">
-    <li class="flex2 flexrow check-field">
-      <div>
+  {{#if isOwnerOrObserver}}
+    <ul class="summary flexrow">
+      <li class="flex2 flexrow check-field">
+        <div>
+          <input
+            type="text"
+            name="system.details.alignment"
+            value="{{system.details.alignment}}"
+          />
+          <label>{{localize 'OSE.details.alignment'}}</label>
+        </div>
+        <div
+          class="check reaction-check"
+          title="{{localize 'OSE.roll.reaction'}}"
+        >
+          <a><i class="fas fa-dice"></i></a>
+        </div>
+      </li>
+      <li class="flexrow check-field" data-check="dungeon">
+        <div>
+          <input
+            type="text"
+            name="system.details.appearing.d"
+            value="{{system.details.appearing.d}}"
+          />
+          <label>{{localize 'OSE.details.appearing'}}</label>
+        </div>
+        <div
+          class="check appearing-check"
+          title="{{localize 'OSE.roll.appearing'}}"
+        >
+          <a><i class="fas fa-dice"></i></a>
+        </div>
+      </li>
+      <li class="flexrow check-field" data-check="wilderness">
+        (
+        <div>
+          <input
+            type="text"
+            name="system.details.appearing.w"
+            value="{{system.details.appearing.w}}"
+          />
+        </div>
+        )
+        <div
+          class="check appearing-check"
+          title="{{localize 'OSE.roll.appearing'}}"
+        >
+          <a><i class="fas fa-dice"></i></a>
+        </div>
+      </li>
+      {{#if config.morale}}
+      <li class="flexrow check-field">
+        <div>
+          <input
+            type="text"
+            name="system.details.morale"
+            value="{{system.details.morale}}"
+          />
+          <label>{{localize 'OSE.details.morale'}}</label>
+        </div>
+        <div class="check morale-check" title="{{localize 'OSE.roll.morale'}}">
+           <a><i class="fas fa-dice"></i></a>
+        </div>
+      </li>
+      {{/if}}
+    </ul>
+    <ul class="summary flexrow">
+      <li>
         <input
           type="text"
-          name="system.details.alignment"
-          value="{{system.details.alignment}}"
+          name="system.details.xp"
+          value="{{system.details.xp}}"
         />
-        <label>{{localize 'OSE.details.alignment'}}</label>
-      </div>
-      <div
-        class="check reaction-check"
-        title="{{localize 'OSE.roll.reaction'}}"
-      >
-        <a><i class="fas fa-dice"></i></a>
-      </div>
-    </li>
-    <li class="flexrow check-field" data-check="dungeon">
-      <div>
+        <label>{{localize 'OSE.details.experience.award'}}</label>
+      </li>
+      <li>
         <input
           type="text"
-          name="system.details.appearing.d"
-          value="{{system.details.appearing.d}}"
+          name="system.details.specialAbilities"
+          value="{{system.details.specialAbilities}}"
         />
-        <label>{{localize 'OSE.details.appearing'}}</label>
-      </div>
-      <div
-        class="check appearing-check"
-        title="{{localize 'OSE.roll.appearing'}}"
+        <label title="Special Abilities"
+          >{{localize 'OSE.details.special.abilities'}}</label>
+      </li>
+      <li
+        class="treasure-table"
+        title="{{localize 'OSE.details.treasureTableHint'}}"
       >
-        <a><i class="fas fa-dice"></i></a>
-      </div>
-    </li>
-    <li class="flexrow check-field" data-check="wilderness">
-      (
-      <div>
-        <input
-          type="text"
-          name="system.details.appearing.w"
-          value="{{system.details.appearing.w}}"
-        />
-      </div>
-      )
-      <div
-        class="check appearing-check"
-        title="{{localize 'OSE.roll.appearing'}}"
-      >
-        <a><i class="fas fa-dice"></i></a>
-      </div>
-    </li>
-    {{#if config.morale}}
-    <li class="flexrow check-field">
-      <div>
-        <input
-          type="text"
-          name="system.details.morale"
-          value="{{system.details.morale}}"
-        />
-        <label>{{localize 'OSE.details.morale'}}</label>
-      </div>
-      <div class="check morale-check" title="{{localize 'OSE.roll.morale'}}">
-        <a><i class="fas fa-dice"></i></a>
-      </div>
-    </li>
-    {{/if}}
-  </ul>
-  <ul class="summary flexrow">
-    <li>
-      <input
-        type="text"
-        name="system.details.xp"
-        value="{{system.details.xp}}"
-      />
-      <label>{{localize 'OSE.details.experience.award'}}</label>
-    </li>
-    <li>
-      <input
-        type="text"
-        name="system.details.specialAbilities"
-        value="{{system.details.specialAbilities}}"
-      />
-      <label title="Special Abilities"
-        >{{localize 'OSE.details.special.abilities'}}</label
-      >
-    </li>
-    <li
-      class="treasure-table"
-      title="{{localize 'OSE.details.treasureTableHint'}}"
-    >
-      <div>{{{system.details.treasure.link}}}</div>
-      <label>{{localize 'OSE.details.treasure'}}</label>
-    </li>
-  </ul>
+        <div>{{{system.details.treasure.link}}}</div>
+        <label>{{localize 'OSE.details.treasure'}}</label>
+      </li>
+    </ul>
+  {{/if}}
 </section>
