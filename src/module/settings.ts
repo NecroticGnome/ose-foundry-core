@@ -113,6 +113,15 @@ const registerSettings = () => {
     type: Boolean,
     config: true,
   });
+  game.settings.register(game.system.id, "ignoreAttackBonusOnDamageRoll", {
+    name: game.i18n.localize("OSE.Setting.ignoreAttackBonusOnDamageRoll"),
+    hint: game.i18n.localize("OSE.Setting.ignoreAttackBonusOnDamageRollHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
   game.settings.register(game.system.id, "hasPromptedDefaultOSETokenRing", {
     default: false,
     scope: "world",
@@ -132,6 +141,7 @@ declare global {
       "ose.significantTreasure": number;
       "ose.languages": string;
       "ose.applyDamageOption": ApplyDamageOption;
+      "ose.ignoreAttackBonusOnDamageRoll": boolean;
     }
   }
 }
