@@ -23,10 +23,22 @@ export default class OseDataModelCharacterEncumbranceItemBased
     sevenEighths: (14 / 16) * 100,
   };
 
+  static packedStepCounts = {
+    stepOne: 10,
+    stepTwo: 12,
+    stepThree: 14,
+  };
+
   static equippedEncumbranceSteps = {
     oneThird: (3 / 9) * 100,
     fiveNinths: (5 / 9) * 100,
     sevenNinths: (7 / 9) * 100,
+  };
+
+  static equippedStepCounts = {
+    stepOne: 3,
+    stepTwo: 5,
+    stepThree: 7,
   };
 
   #equippedMax;
@@ -94,17 +106,14 @@ export default class OseDataModelCharacterEncumbranceItemBased
             // Coins and gems are handled below
             return acc;
           }
-          if (item.type === "item" && !item.system.equipped) {
+          if (
+            (item.type === "item" || item.type === "container") &&
+            !item.system.equipped
+          ) {
             return (
               acc +
               Math.ceil(item.system.quantity.value * item.system.itemslots)
             );
-          }
-          if (item.type === "container") {
-            // Containers only count when they are not in use, i.e. are empty
-            return item.system.itemIds?.length
-              ? acc
-              : acc + item.system.itemslots;
           }
           if (
             ["weapon", "armor"].includes(item.type) &&
@@ -147,30 +156,24 @@ export default class OseDataModelCharacterEncumbranceItemBased
       : this.#packedMax;
 
     this.#atFiveEighths =
-      this.packedPct >
-      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
-        .fiveEighths;
+      this.#packedWeight >
+      OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepOne;
     this.#atThreeQuarters =
-      this.packedPct >
-      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
-        .threeQuarters;
+      this.#packedWeight >
+      OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepTwo;
     this.#atSevenEights =
-      this.packedPct >
-      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
-        .sevenEighths;
+      this.#packedWeight >
+      OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepThree;
 
     this.#atOneThird =
-      this.equippedPct >
-      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
-        .oneThird;
+      this.#equippedWeight >
+      OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepOne;
     this.#atFiveNinths =
-      this.equippedPct >
-      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
-        .fiveNinths;
+      this.#equippedWeight >
+      OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepTwo;
     this.#atSevenNinths =
-      this.equippedPct >
-      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
-        .sevenNinths;
+      this.#equippedWeight >
+      OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepThree;
   }
 
   static defineSchema() {
@@ -218,22 +221,18 @@ export default class OseDataModelCharacterEncumbranceItemBased
 
   get usingEquippedEncumbrance() {
     const equippedValues = Object.values(
-      OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps
+      OseDataModelCharacterEncumbranceItemBased.equippedStepCounts
     );
     const packedValues = Object.values(
-      OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps
+      OseDataModelCharacterEncumbranceItemBased.packedStepCounts
     );
     let equippedIndex = equippedValues.findIndex(
-      (step) => step > (this.#equippedWeight / this.#equippedMax) * 100
+      (step) => step >= this.#equippedWeight
     );
     equippedIndex = equippedIndex === -1 ? 4 : equippedIndex;
 
     let packedIndex = packedValues.findIndex(
-      (step) =>
-        step >
-        ((this.#packedWeight - this.#weightMod) /
-          (this.#packedMax + this.#weightMod)) *
-          100
+      (step) => step >= this.#packedWeight - this.#weightMod
     );
     packedIndex = packedIndex === -1 ? 4 : packedIndex;
     if (equippedIndex === 0 && packedIndex === 0) {
