@@ -207,7 +207,7 @@
     .inventory {
       overflow: auto;
       .header-spells {
-        line-height: 1.9rem;
+        line-height: max(30px, 1.9rem);
       }
       .item-category-title {
         text-align: center;
@@ -407,7 +407,7 @@
       }
       .item-controls {
         font-size: var(--font-size-12);
-        flex-basis: 3.6rem;
+        flex-basis: max(60px, 3.8rem);
         flex-grow: 0;
         text-align: right;
         margin-right: 4px;
