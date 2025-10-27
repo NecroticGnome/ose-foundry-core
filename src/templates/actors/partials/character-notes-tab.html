@@ -5,6 +5,7 @@
         <div class="languages">
           <div class="item-category-title flexrow">
             <div class="item-name">{{localize "OSE.category.languages"}}</div>
+            {{#if @root.owner}}
             <div class="item-controls">
               <a
                 class="item-control item-push"
@@ -13,11 +14,13 @@
                 ><i class="fa fa-plus"></i
               ></a>
             </div>
+            {{/if}}
           </div>
           <ol>
             {{#each system.languages.value as |lang|}}
             <li class="item flexrow" data-lang="{{lang}}">
               <div class="item-name">{{lang}}</div>
+              {{#if @root.owner}}
               <div class="item-controls">
                 <a
                   class="item-control item-pop"
@@ -26,6 +29,7 @@
                   ><i class="fa fa-trash"></i
                 ></a>
               </div>
+              {{/if}}
             </li>
             {{/each}}
           </ol>

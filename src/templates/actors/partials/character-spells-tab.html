@@ -1,6 +1,7 @@
 <section class="inventory spells resizable" data-base-size="320">
   <div class="item-category-title flexrow" style="line-height: 15px">
     <div class="category-name">{{localize "OSE.category.spells"}}</div>
+    {{#if @root.owner}}
     <div class="item-controls">
       <a
         class="item-control item-reset"
@@ -15,6 +16,7 @@
         ><i class="fa fa-plus"></i
       ></a>
     </div>
+    {{/if}}
   </div>
   {{#each spells as |spellGroup id|}}
   <div class="item-category-title flexrow">
@@ -39,6 +41,7 @@
         title="{{localize 'OSE.spells.MaximumSlotsHint'}}"
       />
     </div>
+    {{#if @root.owner}}
     <div class="item-controls">
       <a
         class="item-control item-create"
@@ -48,6 +51,7 @@
         ><i class="fa fa-plus"></i
       ></a>
     </div>
+    {{/if}}
   </div>
   <ol class="item-list">
     {{#each spellGroup as |item|}}
@@ -77,8 +81,8 @@
             title="{{localize 'OSE.spells.Memorized'}}"
           />
         </div>
+        {{#if @root.owner}}
         <div class="item-controls">
-          {{#if ../../owner}}
           <a class="item-control item-show" title='{{localize "OSE.Show"}}'
             ><i class="fas fa-eye"></i
           ></a>
@@ -88,8 +92,8 @@
           <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
             ><i class="fas fa-trash"></i
           ></a>
-          {{/if}}
         </div>
+        {{/if}}
       </div>
       <div class="item-summary{{#if item.isExpanded}} expanded{{/if}}">
         {{> (path "/templates/actors/partials/actor-item-summary.html")
