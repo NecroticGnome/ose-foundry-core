@@ -69,7 +69,15 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   get isCoinsOrGems() {
     if (!this.treasure) return false;
 
-    if (this.tags?.some((t) => t.value === "gem" || t.value === "gems")) {
+    if (
+      this.tags?.some(
+        (t) =>
+          t.value === "gem" ||
+          t.value === "gems" ||
+          t.value === "coin" ||
+          t.value === "coins"
+      )
+    ) {
       return true;
     }
 
