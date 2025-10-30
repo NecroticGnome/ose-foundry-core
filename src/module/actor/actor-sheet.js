@@ -517,6 +517,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
 
+  // Send item and ability data to chat
   // eslint-disable-next-line no-underscore-dangle
   async _showItemChatMessage(item){
     // Render template with data
