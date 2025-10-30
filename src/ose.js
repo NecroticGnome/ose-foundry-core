@@ -215,6 +215,32 @@ Hooks.on("createCombatant", (combatant) => {
   combatant.assignGroup();
 });
 
+Hooks.on("renderActorSheet", (app, html, data) =>{
+  new foundry.applications.ux.ContextMenu(
+    html,
+    ".item",
+    [
+      {
+        name: "Send To Chat",
+        callback: (el) => {
+          const id = el.dataset.itemId;
+          const actor = app.actor;
+          const item = app.actor.items.get(id);
+          app._showItemChatMessage(item);
+        }
+      }
+    ],
+    {
+      jQuery: false,
+      onOpen: (el) => {
+        el.classList.add("item-context-menu");
+      }
+    }
+  );
+});
+
+
+
 Hooks.on("renderCompendium", renderList.RenderCompendium);
 Hooks.on("activateItemDirectory", renderList.RenderItemDirectory);
 

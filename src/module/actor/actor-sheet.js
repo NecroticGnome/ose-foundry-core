@@ -516,6 +516,20 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
   }
 
+
+  // eslint-disable-next-line no-underscore-dangle
+  async _showItemChatMessage(item){
+    // Render template with data
+    const renderContent = await foundry.applications.handlebars.renderTemplate(`${OSE.systemPath()}/templates/actors/partials/actor-item-card.html`, item);
+
+    // Display item data in chat box
+    await ChatMessage.create({
+        user: game.user.id,
+        speaker: { alias: this.actor.name },
+        content: renderContent,
+    });
+  }
+
   // Override to set resizable initial size
   // eslint-disable-next-line no-underscore-dangle
   async _renderInner(...args) {
