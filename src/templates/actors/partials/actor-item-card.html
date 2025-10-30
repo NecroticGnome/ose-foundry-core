@@ -1,0 +1,11 @@
+<div class="item-header flexrow">
+  <div
+    class="item-image"
+    style="background-image: url({{img}})"
+  ></div>
+  <p class="item-name" title="{{item.name}}">{{name}}</p>
+</div>
+<div class="item-summary expanded">
+  {{> (path "/templates/actors/partials/actor-item-summary.html") item=this}}
+</div>
+
