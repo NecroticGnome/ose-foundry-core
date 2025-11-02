@@ -428,44 +428,13 @@
           flex-basis: 2.7rem;
         }
       }
+      #context-menu {
+        width: fit-content;
+      }
     }
     .editor {
       flex: 1 0 300px;
       padding: 4px;
     }
   }
-  /*
-  .item-context-menu {
-    position: absolute;
-    background: #2a2a2a;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-    min-width: 150px;
-    max-width: 200px;
-    padding: 4px 0;
-    z-index: 9999;
-    font-family: sans-serif;
-
-
-    .context-items {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-
-
-      li.context-item {
-        padding: 6px 12px;
-        cursor: pointer;
-        color: #fff;
-        background: transparent;
-
-        &:hover {
-          background: #3d3d3d;
-        }
-      }
-    }
-  }
-  */
 }

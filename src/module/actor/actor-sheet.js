@@ -5,6 +5,7 @@ import OSE from "../config";
 import OseEntityTweaks from "../dialog/entity-tweaks";
 import skipRollDialogCheck from "../helpers-behaviour";
 
+
 export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   /**
    * IDs for items on the sheet that have been expanded.
@@ -33,9 +34,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     data.editable = this.actor.sheet.isEditable;
 
     // Store flag if the full character sheet is to be shown
-    data.isOwnerOrObserver =
-      this.actor.testUserPermission(game.user, "OWNER") === true ||
-      this.actor.testUserPermission(game.user, "OBSERVER") === true;
+    data.isOwnerOrObserver = this.actor.isOwnerOrObserver;
 
     data.config = {
       ...CONFIG.OSE,
@@ -128,6 +127,25 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry");
     const item = this.actor.items.get(li.data("itemId"));
     item.show();
+  }
+
+  async _promptRemoveItemFromActor(item) {
+    const sheet = this;
+    return foundry.applications.api.DialogV2.confirm({
+      window: {
+        title: game.i18n.localize("OSE.dialog.deleteItem"),
+      },
+      content: game.i18n.format("OSE.dialog.confirmDeleteItem", {
+        name: item.name,
+      }),
+      yes: {
+        default: false,
+        callback: () => {
+          sheet._removeItemFromActor(item);
+        },
+      },
+      defaultYes: false,
+    });
   }
 
   // eslint-disable-next-line no-underscore-dangle, consistent-return
@@ -516,18 +534,20 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
   }
 
-
   // Send item and ability data to chat
   // eslint-disable-next-line no-underscore-dangle
-  async _showItemChatMessage(item){
+  async _showItemChatMessage(item) {
     // Render template with data
-    const renderContent = await foundry.applications.handlebars.renderTemplate(`${OSE.systemPath()}/templates/actors/partials/actor-item-card.html`, item);
+    const renderContent = await foundry.applications.handlebars.renderTemplate(
+      `${OSE.systemPath()}/templates/actors/partials/actor-item-card.html`,
+      item
+    );
 
     // Display item data in chat box
     await ChatMessage.create({
-        user: game.user.id,
-        speaker: { alias: this.actor.name },
-        content: renderContent,
+      user: game.user.id,
+      speaker: { alias: this.actor.name },
+      content: renderContent,
     });
   }
 
@@ -665,22 +685,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     html.find(".item-delete").click((event) => {
       const item = this._getItemFromActor(event);
-
-      foundry.applications.api.DialogV2.confirm({
-        window: {
-          title: game.i18n.localize("OSE.dialog.deleteItem"),
-        },
-        content: game.i18n.format("OSE.dialog.confirmDeleteItem", {
-          name: item.name,
-        }),
-        yes: {
-          default: false,
-          callback: () => {
-            this._removeItemFromActor(item);
-          },
-        },
-        defaultYes: false,
-      });
+      this._promptRemoveItemFromActor(item);
     });
 
     html
