@@ -167,9 +167,38 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     }).render(true);
   }
 
-  async _onShowGpCost(event, preparedData) {
+  /**
+   * Prepare shopping cart data by filtering out items that have already been paid for
+   */
+  async _prepareShoppingCartData() {
+    const data = await this.getData();
+    
+    // Filter out items that have been marked as paid
+    const filterUnpaidItems = (items) => {
+      return items.filter(item => !item.flags?.ose?.paid);
+    };
+    
+    // Create a filtered copy of the data with only unpaid items
+    const cartData = foundry.utils.deepClone(data);
+    if (cartData.owned) {
+      cartData.owned.items = filterUnpaidItems(cartData.owned.items || []);
+      cartData.owned.weapons = filterUnpaidItems(cartData.owned.weapons || []);
+      cartData.owned.armors = filterUnpaidItems(cartData.owned.armors || []);
+      cartData.owned.containers = filterUnpaidItems(cartData.owned.containers || []);
+    }
+    
+    // Also filter the flat items array if it exists
+    if (cartData.items) {
+      cartData.items = filterUnpaidItems(cartData.items);
+    }
+    
+    return cartData;
+  }
+
+  async _onShowGpCost(event) {
     event.preventDefault();
-    new OseCharacterGpCost(this.actor, preparedData, {
+    const cartData = await this._prepareShoppingCartData();
+    new OseCharacterGpCost(this.actor, cartData, {
       top: this.position.top + 40,
       left: this.position.left + (this.position.width - 400) / 2,
     }).render(true);
@@ -216,7 +245,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     });
 
     html.find("a[data-action='gp-cost']").click((ev) => {
-      this._onShowGpCost(ev, this.getData());
+      this._onShowGpCost(ev);
     });
 
     // Everything below here is only needed if the sheet is editable
