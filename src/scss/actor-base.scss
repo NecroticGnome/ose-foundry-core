@@ -428,6 +428,9 @@
           flex-basis: 2.7rem;
         }
       }
+      #context-menu {
+        width: fit-content;
+      }
     }
     .editor {
       flex: 1 0 300px;

@@ -133,6 +133,16 @@ export default class OseActor extends Actor {
     this.updateSource({ prototypeToken });
   }
 
+  get isOwnerOrObserver() {
+    return (
+      this.isOwner ||
+      this.testUserPermission(
+        game.user,
+        CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER
+      )
+    );
+  }
+
   generateSave(hd) {
     hd = hd.includes("+") ? parseInt(hd) + 1 : parseInt(hd);
 
