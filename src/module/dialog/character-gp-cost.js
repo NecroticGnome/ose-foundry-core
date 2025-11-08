@@ -89,9 +89,15 @@ export default class OseCharacterGpCost extends FormApplication {
     }
     const newGP = gp.system.quantity.value - totalCost;
     if (newGP >= 0) {
-      this.object.updateEmbeddedDocuments("Item", [
+      await this.object.updateEmbeddedDocuments("Item", [
         { _id: gp.id, "system.quantity.value": newGP },
       ]);
+      
+      // Mark all items in the cart as "paid for" by setting a flag
+      await this.#markItemsAsPaid();
+      
+      // Close the dialog after successful transaction
+      await this.close();
     } else {
       ui.notifications.error(game.i18n.localize("OSE.error.notEnoughGP"));
     }
@@ -130,12 +136,40 @@ export default class OseCharacterGpCost extends FormApplication {
     const physical = new Set(["item", "container", "weapon", "armor"]);
     data.items.forEach((item) => {
       const itemData = item.system;
-      if (physical.has(item.type) && !itemData.treasure)
+      // Only count items that haven't been paid for yet
+      if (physical.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid)
         total += itemData.quantity.max
           ? itemData.cost
           : itemData.cost * itemData.quantity.value;
     });
     return total;
+  }
+
+  /**
+   * Mark all items in the shopping cart as paid for
+   * This prevents them from appearing in the cart on subsequent openings
+   * Items remain in inventory but won't be counted in cart calculations
+   * @private
+   */
+  async #markItemsAsPaid() {
+    const physical = new Set(["item", "container", "weapon", "armor"]);
+    const updates = [];
+    
+    this.object.items.forEach((item) => {
+      const itemData = item.system;
+      // Mark all non-treasure physical items that haven't been paid for yet
+      if (physical.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
+        updates.push({
+          _id: item.id,
+          "flags.ose.paid": true
+        });
+      }
+    });
+    
+    // Update all items in one batch
+    if (updates.length > 0) {
+      await this.object.updateEmbeddedDocuments("Item", updates);
+    }
   }
 
   /* -------------------------------------------- */
