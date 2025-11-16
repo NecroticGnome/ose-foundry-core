@@ -1,9 +1,9 @@
 /**
  * @file OSE Class Type Definitions used in the system character class definitions.
  */
-export const ATTRIBUTES = ["str", "dex", "con", "int", "wis", "cha"] as const;
+export type Attribute = "str" | "dex" | "con" | "int" | "wis" | "cha";
 
-export type Attribute = typeof ATTRIBUTES[number];
+export type ClassSkillKey = "cs" | "tr" | "hn" | "hs" | "ms" | "ol" | "pp";
 
 export type ClassicClassName =
   | "Cleric"
@@ -24,5 +24,5 @@ export type OseClass = {
     saves: number[];
     spells?: number[];
   }[];
-  skillChecks?: Record<string, number>[];
+  skillChecks?: Record<ClassSkillKey, number>[];
 };
