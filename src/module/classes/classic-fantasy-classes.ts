@@ -5,7 +5,7 @@ import type { ClassicClassName, OseClass } from "./types";
 
 // Ignoring prettier here to keep the table-like structure for readability
 // prettier-ignore
-const OSE_CLASSIC_CLASSES: Record<ClassicClassName, OseClass> = {
+const CLASSIC_FANTASY_CLASSES: Record<ClassicClassName, OseClass> = {
   Cleric: {
     name: "Cleric",
     levels: [
@@ -145,4 +145,4 @@ const OSE_CLASSIC_CLASSES: Record<ClassicClassName, OseClass> = {
   },
 };
 
-export default OSE_CLASSIC_CLASSES;
+export default CLASSIC_FANTASY_CLASSES;
