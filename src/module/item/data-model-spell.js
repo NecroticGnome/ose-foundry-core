@@ -9,7 +9,7 @@ export default class OseDataModelSpell extends foundry.abstract.TypeDataModel {
       foundry.data.fields;
     return {
       save: new StringField(),
-      lvl: new NumberField({ positive: true, min: 0 }),
+      lvl: new NumberField({ integer: true, min: 0 }),
       class: new StringField(),
       duration: new StringField(),
       range: new StringField(),
