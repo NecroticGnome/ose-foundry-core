@@ -1,0 +1,20 @@
+table.ose-class-progression, table.ose-class-abilities {
+  border-collapse: collapse;
+  border-spacing: 0;
+  th, td {
+    padding: 1px 3px;
+    text-align: center;
+  }
+  @for $i from 1 through 14 {
+    &.border-column-#{$i} {
+      th:nth-child(#{$i}), td:nth-child(#{$i}) {
+        border-right: 2px solid #000;
+      }
+    }
+  }
+}
+table.ose-class-progression {
+  thead tr:first-child th:not(:last-child) {
+    border-right: 2px solid #000;
+  }
+}
