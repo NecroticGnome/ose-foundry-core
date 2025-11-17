@@ -76,7 +76,7 @@ export default class OseCharacterGpCost extends FormApplication {
       preventRender,
     });
     // Generate gold
-    const totalCost = await this.#getTotalCost(this.getData());
+    const totalCost = await this.#getTotalCost(await this.getData());
     const gp = await this.object.items.find((item) => {
       const itemData = item.system;
       return (
