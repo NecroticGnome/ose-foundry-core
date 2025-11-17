@@ -5,6 +5,8 @@
 import OSE from "../config";
 
 export default class OseCharacterGpCost extends FormApplication {
+  static physicalItemTypes = new Set(["item", "container", "weapon", "armor"]);
+
   constructor(event, preparedData, position) {
     super(event, position);
     this.object.preparedData = preparedData;
@@ -74,7 +76,7 @@ export default class OseCharacterGpCost extends FormApplication {
       preventRender,
     });
     // Generate gold
-    const totalCost = await this.#getTotalCost(await this.getData());
+    const totalCost = await this.#getTotalCost(this.getData());
     const gp = await this.object.items.find((item) => {
       const itemData = item.system;
       return (
@@ -92,10 +94,10 @@ export default class OseCharacterGpCost extends FormApplication {
       await this.object.updateEmbeddedDocuments("Item", [
         { _id: gp.id, "system.quantity.value": newGP },
       ]);
-      
+
       // Mark all items in the cart as "paid for" by setting a flag
       await this.#markItemsAsPaid();
-      
+
       // Close the dialog after successful transaction
       await this.close();
     } else {
@@ -132,17 +134,24 @@ export default class OseCharacterGpCost extends FormApplication {
 
   // eslint-disable-next-line class-methods-use-this
   async #getTotalCost(data) {
-    let total = 0;
-    const physical = new Set(["item", "container", "weapon", "armor"]);
-    data.items.forEach((item) => {
+    return data.items.reduce((total, item) => {
       const itemData = item.system;
-      // Only count items that haven't been paid for yet
-      if (physical.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid)
-        total += itemData.quantity.max
-          ? itemData.cost
-          : itemData.cost * itemData.quantity.value;
-    });
-    return total;
+      // Only count non-treasure physical items that haven't been paid for yet
+      if (
+        OseCharacterGpCost.physicalItemTypes.has(item.type) &&
+        !itemData.treasure &&
+        !item.flags?.ose?.paid
+      ) {
+        return (
+          total +
+          (itemData.quantity.max
+            ? itemData.cost * itemData.quantity.value
+            : itemData.cost)
+        );
+      }
+
+      return total;
+    }, 0);
   }
 
   /**
@@ -152,20 +161,23 @@ export default class OseCharacterGpCost extends FormApplication {
    * @private
    */
   async #markItemsAsPaid() {
-    const physical = new Set(["item", "container", "weapon", "armor"]);
     const updates = [];
-    
+
     this.object.items.forEach((item) => {
       const itemData = item.system;
       // Mark all non-treasure physical items that haven't been paid for yet
-      if (physical.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
+      if (
+        OseCharacterGpCost.physicalItemTypes.has(item.type) &&
+        !itemData.treasure &&
+        !item.flags?.ose?.paid
+      ) {
         updates.push({
           _id: item.id,
-          "flags.ose.paid": true
+          "flags.ose.paid": true,
         });
       }
     });
-    
+
     // Update all items in one batch
     if (updates.length > 0) {
       await this.object.updateEmbeddedDocuments("Item", updates);

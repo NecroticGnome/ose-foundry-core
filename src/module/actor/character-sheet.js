@@ -172,12 +172,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
    */
   async _prepareShoppingCartData() {
     const data = await this.getData();
-    
+
     // Filter out items that have been marked as paid
     const filterUnpaidItems = (items) => {
-      return items.filter(item => !item.flags?.ose?.paid);
+      return items.filter((item) => !item.flags?.ose?.paid);
     };
-    
+
     // Create a filtered copy of the data with only unpaid items
     const cartData = foundry.utils.deepClone(data);
     if (cartData.owned) {
@@ -186,12 +186,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
       cartData.owned.armors = filterUnpaidItems(cartData.owned.armors || []);
       cartData.owned.containers = filterUnpaidItems(cartData.owned.containers || []);
     }
-    
+
     // Also filter the flat items array if it exists
     if (cartData.items) {
       cartData.items = filterUnpaidItems(cartData.items);
     }
-    
+
     return cartData;
   }
 
