@@ -204,15 +204,6 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     }).render(true);
   }
 
-  async _onShowItemTooltip(event) {
-    const templateData = {};
-    const dlg = await foundry.applications.handlebars.renderTemplate(
-      `${OSE.systemPath()}/templates/actors/partials/character-item-tooltip.html`,
-      templateData
-    );
-    document.querySelector(".game").append(dlg);
-  }
-
   /**
    * Activate event listeners using the prepared sheet HTML
    *
