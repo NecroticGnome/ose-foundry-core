@@ -155,11 +155,29 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
   get attackPatterns() {
     return [...this.weapons, ...this.abilities]
       .sort((a, b) => {
+        // Transparent attack patterns always go last.
         if (
           a.system.pattern !== "transparent" &&
           b.system.pattern === "transparent"
-        )
+        ) {
           return -1;
+        }
+        if (
+          a.system.pattern === "transparent" &&
+          b.system.pattern !== "transparent"
+        ) {
+          return 1;
+        }
+
+        // White attack patterns are used for all general monster abilities.
+        // Put these at the end of the colors.
+        if (a.system.pattern === "white" && b.system.pattern !== "white") {
+          return 1;
+        }
+        if (b.system.pattern === "white" && a.system.pattern !== "white") {
+          return -1;
+        }
+
         return b.type.localeCompare(a.type) || a.name.localeCompare(b.name);
       })
       .reduce((prev, curr) => {
