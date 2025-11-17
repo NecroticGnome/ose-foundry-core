@@ -10,6 +10,7 @@
           ></div>
           <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
             <div class="field-short">
+              {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
               {{item.system.cost}}
             </div>
           </div>
@@ -26,6 +27,7 @@
             ></div>
             <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
               <div class="field-short">
+                {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
                 {{item.system.cost}}
               </div>
             </div>
@@ -42,6 +44,7 @@
             ></div>
             <h4 class="item-name" title="{{bag.name}}">{{bag.name~}}</h4>
               <div class="field-short">
+                {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
                 {{bag.system.cost}}
               </div>
             </div>
@@ -56,6 +59,7 @@
             ></div>
             <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
               <div class="field-short">
+                {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
                 {{item.system.cost}}
               </div>
             </div>
@@ -74,6 +78,7 @@
             ></div>
             <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
               <div class="field-short">
+                {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
                 {{item.system.cost}}
               </div>
             </div>
