@@ -102,6 +102,29 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
     };
   }
 
+  /**
+   * @inheritdoc
+   */
+  static migrateData(source) {
+    this.#migrateCantrips(source);
+
+    return super.migrateData(source);
+  }
+
+  /**
+   * Ensure cantrips (level 0 spells) exist in the spells object.
+   * @param {OseDataModelCharacter} source - Source data to migrate
+   */
+  static #migrateCantrips(source) {
+    const spells = source.spells ?? {};
+
+    // If there are spells but no cantrips (level 0 spells),
+    // add an empty cantrip entry.
+    if (spells && !spells["0"]) {
+      spells["0"] = { max: 0, value: 0 };
+    }
+  }
+
   // @todo This only needs to be public until
   //       we can ditch sharing out AC/AAC.
   // eslint-disable-next-line class-methods-use-this

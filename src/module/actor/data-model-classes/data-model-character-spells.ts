@@ -91,7 +91,7 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
     maxSlots: { [n: number]: { max: number } }
   ) {
     if (item === "enabled") return list;
-    const lv = idx + 1;
+    const lv = idx;
     const max = maxSlots[lv]?.max || 0;
     const used = usedSlots[lv];
 

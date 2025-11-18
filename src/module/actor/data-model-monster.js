@@ -27,6 +27,7 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
    */
   static migrateData(source) {
     this.#migrateMonsterLanguages(source);
+    this.#migrateCantrips(source);
 
     return super.migrateData(source);
   }
@@ -43,6 +44,20 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
     // If languages.value isn't an iterable, use an empty array
     if (typeof languages?.value?.[Symbol.iterator] !== "function") {
       languages.value = [];
+    }
+  }
+
+  /**
+   * Ensure cantrips (level 0 spells) exist in the spells object.
+   * @param {OseDataModelMonster} source - Source data to migrate
+   */
+  static #migrateCantrips(source) {
+    const spells = source.spells ?? {};
+
+    // If there are spells but no cantrips (level 0 spells),
+    // add an empty cantrip entry.
+    if (spells && !spells["0"]) {
+      spells["0"] = { max: 0, value: 0 };
     }
   }
 
