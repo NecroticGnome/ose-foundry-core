@@ -1,9 +1,7 @@
 /**
  * @file OSE Class Type Definitions used in the system character class definitions.
  */
-export type Attribute = "str" | "dex" | "con" | "int" | "wis" | "cha";
-
-export type ClassSkillKey = "cs" | "tr" | "hn" | "hs" | "ms" | "ol" | "pp";
+import type { Attribute } from "../config";
 
 export type ClassicClassName =
   | "Cleric"
@@ -16,7 +14,9 @@ export type ClassicClassName =
 
 export type OseClass = {
   name: string;
-  abilitiesPack?: string;
+  abilitiesPack: string;
+  spellsPack?: string;
+  requirements: Partial<Record<Attribute, number>>;
   levels: {
     xp: number;
     hd: string;
@@ -24,5 +24,6 @@ export type OseClass = {
     saves: number[];
     spells?: number[];
   }[];
-  skillChecks?: Record<ClassSkillKey, number>[];
+  skillChecks?: Record<string, number>[];
+  source: string;
 };

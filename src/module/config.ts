@@ -7,7 +7,7 @@ import OseDataModelCharacterEncumbranceDetailed from "./actor/data-model-classes
 import OseDataModelCharacterEncumbranceDisabled from "./actor/data-model-classes/data-model-character-encumbrance-disabled";
 import OseDataModelCharacterEncumbranceItemBased from "./actor/data-model-classes/data-model-character-encumbrance-item-based";
 
-import CLASSIC_FANTASY_CLASSES from "./classes/classic-fantasy-classes";
+import { CLASSIC_FANTASY_CLASSES } from "./classes/classic-fantasy-classes";
 
 export type OseConfig = typeof OSE;
 
