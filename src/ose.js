@@ -167,9 +167,13 @@ Hooks.once("setup", () => {
 
 Hooks.once("ready", async () => {
   Hooks.on("hotbarDrop", (bar, data, slot) => {
-    macros.createOseMacro(data, slot);
-    // Returning false to stop the rest of hotbarDrop handling.
-    return false;
+    if (["Macro", "RollTable", "Item"].includes(data.type)) {
+      macros.createOseMacro(data, slot);
+      // Returning false to stop the rest of hotbarDrop handling.
+      return false;
+    }
+    // Any other type of drop can continue to be handled normally.
+    return true;
   });
 
   await promptTokenRingSelection();
