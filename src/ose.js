@@ -208,6 +208,13 @@ Hooks.on("updateActor", party.update);
 Hooks.on("renderCombatTracker", (app, html) =>
   app.renderGroups(html instanceof HTMLElement ? html : html[0])
 );
+/**
+ * @param {foundry.documents.CombatantGroup} combatantGroup - The combatant group being updated
+ * @param {object} updates - The updates being applied
+ */
+Hooks.on("updateCombatantGroup", async (combatantGroup, updates) => {
+  await combatantGroup.parent?.onUpdateCombatantGroup(combatantGroup, updates);
+});
 /** @param {OSECombatant} combatant */
 Hooks.on("createCombatant", (combatant) => {
   if (
