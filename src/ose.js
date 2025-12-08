@@ -210,10 +210,9 @@ Hooks.on("renderCombatTracker", (app, html) =>
 );
 /**
  * @param {foundry.documents.CombatantGroup} combatantGroup - The combatant group being updated
- * @param {object} updates - The updates being applied
  */
-Hooks.on("updateCombatantGroup", async (combatantGroup, updates) => {
-  await combatantGroup.parent?.onUpdateCombatantGroup(combatantGroup, updates);
+Hooks.on("updateCombatantGroup", async (combatantGroup) => {
+  await combatantGroup.parent?.onUpdateCombatantGroup();
 });
 /** @param {OSECombatant} combatant */
 Hooks.on("createCombatant", (combatant) => {
