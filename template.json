@@ -60,6 +60,9 @@
       "spellcaster": {
         "spells": {
           "enabled": false,
+          "0": {
+            "max": 0
+          },
           "1": {
             "max": 0
           },
