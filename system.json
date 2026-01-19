@@ -26,12 +26,8 @@
       "url": "https://github.com/NecroticGnome/ose-foundry-core#contributors-"
     }
   ],
-  "esmodules": [
-    "dist/ose.js"
-  ],
-  "styles": [
-    "dist/ose.css"
-  ],
+  "esmodules": ["dist/ose.js"],
+  "styles": ["dist/ose.css"],
   "packs": [],
   "languages": [
     {
@@ -118,6 +114,10 @@
   "background": "systems/ose/assets/ose-system.webp",
   "flags": {
     "allowBugReporter": true
+  },
+  "hotReload": {
+    "extensions": ["css"],
+    "paths": ["dist/"]
   },
   "relationships": {
     "recommends": [

@@ -1,0 +1,90 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true,
+		"defaultBranch": "main"
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": ["**", "!**/lang/**/*.json", "!**/*.d.ts", "!**/dist/**", "!**/foundry/**"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineWidth": 120
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedImports": "warn",
+				"noUnusedVariables": "warn"
+			},
+			"style": {
+				"noParameterAssign": "error",
+				"useAsConstAssertion": "error",
+				"useDefaultParameterLast": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"noUselessElse": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always",
+			"lineWidth": 120
+		},
+		"globals": [
+			"game",
+			"foundry",
+			"CONFIG",
+			"CONST",
+			"Hooks",
+			"Item",
+			"Items",
+			"ItemDirectory",
+			"ItemSheet",
+			"Actor",
+			"Actors",
+			"ActorDirectory",
+			"ActorSheet",
+			"Token",
+			"Macro",
+			"Settings",
+			"FormApplication",
+			"FrameViewer",
+			"ChatMessage",
+			"TextEditor",
+			"Roll",
+			"$",
+			"Dialog",
+			"renderTemplate",
+			"canvas",
+			"ui",
+			"isNewerVersion",
+			"fromUuid",
+			"fromUuidSync",
+			"PoolTerm"
+		]
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	}
+}
