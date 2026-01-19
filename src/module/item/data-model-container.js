@@ -40,11 +40,13 @@ export default class OseDataModelContainer extends foundry.abstract
   get totalWeight() {
     if (!this.contents) return 0;
 
-    return this.contents.reduce(
-      (acc, { system: { weight, quantity } }) =>
-        acc + weight * (quantity?.value || 1),
-      0
-    );
+    return this.contents
+      .reduce(
+        (acc, { system: { weight, quantity } }) =>
+          acc + weight * (quantity?.value || 1),
+        0
+      )
+      .toFixed(2);
   }
 
   get manualTags() {

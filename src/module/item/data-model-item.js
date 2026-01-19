@@ -28,11 +28,11 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   }
 
   get cumulativeWeight() {
-    return this.weight * this.quantity.value;
+    return (this.weight * this.quantity.value).toFixed(2);
   }
 
   get cumulativeCost() {
-    return this.cost * this.quantity.value;
+    return (this.cost * this.quantity.value).toFixed(2);
   }
 
   get cumulativeItemslots() {
