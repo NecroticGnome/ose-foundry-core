@@ -2,7 +2,7 @@
  * @file Contains tests for Actor Sheet.
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   cleanUpActorsByKey,
@@ -20,9 +20,9 @@ import {
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
-import OseItem from "../../item/entity";
+import type OseItem from "../../item/entity";
 import OseActorSheet from "../actor-sheet";
-import OseActor from "../entity";
+import type OseActor from "../entity";
 
 export const key = "ose.actor.sheet";
 export const options = {
@@ -53,37 +53,19 @@ type DragNDropDocuments = {
 /* --------------------------------------------- */
 const getActor = async () => game.actors?.getName(`Test Actor ${key}`);
 
-export default ({
-  describe,
-  it,
-  expect,
-  after,
-  afterEach,
-  before,
-}: QuenchMethods) => {
+export default ({ describe, it, expect, after, afterEach, before }: QuenchMethods) => {
   // Saving settings being modified by tests
-  const originalCtrlSetting = game.settings.get(
-    game.system.id,
-    "invertedCtrlBehavior"
-  );
+  const originalCtrlSetting = game.settings.get(game.system.id, "invertedCtrlBehavior");
 
   after(async () => {
     await cleanUpActorsByKey(key);
     await closeSheets();
-    game.settings.set(
-      game.system.id,
-      "invertedCtrlBehavior",
-      originalCtrlSetting
-    );
+    game.settings.set(game.system.id, "invertedCtrlBehavior", originalCtrlSetting);
   });
 
   describe("getData()", () => {
     it("returns the expected data", async () => {
-      const actor = (await createMockActorKey(
-        "character",
-        {},
-        key
-      )) as OseActor;
+      const actor = (await createMockActorKey("character", {}, key)) as OseActor;
       const sheet = new OseActorSheet(actor);
       const data = await sheet.getData();
 
@@ -111,8 +93,7 @@ export default ({
 
         expect(actor?.items.size).equal(1);
         const mockedItem = item?.pop();
-        expect(actor?.items.contents.find((o) => o.id === mockedItem?.id)).not
-          .undefined;
+        expect(actor?.items.contents.find((o) => o.id === mockedItem?.id)).not.undefined;
 
         // Select tab to look inside
         let tab = "";
@@ -137,16 +118,13 @@ export default ({
 
         // Setup what to click
         const clickElement = document.querySelector(`${tab} .item-name`);
-        const descriptionElement =
-          clickElement?.parentElement?.nextElementSibling;
+        const descriptionElement = clickElement?.parentElement?.nextElementSibling;
         expect([...descriptionElement?.classList])
           .to.be.an("array")
           .that.does.not.include("expanded");
 
         // Mock event
-        document
-          .querySelector(`${tab} .item-name`)
-          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        document.querySelector(`${tab} .item-name`)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await delay(200);
 
         // Verify method
@@ -176,11 +154,7 @@ export default ({
     };
 
     before(async () => {
-      const actor = (await createMockActorKey(
-        "character",
-        {},
-        key
-      )) as OseActor;
+      const actor = (await createMockActorKey("character", {}, key)) as OseActor;
       await actor.update({ system: { spells: { enabled: true } } });
       actor?.sheet?.render(true);
       await delay(220);
@@ -189,9 +163,7 @@ export default ({
     it("clicking the category name hides the item cateogry", async () => {
       const sheets = openWindows("sheet");
       expect(sheets.length).equal(1);
-      const categoryElement = document.querySelector(
-        ".tab[data-tab='inventory'] .item-list"
-      );
+      const categoryElement = document.querySelector(".tab[data-tab='inventory'] .item-list");
       expect(categoryElement?.style.display).equal("");
       await clickCategory();
       expect(categoryElement?.style.display).equal("none");
@@ -200,9 +172,7 @@ export default ({
     it("clicking the category name again shows the item cateogry", async () => {
       const sheets = openWindows("sheet");
       expect(sheets.length).equal(1);
-      const categoryElement = document.querySelector(
-        ".tab[data-tab='inventory'] .item-list"
-      );
+      const categoryElement = document.querySelector(".tab[data-tab='inventory'] .item-list");
       expect(categoryElement?.style.display).equal("none");
       await clickCategory();
       expect(categoryElement?.style.display).equal("");
@@ -242,12 +212,8 @@ export default ({
       expect(actor?.items.size).equal(2);
 
       const container = actor?.items?.getName("New Actor Test Container");
-      expect(
-        actor?.items.getName("New Actor Test Weapon")?.system.containerId
-      ).equal(container?.id);
-      const containerElement = document.querySelector(
-        ".tab[data-tab='inventory'] .container .contained-items"
-      );
+      expect(actor?.items.getName("New Actor Test Weapon")?.system.containerId).equal(container?.id);
+      const containerElement = document.querySelector(".tab[data-tab='inventory'] .container .contained-items");
       expect(containerElement?.style.display).equal("");
 
       await clickContainerCaret();
@@ -262,12 +228,8 @@ export default ({
       expect(actor?.items.size).equal(2);
 
       const container = actor?.items?.getName("New Actor Test Container");
-      expect(
-        actor?.items.getName("New Actor Test Weapon")?.system.containerId
-      ).equal(container?.id);
-      const containerElement = document.querySelector(
-        ".tab[data-tab='inventory'] .container .contained-items"
-      );
+      expect(actor?.items.getName("New Actor Test Weapon")?.system.containerId).equal(container?.id);
+      const containerElement = document.querySelector(".tab[data-tab='inventory'] .container .contained-items");
 
       expect(containerElement?.style.display).equal("none");
       await clickContainerCaret();
@@ -285,20 +247,14 @@ export default ({
     const clickItemSummary = async (tab: string) => {
       const actor = await getActor();
       document
-        .querySelector(
-          `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-name`
-        )
+        .querySelector(`#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-name`)
         ?.click();
       await delay(320);
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const clickNavTab = async (tab: string) => {
       const actor = await getActor();
-      document
-        .querySelector(
-          `#OseActorSheetCharacter-Actor-${actor.id} nav.sheet-tabs a[data-tab="${tab}"]`
-        )
-        ?.click();
+      document.querySelector(`#OseActorSheetCharacter-Actor-${actor.id} nav.sheet-tabs a[data-tab="${tab}"]`)?.click();
       await delay(120);
     };
 
@@ -346,7 +302,7 @@ export default ({
           expect(actor?.items.size).equal(1);
 
           const summaryElement = document.querySelector(
-            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`
+            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
           expect([...summaryElement?.classList])
             .to.be.an("array")
@@ -366,7 +322,7 @@ export default ({
           expect(actor?.items.size).equal(1);
 
           const summaryElement = document.querySelector(
-            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`
+            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
           expect([...summaryElement?.classList])
             .to.be.an("array")
@@ -382,9 +338,7 @@ export default ({
           await clickNavTab(tab);
 
           const actor = await getActor();
-          const item = actor?.items.getName(
-            `New Actor Test ${itemType.capitalize()}`
-          );
+          const item = actor?.items.getName(`New Actor Test ${itemType.capitalize()}`);
 
           await clickItemSummary(tab);
           await item?.update({ system: { description: "hello world" } });
@@ -392,7 +346,7 @@ export default ({
           expect(item?.system.description).equal("hello world");
 
           const summaryElement = document.querySelector(
-            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`
+            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
           expect(summaryElement?.innerHTML.indexOf("hello world") >= 0).is.true;
 
@@ -407,18 +361,15 @@ export default ({
           const macroReference = `<p>@UUID[${macro?.uuid}]{Mock Macro}</p>`;
 
           const actor = await getActor();
-          const item = actor?.items.getName(
-            `New Actor Test ${itemType.capitalize()}`
-          );
+          const item = actor?.items.getName(`New Actor Test ${itemType.capitalize()}`);
           await item?.update({ system: { description: macroReference } });
           await waitForInput();
 
           const summaryElement = document.querySelector(
-            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`
+            `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
           expect(summaryElement).is.not.null;
-          expect(summaryElement?.querySelector(`a[data-uuid="${macro?.uuid}"]`))
-            .is.not.null;
+          expect(summaryElement?.querySelector(`a[data-uuid="${macro?.uuid}"]`)).is.not.null;
           await macro?.delete();
           await item?.update({ system: { description: "" } });
         });
@@ -443,9 +394,7 @@ export default ({
   describe("_displayItemInChat(event)", () => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const clickItemShow = async (tab: string) => {
-      document
-        .querySelector(`${tab} .item-show`)
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      document.querySelector(`${tab} .item-show`)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       await delay(220);
     };
 
@@ -485,9 +434,7 @@ export default ({
         await clickItemShow(tab);
         await waitForInput();
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0]?.content).contain(
-          `New Actor Test ${itemType.capitalize()}`
-        );
+        expect(game.messages?.contents[0]?.content).contain(`New Actor Test ${itemType.capitalize()}`);
         actor?.items.forEach((i: OseItem) => i.delete());
       });
 
@@ -513,9 +460,7 @@ export default ({
 
           await createActorTestItem(actor, itemType);
           await waitForInput();
-          const item = actor?.items.getName(
-            `New Actor Test ${itemType.capitalize()}`
-          );
+          const item = actor?.items.getName(`New Actor Test ${itemType.capitalize()}`);
           expect(actor?.items.size).equal(1);
 
           // eslint-disable-next-line no-underscore-dangle
@@ -524,11 +469,7 @@ export default ({
           expect(actor?.items.size).equal(0);
         });
 
-        if (
-          itemType !== "container" &&
-          itemType !== "spell" &&
-          itemType !== "ability"
-        ) {
+        if (itemType !== "container" && itemType !== "spell" && itemType !== "ability") {
           it("can remove item inside container", async () => {
             const actor = await getActor();
             expect(actor?.items.size).equal(0);
@@ -538,10 +479,8 @@ export default ({
             await waitForInput();
             expect(actor?.items.size).equal(2);
 
-            const item = actor?.items.getName(
-              `New Actor Test ${itemType.capitalize()}`
-            );
-            const container = actor?.items.getName(`New Actor Test Container`);
+            const item = actor?.items.getName(`New Actor Test ${itemType.capitalize()}`);
+            const container = actor?.items.getName("New Actor Test Container");
             expect(item).not.undefined;
             expect(container).not.undefined;
 
@@ -569,10 +508,8 @@ export default ({
             await waitForInput();
             expect(actor?.items.size).equal(2);
 
-            const item = actor?.items.getName(
-              `New Actor Test ${itemType.capitalize()}`
-            );
-            const container = actor?.items.getName(`New Actor Test Container`);
+            const item = actor?.items.getName(`New Actor Test ${itemType.capitalize()}`);
+            const container = actor?.items.getName("New Actor Test Container");
             expect(item).not.undefined;
             expect(container).not.undefined;
             expect(actor?.items.size).equal(2);
@@ -702,16 +639,10 @@ export default ({
 
     it("resetting spells resets the cast field to maximum", async () => {
       const actor = await getActor();
-      document
-        .querySelector(
-          `#OseActorSheetCharacter-Actor-${actor.id} a[data-action='reset-spells']`
-        )
-        ?.click();
+      document.querySelector(`#OseActorSheetCharacter-Actor-${actor.id} a[data-action='reset-spells']`)?.click();
       await waitForInput();
 
-      expect(actor?.items.contents[0].system.cast).equal(
-        actor?.items.contents[0].system.memorized
-      );
+      expect(actor?.items.contents[0].system.cast).equal(actor?.items.contents[0].system.memorized);
     });
 
     after(async () => {
@@ -760,7 +691,7 @@ export default ({
       expect(game.messages?.contents[0].content).contain(
         `<h2>${game.i18n.format("OSE.roll.attacksWith", {
           name: "New Actor Test Weapon",
-        })}</h2>`
+        })}</h2>`,
       );
       expect(actor?.items.contents[0].system.counter.value).equal(2);
     });
@@ -783,7 +714,7 @@ export default ({
       expect(game.messages?.contents[0].content).contain(
         `<h2>${game.i18n.format("OSE.roll.attacksWith", {
           name: "New Actor Test Weapon",
-        })}</h2>`
+        })}</h2>`,
       );
     });
 
@@ -803,9 +734,7 @@ export default ({
 
       // Verification
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        "<h2>New Actor Test Spell</h2>"
-      );
+      expect(game.messages?.contents[0].content).contain("<h2>New Actor Test Spell</h2>");
     });
 
     it("rolling anything else rolls the formula", async () => {
@@ -830,7 +759,7 @@ export default ({
       expect(game.messages?.contents[0].content).contain(
         `<h2>${game.i18n.format("OSE.roll.formula", {
           label: "New Actor Test Ability",
-        })}</h2>`
+        })}</h2>`,
       );
     });
 
@@ -864,13 +793,11 @@ export default ({
 
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const clickSave = async (save: string) => {
-      document
-        .querySelector(`li[data-save="${save}"] a`)
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      document.querySelector(`li[data-save="${save}"] a`)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
       await delay(220);
     };
 
-    describe(`character can roll`, () => {
+    describe("character can roll", () => {
       before(async () => {
         const actor = await createMockActorKey("character", {}, key);
         await actor?.sheet?.render(true);
@@ -889,7 +816,7 @@ export default ({
           expect(game.messages?.contents[0].content).contain(
             game.i18n.format("OSE.roll.save", {
               save: game.i18n.localize(`OSE.saves.${save}.long`),
-            })
+            }),
           );
         });
       });
@@ -901,7 +828,7 @@ export default ({
       });
     });
 
-    describe(`monster can roll`, () => {
+    describe("monster can roll", () => {
       before(async () => {
         const actor = await createMockActorKey("monster", {}, key);
         await actor?.sheet?.render(true);
@@ -917,7 +844,7 @@ export default ({
           expect(game.messages?.contents[0].content).contain(
             game.i18n.format("OSE.roll.save", {
               save: game.i18n.localize(`OSE.saves.${save}.long`),
-            })
+            }),
           );
         });
       });
@@ -954,9 +881,7 @@ export default ({
         expect(game.messages?.size).equal(0);
         await clickAttack(attackClass);
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0].content).contain(
-          game.i18n.format("OSE.roll.attacks", { name: actor?.name })
-        );
+        expect(game.messages?.contents[0].content).contain(game.i18n.format("OSE.roll.attacks", { name: actor?.name }));
         await trashChat();
       });
     });
@@ -969,10 +894,7 @@ export default ({
   /* --------------------------------------------- */
   /* Check Test Helper functions                   */
   /* --------------------------------------------- */
-  const dragNDropSanityChecks = (
-    documents: DragNDropDocuments,
-    items: DragNDropItems
-  ) => {
+  const dragNDropSanityChecks = (documents: DragNDropDocuments, items: DragNDropItems) => {
     // Check Actor constructed properly
     expect(documents.actor).not.undefined;
     expect(documents.actor?.documentName).equal("Actor");
@@ -983,10 +905,7 @@ export default ({
     expect(items.target.item?.name).equal("TargetContainer");
   };
 
-  const dragNDropCasePreflightCheck = (
-    sourceItemName: string,
-    items: DragNDropItems
-  ) => {
+  const dragNDropCasePreflightCheck = (sourceItemName: string, items: DragNDropItems) => {
     expect(items.source.item).not.undefined;
     expect(items.source.item?.documentName).equal("Item");
     expect(items.source.item?.name).equal(sourceItemName);
@@ -996,20 +915,14 @@ export default ({
     expect(items.target.item?.system.itemIds.length).equal(0);
   };
 
-  const dragNDropCasePostflightCheck = (
-    documents: DragNDropDocuments,
-    items: DragNDropItems
-  ) => {
+  const dragNDropCasePostflightCheck = (documents: DragNDropDocuments, items: DragNDropItems) => {
     // Check item data
     expect(items.target.item?.system.itemIds.length).equal(1);
     expect(items.target.item?.system.itemIds).contain(items.source.item?.id);
     expect(items.source.item?.system.containerId).equal(items.target.item?.id);
 
     // Check getters
-    const getter =
-      items.source.item?.type === "armor"
-        ? items.source.item?.type
-        : `${items.source.item?.type}s`;
+    const getter = items.source.item?.type === "armor" ? items.source.item?.type : `${items.source.item?.type}s`;
     const amount = getter === "containers" ? 1 : 0;
     expect(documents.actor?.system[getter].length).equal(amount);
   };
@@ -1034,21 +947,14 @@ export default ({
         documents.actor = await createMockActorKey("character", {}, key);
 
         // Create target container
-        [items.target.item] = await createActorTestItem(
-          documents.actor,
-          "container",
-          "TargetContainer"
-        );
+        [items.target.item] = await createActorTestItem(documents.actor, "container", "TargetContainer");
       });
 
       it(`add ${itemType} to container`, async () => {
         dragNDropSanityChecks(documents, items);
 
         // Create source item
-        [items.source.item] = await createActorTestItem(
-          documents.actor,
-          itemType
-        );
+        [items.source.item] = await createActorTestItem(documents.actor, itemType);
 
         // Perform pre-flight checks
         const sourceItemName = `New Actor Test ${itemType.capitalize()}`;
@@ -1056,10 +962,7 @@ export default ({
 
         // Perform operation
         // eslint-disable-next-line no-underscore-dangle
-        await documents.actor?.sheet?._onContainerItemAdd(
-          items.source.item,
-          items.target.item
-        );
+        await documents.actor?.sheet?._onContainerItemAdd(items.source.item, items.target.item);
 
         // Perform post-flight checks
         dragNDropCasePostflightCheck(documents, items);
@@ -1091,24 +994,14 @@ export default ({
         documents.actor = await createMockActorKey("character", {}, key);
 
         // Create target container
-        [items.target.item] = await createActorTestItem(
-          documents.actor,
-          "container",
-          "TargetContainer"
-        );
+        [items.target.item] = await createActorTestItem(documents.actor, "container", "TargetContainer");
 
         // Create source item
-        [items.source.item] = await createActorTestItem(
-          documents.actor,
-          itemType
-        );
+        [items.source.item] = await createActorTestItem(documents.actor, itemType);
 
         // Perform operation
         // eslint-disable-next-line no-underscore-dangle
-        await documents.actor?.sheet?._onContainerItemAdd(
-          items.source.item,
-          items.target.item
-        );
+        await documents.actor?.sheet?._onContainerItemAdd(items.source.item, items.target.item);
       });
 
       it(`remove ${itemType} from container`, async () => {
@@ -1117,10 +1010,7 @@ export default ({
 
         // Perform operation
         // eslint-disable-next-line no-underscore-dangle
-        await documents.actor?.sheet?._onContainerItemRemove(
-          items.source.item,
-          items.target.item
-        );
+        await documents.actor?.sheet?._onContainerItemRemove(items.source.item, items.target.item);
 
         // Perform pre-flight checks
         const sourceItemName = `New Actor Test ${itemType.capitalize()}`;
@@ -1162,9 +1052,7 @@ export default ({
         await documents.actor?.sheet?._onDropItemCreate([items.source.item]);
 
         // Store new item as it recreates in the character sheet
-        items.source.item = documents.actor?.items.getName(
-          sourceItemName
-        ) as OseItem;
+        items.source.item = documents.actor?.items.getName(sourceItemName) as OseItem;
 
         expect(items.source.item).not.undefined;
       });
@@ -1188,8 +1076,7 @@ export default ({
       expect(dialogs.length).equal(1);
 
       defaultChoices.forEach((choice) => {
-        expect(dialogs[0]?.element.querySelector(`option[value="${choice}"]`))
-          .is.not.null;
+        expect(dialogs[0]?.element.querySelector(`option[value="${choice}"]`)).is.not.null;
       });
       await dialogs[0]?.close();
     });
@@ -1205,8 +1092,7 @@ export default ({
       expect(dialogs.length).equal(1);
 
       customChoices.forEach((choice) => {
-        expect(dialogs[0]?.element.querySelector(`option[value="${choice}"]`))
-          .is.not.null;
+        expect(dialogs[0]?.element.querySelector(`option[value="${choice}"]`)).is.not.null;
       });
       await dialogs[0]?.close();
     });
@@ -1234,9 +1120,7 @@ export default ({
         } else if (itemType === "treasure") {
           selector = `.sheet .item-create[data-type="item"][data-treasure="true"]`;
         }
-        document
-          .querySelector(selector)
-          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        document.querySelector(selector)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
         expect(actor?.items.size).equal(1);
@@ -1256,7 +1140,7 @@ export default ({
   describe("_updateItemQuantity(event)", () => {
     const updateQuantity = (element: HTMLInputElement, modifier: number) => {
       // eslint-disable-next-line no-param-reassign
-      element.value = String(parseInt(element.value, 10) + modifier);
+      element.value = String(Number.parseInt(element.value, 10) + modifier);
       const event = new InputEvent("change");
       element.dispatchEvent(event);
     };
@@ -1264,15 +1148,12 @@ export default ({
     it("can add to the quantity", async () => {
       const actor = await createMockActorKey("character", {}, key);
       actor?.sheet?.render(true);
-      const [item] = (await createActorTestItem(
-        actor,
-        "item"
-      )) as unknown as OseItem;
+      const [item] = (await createActorTestItem(actor, "item")) as unknown as OseItem;
       await item.update({ system: { quantity: { value: 2, max: 4 } } });
       await waitForInput();
 
       const quantityElement = document.querySelector(
-        `.sheet .item[data-item-id="${item.id}"] input[data-field="value"]`
+        `.sheet .item[data-item-id="${item.id}"] input[data-field="value"]`,
       ) as HTMLInputElement;
 
       expect(item.system.quantity.value).equal(2);
@@ -1284,15 +1165,12 @@ export default ({
     it("can subtract from the quantity", async () => {
       const actor = await createMockActorKey("character", {}, key);
       actor?.sheet?.render(true);
-      const [item] = (await createActorTestItem(
-        actor,
-        "item"
-      )) as unknown as OseItem;
+      const [item] = (await createActorTestItem(actor, "item")) as unknown as OseItem;
       await item.update({ system: { quantity: { value: 2, max: 4 } } });
       await waitForInput();
 
       const quantityElement = document.querySelector(
-        `.sheet .item[data-item-id="${item.id}"] input[data-field="value"]`
+        `.sheet .item[data-item-id="${item.id}"] input[data-field="value"]`,
       ) as HTMLInputElement;
 
       expect(item.system.quantity.value).equal(2);
@@ -1321,22 +1199,16 @@ export default ({
         await delay(600);
 
         document
-          .querySelector(
-            `#OseActorSheet${actorType.capitalize()}-Actor-${actor?.id} .configure-actor`
-          )
+          .querySelector(`#OseActorSheet${actorType.capitalize()}-Actor-${actor?.id} .configure-actor`)
           ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
         const windows = openWindows("sheet-tweaks");
-        const w = windows.filter(
-          (win) => win.object?.name === `Test Actor ${key} ${actorType}`
-        );
+        const w = windows.filter((win) => win.object?.name === `Test Actor ${key} ${actorType}`);
         expect(w.length).equal(1);
         const windowElement = w?.[0]?.element?.[0];
         expect(windowElement).not.undefined;
-        expect(
-          windowElement.querySelector("h4.window-title").innerHTML
-        ).to.include(`Test Actor ${key} ${actorType}`);
+        expect(windowElement.querySelector("h4.window-title").innerHTML).to.include(`Test Actor ${key} ${actorType}`);
         // eslint-disable-next-line no-restricted-syntax
         await w?.[0]?.close();
         await actor?.delete();

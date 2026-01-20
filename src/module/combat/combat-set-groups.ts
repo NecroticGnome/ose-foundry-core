@@ -1,5 +1,5 @@
 import { OSE } from "../config";
-import { OSECombatant } from "./combatant";
+import type { OSECombatant } from "./combatant";
 
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
@@ -37,7 +37,7 @@ export default class OSECombatGroupSelector extends HandlebarsApplicationMixin(A
 
   static PARTS = {
     main: {
-      template: `/systems/ose-dev/dist/templates/apps/combat-set-groups.hbs`,
+      template: "/systems/ose-dev/dist/templates/apps/combat-set-groups.hbs",
     },
   };
 

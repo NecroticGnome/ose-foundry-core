@@ -5,7 +5,6 @@ import OSE from "../config";
 import OseEntityTweaks from "../dialog/entity-tweaks";
 import skipRollDialogCheck from "../helpers-behaviour";
 
-
 export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   /**
    * IDs for items on the sheet that have been expanded.
@@ -130,7 +129,6 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async _promptRemoveItemFromActor(item) {
-    const sheet = this;
     return foundry.applications.api.DialogV2.confirm({
       window: {
         title: game.i18n.localize("OSE.dialog.deleteItem"),
@@ -141,7 +139,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
       yes: {
         default: false,
         callback: () => {
-          sheet._removeItemFromActor(item);
+          this._removeItemFromActor(item);
         },
       },
       defaultYes: false,
@@ -156,20 +154,15 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
     if (item.type !== "container" && item.system.containerId !== "") {
       const { containerId } = item.system;
-      const newItemIds = this.actor.items
-        .get(containerId)
-        .system.itemIds.filter((o) => o !== item.id);
+      const newItemIds = this.actor.items.get(containerId).system.itemIds.filter((o) => o !== item.id);
 
-      await this.actor.updateEmbeddedDocuments("Item", [
-        { _id: containerId, system: { itemIds: newItemIds } },
-      ]);
+      await this.actor.updateEmbeddedDocuments("Item", [{ _id: containerId, system: { itemIds: newItemIds } }]);
     }
     if (item.type === "container" && item.system.itemIds) {
       const containedItems = item.system.itemIds;
       const updateData = containedItems.reduce((acc, val) => {
         // Only create update data for items that still exist on the actor
-        if (this.actor.items.get(val))
-          acc.push({ _id: val, "system.containerId": "" });
+        if (this.actor.items.get(val)) acc.push({ _id: val, "system.containerId": "" });
         return acc;
       }, []);
 
@@ -199,11 +192,11 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     event.preventDefault();
     const item = this._getItemFromActor(event);
     if (event.target.dataset.field === "cast") {
-      return item.update({ "system.cast": parseInt(event.target.value) });
+      return item.update({ "system.cast": Number.parseInt(event.target.value) });
     }
     if (event.target.dataset.field === "memorize") {
       return item.update({
-        "system.memorized": parseInt(event.target.value),
+        "system.memorized": Number.parseInt(event.target.value),
       });
     }
   }
@@ -266,9 +259,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   _onSortItem(event, itemData) {
     const source = this.actor.items.get(itemData._id);
-    const siblings = this.actor.items.filter(
-      (i) => i.data._id !== source.data._id
-    );
+    const siblings = this.actor.items.filter((i) => i.data._id !== source.data._id);
     const dropTarget = event.target.closest("[data-item-id]");
     const targetId = dropTarget ? dropTarget.dataset.itemId : null;
     const target = siblings.find((s) => s.data._id === targetId);
@@ -276,19 +267,12 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     const targetData = target?.system;
 
     // Dragging items into a container
-    if (
-      (target?.type === "container" || target?.data?.type === "container") &&
-      targetData.containerId === ""
-    ) {
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": target.id },
-      ]);
+    if ((target?.type === "container" || target?.data?.type === "container") && targetData.containerId === "") {
+      this.actor.updateEmbeddedDocuments("Item", [{ _id: source.id, "system.containerId": target.id }]);
       return;
     }
     if (source?.system.containerId !== "") {
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": "" },
-      ]);
+      this.actor.updateEmbeddedDocuments("Item", [{ _id: source.id, "system.containerId": "" }]);
     }
 
     super._onSortItem(event, itemData);
@@ -336,7 +320,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
           return JSON.stringify(itemIdsArray);
         }
         return value;
-      })
+      }),
     );
   }
 
@@ -399,9 +383,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async _onContainerItemAdd(item, target) {
-    const alreadyExistsInActor = target.parent.items.find(
-      (i) => i.id === item.id
-    );
+    const alreadyExistsInActor = target.parent.items.find((i) => i.id === item.id);
     let latestItem = item;
     if (!alreadyExistsInActor) {
       // eslint-disable-next-line no-underscore-dangle
@@ -409,9 +391,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
       latestItem = newItem.pop();
     }
 
-    const alreadyExistsInContainer = target.system.itemIds.find(
-      (i) => i.id === latestItem.id
-    );
+    const alreadyExistsInContainer = target.system.itemIds.find((i) => i.id === latestItem.id);
     if (!alreadyExistsInContainer) {
       const newList = [...target.system.itemIds, latestItem.id];
       await target.update({ system: { itemIds: newList } });
@@ -422,17 +402,12 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   // eslint-disable-next-line no-underscore-dangle, consistent-return
   async _onDropItemCreate(droppedItem, targetContainer = false) {
     // override to fix hidden items because their original containers don't exist on this actor
-    const droppedItemArray = Array.isArray(droppedItem)
-      ? droppedItem
-      : [droppedItem];
+    const droppedItemArray = Array.isArray(droppedItem) ? droppedItem : [droppedItem];
     droppedItemArray.forEach((item) => {
       if (item.system.containerId && item.system.containerId !== "")
         // eslint-disable-next-line no-param-reassign
         item.system.containerId = "";
-      if (
-        item.type === "container" &&
-        typeof item.system.itemIds === "string"
-      ) {
+      if (item.type === "container" && typeof item.system.itemIds === "string") {
         // itemIds was double stringified to fix strange behavior with stringify blanking our Arrays
         const containedItems = JSON.parse(item.system.itemIds);
         containedItems.forEach((containedItem) => {
@@ -464,7 +439,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     };
     const dlg = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/items/entity-create.html`,
-      templateData
+      templateData,
     );
     // Create Dialog window
     return new Promise((resolve) => {
@@ -524,12 +499,12 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     if (event.target.dataset.field === "value") {
       return item.update({
-        "system.quantity.value": parseInt(event.target.value),
+        "system.quantity.value": Number.parseInt(event.target.value),
       });
     }
     if (event.target.dataset.field === "max") {
       return item.update({
-        "system.quantity.max": parseInt(event.target.value),
+        "system.quantity.max": Number.parseInt(event.target.value),
       });
     }
   }
@@ -547,7 +522,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
     resizable.each((_, el) => {
       const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + parseInt(el.dataset.baseSize)}px`;
+      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize)}px`;
     });
     return html;
   }
@@ -565,7 +540,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Resize divs
     resizable.each((_, el) => {
       const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + parseInt(el.dataset.baseSize)}px`;
+      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize)}px`;
     });
     // Resize editors
     const editors = html.find(".editor");
@@ -573,9 +548,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
       const container = editor.closest(".resizable-editor");
       if (container) {
         const heightDelta = this.position.height - this.options.height;
-        editor.style.height = `${
-          heightDelta + parseInt(container.dataset.editorSize)
-        }px`;
+        editor.style.height = `${heightDelta + Number.parseInt(container.dataset.editorSize)}px`;
       }
     });
   }
@@ -690,10 +663,8 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
       .click((event) => event.target.select())
       .change(this._onSpellChange.bind(this));
 
-    html
-      .find(".spells .item-reset[data-action='reset-spells']")
-      .click((event) => {
-        this._resetSpells(event);
-      });
+    html.find(".spells .item-reset[data-action='reset-spells']").click((event) => {
+      this._resetSpells(event);
+    });
   }
 }

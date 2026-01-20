@@ -2,12 +2,8 @@
  * @file Contains tests for Monster Data Model.
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../../e2e";
-import {
-  cleanUpActorsByKey,
-  createMockActorKey,
-  getMockActorKey,
-} from "../../../e2e/testUtils";
+import type { QuenchMethods } from "../../../e2e";
+import { cleanUpActorsByKey, createMockActorKey, getMockActorKey } from "../../../e2e/testUtils";
 import OseDataModelMonster from "../data-model-monster";
 
 export const key = "ose.actor.datamodel.monster";
@@ -15,14 +11,7 @@ export const options = { displayName: "OSE: Actor: Data Model: Monster" };
 
 const createMockActor = () => createMockActorKey("monster", {}, key);
 
-export default ({
-  describe,
-  it,
-  expect,
-  after,
-  afterEach,
-  before,
-}: QuenchMethods) => {
+export default ({ describe, it, expect, after, afterEach, before }: QuenchMethods) => {
   const dataModel = new OseDataModelMonster();
   const ascendingACSetting = game.settings.get(game.system.id, "ascendingAC");
   const initiativeSetting = game.settings.get(game.system.id, "initiative");
@@ -172,7 +161,7 @@ export default ({
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.true;
     });
@@ -191,7 +180,7 @@ export default ({
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.false;
     });
@@ -202,9 +191,7 @@ export default ({
       const actor = await createMockActor();
       expect(actor?.items.contents.length).equal(0);
       expect(actor?.system.containers.length).equal(0);
-      await actor?.createEmbeddedDocuments("Item", [
-        { type: "container", name: "test container" },
-      ]);
+      await actor?.createEmbeddedDocuments("Item", [{ type: "container", name: "test container" }]);
       expect(actor?.items.contents.length).equal(1);
       const container = actor?.items.getName("test container");
       expect(container).to.not.be.undefined;
@@ -243,9 +230,7 @@ export default ({
       const actor = await createMockActor();
       expect(actor?.items.contents.length).equal(0);
       expect(actor?.system.treasures.length).equal(0);
-      await actor?.createEmbeddedDocuments("Item", [
-        { type: "container", name: "test container" },
-      ]);
+      await actor?.createEmbeddedDocuments("Item", [{ type: "container", name: "test container" }]);
       const container = actor?.items.getName("test container");
       await actor?.createEmbeddedDocuments("Item", [
         {
@@ -353,9 +338,7 @@ export default ({
         const actor = await createMockActor();
         expect(actor?.items.contents.length).equal(0);
         expect(actor?.system[getter].length).equal(0);
-        await actor?.createEmbeddedDocuments("Item", [
-          { type, name: `test ${type}` },
-        ]);
+        await actor?.createEmbeddedDocuments("Item", [{ type, name: `test ${type}` }]);
         expect(actor?.items.contents.length).equal(1);
         const item = actor?.items.getName(`test ${type}`);
         expect(item).to.not.be.undefined;
@@ -392,9 +375,7 @@ export default ({
         ]);
         expect(actor?.items.contents.length).equal(3);
         const testContainer = actor?.items.getName("test container");
-        const testItemInContainer = actor?.items.getName(
-          `test ${type} in container`
-        );
+        const testItemInContainer = actor?.items.getName(`test ${type} in container`);
         const testItem = actor?.items.getName(`test ${type}`);
         expect(testContainer).to.not.be.undefined;
         expect(testContainer?.name).equal("test container");
@@ -431,12 +412,8 @@ export default ({
       expect(Object.keys(actor?.system.attackPatterns).length).equal(1);
       expect(Object.keys(actor?.system.attackPatterns)).contain("transparent");
       expect(actor?.system.attackPatterns.transparent.length).equal(2);
-      expect(actor?.system.attackPatterns.transparent[0].name).equal(
-        "test weapon"
-      );
-      expect(actor?.system.attackPatterns.transparent[1].name).equal(
-        "test ability"
-      );
+      expect(actor?.system.attackPatterns.transparent[0].name).equal("test weapon");
+      expect(actor?.system.attackPatterns.transparent[1].name).equal("test ability");
     });
 
     it("returns separated weapons and abilities whith patterns patterns", async () => {
@@ -466,19 +443,11 @@ export default ({
       expect(Object.keys(actor?.system.attackPatterns)).contain("transparent");
       expect(Object.keys(actor?.system.attackPatterns)).contain("green");
       expect(actor?.system.attackPatterns.transparent.length).equal(2);
-      expect(actor?.system.attackPatterns.transparent[0].name).equal(
-        "test ability"
-      );
-      expect(actor?.system.attackPatterns.transparent[1].name).equal(
-        "test weapon"
-      );
+      expect(actor?.system.attackPatterns.transparent[0].name).equal("test ability");
+      expect(actor?.system.attackPatterns.transparent[1].name).equal("test weapon");
       expect(actor?.system.attackPatterns.green.length).equal(2);
-      expect(actor?.system.attackPatterns.green[0].name).equal(
-        "test weapon green"
-      );
-      expect(actor?.system.attackPatterns.green[1].name).equal(
-        "test ability green"
-      );
+      expect(actor?.system.attackPatterns.green[0].name).equal("test weapon green");
+      expect(actor?.system.attackPatterns.green[1].name).equal("test ability green");
     });
   });
 

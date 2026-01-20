@@ -22,25 +22,19 @@ export default class OseItem extends Item {
 
   static async create(data, context = {}) {
     if (data.img === undefined) {
-      data.img = this.defaultIcons[data.type];
+      data.img = OseItem.defaultIcons[data.type];
     }
-    return super.create(data, context);
+    return Item.create(data, context);
   }
 
   static migrateData(source) {
     if (source?.img === "" && source.type) {
-      source.img = this.defaultIcons(source.type);
+      source.img = OseItem.defaultIcons[source.type];
     }
     if (source?.system?.itemslots === undefined) {
-      if (
-        (source?.system?.tags ?? []).some(
-          (tag) => tag.value === "Two-handed"
-        ) &&
-        source?.type === "weapon"
-      )
+      if ((source?.system?.tags ?? []).some((tag) => tag.value === "Two-handed") && source?.type === "weapon")
         source.system.itemslots = 2;
-      if (source?.system?.type === "heavy" && source.type === "armor")
-        source.system.itemslots = 2;
+      if (source?.system?.type === "heavy" && source.type === "armor") source.system.itemslots = 2;
     }
 
     return source;
@@ -52,11 +46,10 @@ export default class OseItem extends Item {
 
   async prepareDerivedData() {
     // Rich text description
-    this.system.enrichedDescription =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.system.description,
-        { async: true }
-      );
+    this.system.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.system.description,
+      { async: true },
+    );
   }
 
   static chatListeners(html) {
@@ -86,13 +79,9 @@ export default class OseItem extends Item {
       itemData.tags.forEach((t) => props.push(t.value));
     }
     if (itemType === "spell") {
-      props.push(
-        `${itemData.class} ${itemData.lvl}`,
-        itemData.range,
-        itemData.duration
-      );
+      props.push(`${itemData.class} ${itemData.lvl}`, itemData.range, itemData.duration);
     }
-    if (itemData.hasOwnProperty("equipped")) {
+    if (Object.hasOwn(itemData, "equipped")) {
       props.push(itemData.equipped ? "Equipped" : "Not Equipped");
     }
 
@@ -176,8 +165,8 @@ export default class OseItem extends Item {
     };
 
     if (this.type === "spell") {
-      rollData.description = itemData.description
-    };
+      rollData.description = itemData.description;
+    }
 
     // Roll and return
     return OseDice.Roll({
@@ -192,10 +181,7 @@ export default class OseItem extends Item {
   }
 
   async spendSpell() {
-    if (this.type !== "spell")
-      throw new Error(
-        "Trying to spend a spell on an item that is not a spell."
-      );
+    if (this.type !== "spell") throw new Error("Trying to spend a spell on an item that is not a spell.");
 
     const itemData = this.system;
     await this.update({
@@ -205,16 +191,17 @@ export default class OseItem extends Item {
     });
 
     if (itemData.roll) {
-      await this.rollFormula()
+      await this.rollFormula();
     } else {
-      await this.show({ skipDialog: true })
+      await this.show({ skipDialog: true });
     }
   }
 
   _getRollTag(data) {
     if (data.roll) {
-      const roll = `${data.roll}${data.rollTarget ? CONFIG.OSE.roll_type[data.rollType] : ""
-        }${data.rollTarget ? data.rollTarget : ""}`;
+      const roll = `${data.roll}${
+        data.rollTarget ? CONFIG.OSE.roll_type[data.rollType] : ""
+      }${data.rollTarget ? data.rollTarget : ""}`;
       return {
         label: `${game.i18n.localize("OSE.items.Roll")} ${roll}`,
       };
@@ -263,11 +250,7 @@ export default class OseItem extends Item {
       }
 
       case "spell": {
-        tagList.push(
-          { label: data.class },
-          { label: data.range },
-          { label: data.duration }
-        );
+        tagList.push({ label: data.class }, { label: data.range }, { label: data.duration });
         break;
       }
 
@@ -338,10 +321,7 @@ export default class OseItem extends Item {
       }
 
       // Add the tag if it has a specific title or if it is not a checkbox
-      if (
-        title !== val ||
-        (!newData.melee && !newData.slow && !newData.missile)
-      ) {
+      if (title !== val || (!newData.melee && !newData.slow && !newData.missile)) {
         update.push({
           title,
           value: val,
@@ -369,9 +349,7 @@ export default class OseItem extends Item {
     const { tags } = itemData;
     if (!tags) return;
 
-    const update = tags.filter(
-      (el) => el.value.toLowerCase() !== value.toLowerCase()
-    );
+    const update = tags.filter((el) => el.value.toLowerCase() !== value.toLowerCase());
     const newData = {
       tags: update,
     };
@@ -429,10 +407,7 @@ export default class OseItem extends Item {
       hasSave: this.hasSave,
       config: CONFIG.OSE,
     };
-    templateData.rollFormula = new Roll(
-      templateData.data.roll,
-      templateData
-    ).formula;
+    templateData.rollFormula = new Roll(templateData.data.roll, templateData).formula;
     templateData.data.properties = this.system.autoTags;
 
     // Render the chat card template
@@ -453,8 +428,7 @@ export default class OseItem extends Item {
 
     // Toggle default roll mode
     const rollMode = game.settings.get("core", "rollMode");
-    if (["gmroll", "blindroll"].includes(rollMode))
-      chatData.whisper = ChatMessage.getWhisperRecipients("GM");
+    if (["gmroll", "blindroll"].includes(rollMode)) chatData.whisper = ChatMessage.getWhisperRecipients("GM");
     if (rollMode === "selfroll") chatData.whisper = [game.user.id];
     if (rollMode === "blindroll") chatData.blind = true;
 
@@ -496,7 +470,7 @@ export default class OseItem extends Item {
     if (!(isTargetted || game.user.isGM || message.isAuthor)) return;
 
     // Get the Actor from a synthetic Token
-    const actor = this._getChatCardActor(card);
+    const actor = OseItem._getChatCardActor(card);
     if (!actor) return;
 
     // Get the Item
@@ -506,14 +480,14 @@ export default class OseItem extends Item {
         game.i18n.format("OSE.error.itemNoLongerExistsOnActor", {
           actorName: actor.name,
           itemId: card.dataset.itemId,
-        })
+        }),
       );
     }
 
     // Get card targets
     let targets = [];
     if (isTargetted) {
-      targets = this._getChatCardTargets(card);
+      targets = OseItem._getChatCardTargets(card);
     }
 
     // Attack and Damage Rolls
@@ -530,9 +504,7 @@ export default class OseItem extends Item {
 
       case "save": {
         if (targets.length === 0) {
-          ui.notifications.error(
-            game.i18n.localize("OSE.error.noTokenControlled")
-          );
+          ui.notifications.error(game.i18n.localize("OSE.error.noTokenControlled"));
           return (button.disabled = false);
         }
         for (const t of targets) {
@@ -569,10 +541,7 @@ export default class OseItem extends Item {
   static _getChatCardTargets(card) {
     const { character } = game.user;
     const { controlled } = canvas.tokens;
-    const targets = controlled.reduce(
-      (arr, t) => (t.actor ? [...arr, t.actor] : arr),
-      []
-    );
+    const targets = controlled.reduce((arr, t) => (t.actor ? [...arr, t.actor] : arr), []);
     if (character && controlled.length === 0) targets.push(character);
     return targets;
   }

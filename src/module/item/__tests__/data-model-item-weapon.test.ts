@@ -2,7 +2,7 @@
  * @file Contains tests for Weapon Item Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import OseDataModelWeapon from "../data-model-weapon";
 
 export const key = "ose.item.datamodel.weapon";
@@ -149,9 +149,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       expect(item.autoTags[0].icon).equal("fa-tint");
       expect(item.autoTags[0].label).equal("");
       expect(Object.keys(item.autoTags[2]).length).equal(2);
-      expect(item.autoTags[2].label).equal(
-        game.i18n.localize("OSE.saves.death.long")
-      );
+      expect(item.autoTags[2].label).equal(game.i18n.localize("OSE.saves.death.long"));
       expect(item.autoTags[2].icon).equal("fa-skull");
     });
   });

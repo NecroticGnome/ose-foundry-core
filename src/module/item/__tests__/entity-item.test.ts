@@ -2,7 +2,7 @@
  * @file Contains tests for Item Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import {
   cleanUpWorldItems,
   closeV2Dialogs,
@@ -19,25 +19,10 @@ import OseItem from "../entity";
 export const key = "ose.item.entity";
 export const options = { displayName: "OSE: Item: Entity" };
 
-const createMockActor = async (data: object = {}) =>
-  createMockActorKey("character", data, key);
+const createMockActor = async (data: object = {}) => createMockActorKey("character", data, key);
 
-export default ({
-  describe,
-  it,
-  expect,
-  after,
-  beforeEach,
-  assert,
-}: QuenchMethods) => {
-  const itemTypes = new Set([
-    "spell",
-    "ability",
-    "armor",
-    "weapon",
-    "item",
-    "container",
-  ]);
+export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMethods) => {
+  const itemTypes = new Set(["spell", "ability", "armor", "weapon", "item", "container"]);
 
   const { defaultIcons } = OseItem;
 
@@ -46,15 +31,13 @@ export default ({
   });
 
   describe("defaultIcons()", () => {
-    it("There are 6 default icons", () =>
-      expect(Object.keys(defaultIcons).length).equal(6));
+    it("There are 6 default icons", () => expect(Object.keys(defaultIcons).length).equal(6));
 
     itemTypes.forEach((type: string) => {
       it(`Has ${type} icon`, () => expect(defaultIcons[type]).is.not.undefined);
     });
 
-    it("Asking for other items return null", () =>
-      expect(defaultIcons.non_existing).is.undefined);
+    it("Asking for other items return null", () => expect(defaultIcons.non_existing).is.undefined);
   });
 
   describe("create()", () => {
@@ -92,9 +75,7 @@ export default ({
       await expect(item).is.undefined;
       expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
         .to.be.an("array")
-        .that.includes(
-          'OseItem validation errors:\n  name: may not be undefined'
-        );
+        .that.includes("OseItem validation errors:\n  name: may not be undefined");
       await ui.notifications?.clear();
     });
     it("Can't create without type", async () => {
@@ -102,9 +83,7 @@ export default ({
       await expect(item).is.undefined;
       expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
         .to.be.an("array")
-        .that.includes(
-          'OseItem validation errors:\n  type: may not be undefined'
-        );
+        .that.includes("OseItem validation errors:\n  type: may not be undefined");
       await ui.notifications?.clear();
     });
     it("Can't create without acceptable type", async () => {
@@ -112,9 +91,7 @@ export default ({
       await expect(item).is.undefined;
       expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
         .to.be.an("array")
-        .that.includes(
-          'OseItem validation errors:\n  type: "TEST" is not a valid type for the Item Document class'
-        );
+        .that.includes('OseItem validation errors:\n  type: "TEST" is not a valid type for the Item Document class');
       await ui.notifications?.clear();
     });
   });
@@ -212,7 +189,7 @@ export default ({
     });
     it("Calling function reduces item.system.cast by one", async () => {
       const item: OseItem = await createWorldTestItem("spell");
-      const initialSlots: Number = 3;
+      const initialSlots: number = 3;
       await item.update({ system: { cast: initialSlots } });
       await item.spendSpell();
       expect(item?.system?.cast).equal(initialSlots - 1);
@@ -256,7 +233,7 @@ export default ({
     const testPushManualTag = async (
       item: OseItem,
       tag: string,
-      itemTagData: { label: string; title: string; value: string }
+      itemTagData: { label: string; title: string; value: string },
       // eslint-disable-next-line unicorn/consistent-function-scoping
     ) => {
       expect(item?.system?.tags.length).equal(0);
@@ -274,10 +251,7 @@ export default ({
       await item?.pushManualTag([tag]);
     };
 
-    const testSystemBooleans = (
-      item: OseItem,
-      flags: { melee: boolean; slow: boolean; missile: boolean }
-    ) => {
+    const testSystemBooleans = (item: OseItem, flags: { melee: boolean; slow: boolean; missile: boolean }) => {
       expect(item.system.melee).equal(flags.melee);
       expect(item.system.slow).equal(flags.slow);
       expect(item.system.missile).equal(flags.missile);
@@ -310,11 +284,7 @@ export default ({
     });
 
     // Boolean tags
-    const booleanTags = new Set([
-      CONFIG.OSE.tags.melee,
-      CONFIG.OSE.tags.slow,
-      CONFIG.OSE.tags.missile,
-    ]);
+    const booleanTags = new Set([CONFIG.OSE.tags.melee, CONFIG.OSE.tags.slow, CONFIG.OSE.tags.missile]);
 
     booleanTags.forEach((t) => {
       it(`"${t}" tag activates the boolean but not a tag`, async () => {
@@ -501,17 +471,13 @@ export default ({
     });
 
     after(async () => {
-      game.items
-        ?.filter((o) => o?.name?.indexOf("Test Weapon Item ") >= 0 || false)
-        .forEach(async (i) => i.delete());
+      game.items?.filter((o) => o?.name?.indexOf("Test Weapon Item ") >= 0 || false).forEach(async (i) => i.delete());
       await trashChat();
     });
 
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const rollMessageTest = async (rollMode: string) => {
-      assert(
-        ["publicroll", "gmroll", "blindroll", "selfroll"].includes(rollMode)
-      );
+      assert(["publicroll", "gmroll", "blindroll", "selfroll"].includes(rollMode));
       expect(game.messages?.size).equal(0);
       game.settings.set("core", "rollMode", rollMode);
       expect(game.settings.get("core", "rollMode")).equal(rollMode);

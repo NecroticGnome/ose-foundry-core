@@ -11,15 +11,13 @@ const Party = {
 
 export default class OsePartySheet extends FormApplication {
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
       classes: ["ose", "dialog", "party-sheet"],
       template: `${OSE.systemPath()}/templates/apps/party-sheet.html`,
       width: 280,
       height: 400,
       resizable: true,
-      dragDrop: [
-        { dragSelector: ".actor-list .actor", dropSelector: ".party-members" },
-      ],
+      dragDrop: [{ dragSelector: ".actor-list .actor", dropSelector: ".party-members" }],
       closeOnSubmit: false,
     });
   }
@@ -164,11 +162,9 @@ export default class OsePartySheet extends FormApplication {
       getActor(event).sheet.render(true);
     });
 
-    html
-      .find(".field-img button[data-action='remove-actor']")
-      .click(async (event) => {
-        await this._removeActorFromParty(getActor(event));
-        this.render(true);
-      });
+    html.find(".field-img button[data-action='remove-actor']").click(async (event) => {
+      await this._removeActorFromParty(getActor(event));
+      this.render(true);
+    });
   }
 }

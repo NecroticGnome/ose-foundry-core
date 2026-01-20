@@ -13,8 +13,7 @@ export const delay = (ms: number) =>
  * If there are messages, purge them.
  */
 export const trashChat = (): any => {
-  if (game.messages?.size)
-    return game.messages?.documentClass.deleteDocuments([], { deleteAll: true });
+  if (game.messages?.size) return game.messages?.documentClass.deleteDocuments([], { deleteAll: true });
 };
 
 /**
@@ -25,16 +24,12 @@ export const trashChat = (): any => {
 export const waitForInput = () => delay(inputDelay);
 
 export const openWindows = (className: string) =>
-  Object.values(ui.windows).filter((o) =>
-    o.options.classes.includes(className)
-  );
+  Object.values(ui.windows).filter((o) => o.options.classes.includes(className));
 
-export const openDialogs = () =>
-  Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
+export const openDialogs = () => Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
 
 export const openV2Dialogs = () =>
-  Array.from(foundry.applications.instances.values())
-    .filter((o) => o.options.classes.includes("dialog"));
+  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes("dialog"));
 
 export const closeDialogs = async () => {
   for (const o of openDialogs()) {
@@ -61,7 +56,8 @@ export const closeSheets = async () => {
  *
  * @returns {HTMLElement[]} An array of active notification elements.
  */
-export const getActiveNotifications = (): HTMLElement[] => Array.from(document.querySelectorAll("#notifications li").values() as unknown as HTMLElement[]);
+export const getActiveNotifications = (): HTMLElement[] =>
+  Array.from(document.querySelectorAll("#notifications li").values() as unknown as HTMLElement[]);
 
 /**
  * Checks if an object is a likely to be a Notification since Foundry
@@ -70,9 +66,7 @@ export const getActiveNotifications = (): HTMLElement[] => Array.from(document.q
  * @param obj
  */
 export const objectIsNotification = (obj: any): obj is Notification =>
-  typeof obj?.message === "string" &&
-  typeof obj?.type === "string" &&
-  typeof obj?.remove === "function";
+  typeof obj?.message === "string" && typeof obj?.type === "string" && typeof obj?.remove === "function";
 
 /**
  * Returns the random number required to roll a specific number on a die.
@@ -82,30 +76,20 @@ export const objectIsNotification = (obj: any): obj is Notification =>
  * @param {number} requiredResult - The specific number you want to roll (e.g. 3 for rolling a 3 on a d6).
  * @param {number} diceFaces - The number of faces on the dice. (e.g. 6 for a d6)
  */
-export const rollSpecificNumber = (
-  requiredResult: number,
-  diceFaces: number
-) => 1 - requiredResult / diceFaces;
+export const rollSpecificNumber = (requiredResult: number, diceFaces: number) => 1 - requiredResult / diceFaces;
 
 /**
  * MOCKING HELPERS
  */
 
-export const createMockActorKey = async (
-  type: string,
-  data: object = {},
-  key: string = ""
-) =>
+export const createMockActorKey = async (type: string, data: object = {}, key = "") =>
   CONFIG.Actor.documentClass.create({
     ...data,
     name: `Test Actor ${key}`,
     type,
   });
 
-export const createWorldTestItem = async (
-  type: string,
-  name: string = `New World Test ${type.capitalize()}`
-) =>
+export const createWorldTestItem = async (type: string, name = `New World Test ${type.capitalize()}`) =>
   CONFIG.Item.documentClass.create({
     type,
     name,
@@ -114,8 +98,8 @@ export const createWorldTestItem = async (
 export const createActorTestItem = async (
   actor: StoredDocument<Actor> | undefined,
   type: string,
-  name: string = `New Actor Test ${type.capitalize()}`,
-  data: object = {}
+  name = `New Actor Test ${type.capitalize()}`,
+  data: object = {},
 ) => actor?.createEmbeddedDocuments("Item", [{ type, name, ...data }]);
 
 export const createMockMacro = async () =>
@@ -125,14 +109,12 @@ export const createMockMacro = async () =>
     command: "console.log('Testing Macro');",
   });
 
-export const createMockScene = async () =>
-  CONFIG.Scene.documentClass.create({ name: "Mock Scene", tokenVision: true });
+export const createMockScene = async () => CONFIG.Scene.documentClass.create({ name: "Mock Scene", tokenVision: true });
 
-export const getMockActorKey = async (key: string) =>
-  game.actors?.getName(`Test Actor ${key}`);
+export const getMockActorKey = async (key: string) => game.actors?.getName(`Test Actor ${key}`);
 
 export const createMockCompendium = async (
-  type: CompendiumCollection.Metadata["type"]
+  type: CompendiumCollection.Metadata["type"],
   // eslint-disable-next-line unicorn/consistent-function-scoping
 ): Promise<CompendiumCollection> =>
   // eslint-disable-next-line no-undef
@@ -142,12 +124,11 @@ export const createMockCompendium = async (
     type,
     path: "",
     private: false,
-    package: "world"
+    package: "world",
   });
 
 // eslint-disable-next-line unicorn/consistent-function-scoping
-export const cleanUpCompendium = async () =>
-  game.packs.get("world.testcompendium")?.deleteCompendium();
+export const cleanUpCompendium = async () => game.packs.get("world.testcompendium")?.deleteCompendium();
 
 /**
  * CLEANUP HELPERS
@@ -182,11 +163,4 @@ export const cleanUpScenes = async () => {
 /**
  * CONSTS
  */
-export const itemTypes = new Set([
-  "spell",
-  "ability",
-  "armor",
-  "weapon",
-  "item",
-  "container",
-]);
+export const itemTypes = new Set(["spell", "ability", "armor", "weapon", "item", "container"]);

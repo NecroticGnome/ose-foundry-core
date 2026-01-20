@@ -5,8 +5,7 @@ import OseTags from "../helpers-tags";
 
 export default class OseDataModelSpell extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const { StringField, NumberField, ArrayField, ObjectField } =
-      foundry.data.fields;
+    const { StringField, NumberField, ArrayField, ObjectField } = foundry.data.fields;
     return {
       save: new StringField(),
       lvl: new NumberField({ integer: true, min: 0 }),

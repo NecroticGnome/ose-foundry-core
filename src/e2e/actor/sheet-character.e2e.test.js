@@ -14,25 +14,14 @@ export const options = {
  * @returns {Promise} the promise from closing dialogs
  */
 export const closeRollDialog = async () => {
-  const openDialogs = Object.values(ui.windows).filter((o) =>
-    o.options.classes.includes("dialog")
-  );
+  const openDialogs = Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
 
   openDialogs?.forEach(async (o) => {
     await o.close();
   });
 };
 
-export default ({
-  before,
-  beforeEach,
-  after,
-  afterEach,
-  describe,
-  it,
-  expect,
-  ...context
-}) => {
+export default ({ before, beforeEach, after, afterEach, describe, it, expect, ...context }) => {
   const testCharacterName = "Quench Test Character";
   const prepareActor = async (data) => {
     await trashChat();
@@ -75,10 +64,7 @@ export default ({
 
     const dialog = document.querySelector(".roll-dialog.ose");
     dialog.querySelector('[name="bonus"]').value = 20;
-    dialog
-      .closest(".window-content")
-      .querySelector(".dialog-button.ok")
-      .click();
+    dialog.closest(".window-content").querySelector(".dialog-button.ok").click();
 
     await waitForInput();
 
@@ -101,10 +87,7 @@ export default ({
     const dialog = document.querySelector(".roll-dialog.ose");
     expect(dialog).not.equal(null);
 
-    dialog
-      .closest(".window-content")
-      .querySelector(".dialog-button.ok")
-      .click();
+    dialog.closest(".window-content").querySelector(".dialog-button.ok").click();
 
     await waitForInput();
     expect(game.messages.size).to.equal(1);
@@ -119,10 +102,7 @@ export default ({
     const dialog = document.querySelector(".roll-dialog.ose");
     expect(dialog).not.equal(null);
 
-    dialog
-      .closest(".window-content")
-      .querySelector(".dialog-button.ok")
-      .click();
+    dialog.closest(".window-content").querySelector(".dialog-button.ok").click();
 
     await waitForInput();
     expect(game.messages.size).to.equal(1);

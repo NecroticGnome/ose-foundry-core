@@ -2,7 +2,7 @@
  * @file Contains tests for Party XP Sheet.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import { openWindows, waitForInput } from "../../../e2e/testUtils";
 import OsePartyXP from "../party-xp";
 
@@ -29,9 +29,7 @@ export default ({ describe, it, expect, assert }: QuenchMethods) => {
       const partyXP = new OsePartyXP();
       partyXP.render(true);
       await waitForInput();
-      const dialogTitle = document.querySelector(
-        "div.party-xp .window-title"
-      )?.innerHTML;
+      const dialogTitle = document.querySelector("div.party-xp .window-title")?.innerHTML;
       expect(typeof dialogTitle).equal("string");
       const dialogs = openWindows("party-xp");
       expect(dialogs.length).equal(1);

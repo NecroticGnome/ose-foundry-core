@@ -14,7 +14,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
    * @returns {object} - The default options for this sheet.
    */
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(OseActorSheet.defaultOptions, {
       classes: ["ose", "sheet", "actor", "character"],
       template: `${OSE.systemPath()}/templates/actors/character-sheet.html`,
       width: 450,
@@ -60,11 +60,9 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     data.system.init = this.actor.system.init;
 
     // Sort by sort order (see ActorSheet)
-    [
-      ...Object.values(data.owned),
-      ...Object.values(data?.spells?.spellList || {}),
-      data.abilities,
-    ].forEach((o) => o.sort((a, b) => (a.sort || 0) - (b.sort || 0)));
+    [...Object.values(data.owned), ...Object.values(data?.spells?.spellList || {}), data.abilities].forEach((o) =>
+      o.sort((a, b) => (a.sort || 0) - (b.sort || 0)),
+    );
   }
 
   generateScores() {
@@ -84,16 +82,14 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     // Prepare owned items
     this._prepareItems(data);
 
-    data.enrichedBiography =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.object.system.details.biography,
-        { async: true }
-      );
-    data.enrichedNotes =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.object.system.details.notes,
-        { async: true }
-      );
+    data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.object.system.details.biography,
+      { async: true },
+    );
+    data.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.object.system.details.notes,
+      { async: true },
+    );
 
     return data;
   }
@@ -104,7 +100,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     const templateData = { choices };
     const dlg = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/actors/dialogs/lang-create.html`,
-      templateData
+      templateData,
     );
     // Create Dialog window
     return new Promise((resolve) => {
@@ -266,7 +262,6 @@ export default class OseActorSheetCharacter extends OseActorSheet {
           equipped: !item.system.equipped,
         },
       });
-
     });
 
     html.find("a[data-action='generate-scores']").click((ev) => {

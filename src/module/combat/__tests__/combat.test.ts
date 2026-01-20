@@ -2,9 +2,8 @@
  * @file Combat tests for OSE module
  */
 // eslint-disable-next-line import/no-cycle
-import OseActor from "../../actor/entity";
 
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import {
   cleanUpActorsByKey,
   cleanUpScenes,
@@ -13,6 +12,7 @@ import {
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
+import type OseActor from "../../actor/entity";
 import { OSECombat } from "../combat";
 
 export const key = "ose.combat";
@@ -20,14 +20,7 @@ export const options = {
   displayName: "OSE: Combat",
 };
 
-export default ({
-  describe,
-  it,
-  expect,
-  after,
-  afterEach,
-  before,
-}: QuenchMethods) => {
+export default ({ describe, it, expect, after, afterEach, before }: QuenchMethods) => {
   const oseCombat = new OSECombat();
   let pc1: OseActor | Document | null = null;
   let pc2: OseActor | Document | null = null;
@@ -70,11 +63,9 @@ export default ({
     await TokenDocument.implementation.createCombatants(tokens);
   };
 
-  const getCombatTrackerElement = () =>
-    document.querySelector("#combat ol.combat-tracker");
+  const getCombatTrackerElement = () => document.querySelector("#combat ol.combat-tracker");
 
-  const getCombatantElements = () =>
-    getCombatTrackerElement()?.querySelectorAll("li.combatant");
+  const getCombatantElements = () => getCombatTrackerElement()?.querySelectorAll("li.combatant");
 
   const cleanupCombat = async () => {
     await game.combat?.delete();
@@ -100,7 +91,7 @@ export default ({
           },
         }),
       },
-      key
+      key,
     );
     pc2 = await createMockActorKey(
       "character",
@@ -111,7 +102,7 @@ export default ({
           },
         }),
       },
-      key
+      key,
     );
     friendlyCharacter1 = await createMockActorKey(
       "character",
@@ -120,7 +111,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
         },
       },
-      key
+      key,
     );
     friendlyCharacter2 = await createMockActorKey(
       "character",
@@ -129,7 +120,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
         },
       },
-      key
+      key,
     );
     neutralCharacter1 = await createMockActorKey(
       "character",
@@ -138,7 +129,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
         },
       },
-      key
+      key,
     );
     neutralCharacter2 = await createMockActorKey(
       "character",
@@ -147,7 +138,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
         },
       },
-      key
+      key,
     );
     hostileCharacter1 = await createMockActorKey(
       "character",
@@ -156,7 +147,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
         },
       },
-      key
+      key,
     );
     hostileCharacter2 = await createMockActorKey(
       "character",
@@ -165,7 +156,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
         },
       },
-      key
+      key,
     );
     friendlyMonster1 = await createMockActorKey(
       "monster",
@@ -174,7 +165,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
         },
       },
-      key
+      key,
     );
     friendlyMonster2 = await createMockActorKey(
       "monster",
@@ -183,7 +174,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
         },
       },
-      key
+      key,
     );
     neutralMonster1 = await createMockActorKey(
       "monster",
@@ -192,7 +183,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
         },
       },
-      key
+      key,
     );
     neutralMonster2 = await createMockActorKey(
       "monster",
@@ -201,7 +192,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
         },
       },
-      key
+      key,
     );
     hostileMonster1 = await createMockActorKey(
       "monster",
@@ -210,7 +201,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
         },
       },
-      key
+      key,
     );
     hostileMonster2 = await createMockActorKey(
       "monster",
@@ -219,7 +210,7 @@ export default ({
           disposition: foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
         },
       },
-      key
+      key,
     );
     friendlyRetainer1 = await createMockActorKey(
       "character",
@@ -231,7 +222,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
     friendlyRetainer2 = await createMockActorKey(
       "character",
@@ -243,7 +234,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
     neutralRetainer1 = await createMockActorKey(
       "character",
@@ -255,7 +246,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
     neutralRetainer2 = await createMockActorKey(
       "character",
@@ -267,7 +258,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
     hostileRetainer1 = await createMockActorKey(
       "character",
@@ -279,7 +270,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
     hostileRetainer2 = await createMockActorKey(
       "character",
@@ -291,7 +282,7 @@ export default ({
           retainer: { enabled: true },
         },
       },
-      key
+      key,
     );
 
     await waitForInput();
@@ -328,19 +319,12 @@ export default ({
     let previousInitiativeSetting: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "group");
     });
 
     after(async () => {
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
     });
 
     it('should return true when initiative setting is "group"', () => {
@@ -350,9 +334,7 @@ export default ({
 
     it('should return false when initiative setting is not "group"', async () => {
       await game.settings.set(game.system.id, "initiative", "individual");
-      expect(game.settings.get(game.system.id, "initiative")).to.equal(
-        "individual"
-      );
+      expect(game.settings.get(game.system.id, "initiative")).to.equal("individual");
       expect(oseCombat.isGroupInitiative).to.be.false;
     });
   });
@@ -360,121 +342,115 @@ export default ({
   describe("mockActors", async () => {
     it("should have created valid actors", async () => {
       expect(pc1?.type).to.equal("character");
-      expect(
-        pc1?.hasPlayerOwner,
-        "test can only pass if a non-GM user exists on this world"
-      ).to.be.true;
+      expect(pc1?.hasPlayerOwner, "test can only pass if a non-GM user exists on this world").to.be.true;
       expect(pc2?.type).to.equal("character");
-      expect(
-        pc2?.hasPlayerOwner,
-        "test can only pass if a non-GM user exists on this world"
-      ).to.be.true;
+      expect(pc2?.hasPlayerOwner, "test can only pass if a non-GM user exists on this world").to.be.true;
       expect(friendlyCharacter1?.type).to.equal("character");
       expect(friendlyCharacter1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Character 1 should have friendly disposition"
+        "Friendly Character 1 should have friendly disposition",
       );
       expect(friendlyCharacter1?.hasPlayerOwner).to.be.false;
       expect(friendlyCharacter2?.type).to.equal("character");
       expect(friendlyCharacter2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Character 2 should have friendly disposition"
+        "Friendly Character 2 should have friendly disposition",
       );
       expect(friendlyCharacter2?.hasPlayerOwner).to.be.false;
       expect(neutralCharacter1?.type).to.equal("character");
       expect(neutralCharacter1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Character 1 should have neutral disposition"
+        "Neutral Character 1 should have neutral disposition",
       );
       expect(neutralCharacter1?.hasPlayerOwner).to.be.false;
       expect(neutralCharacter2?.type).to.equal("character");
       expect(neutralCharacter2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Character 2 should have neutral disposition"
+        "Neutral Character 2 should have neutral disposition",
       );
       expect(neutralCharacter2?.hasPlayerOwner).to.be.false;
       expect(hostileCharacter1?.type).to.equal("character");
       expect(hostileCharacter1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Character 1 should have hostile disposition"
+        "Hostile Character 1 should have hostile disposition",
       );
       expect(hostileCharacter1?.hasPlayerOwner).to.be.false;
       expect(hostileCharacter2?.type).to.equal("character");
       expect(hostileCharacter2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Character 2 should have hostile disposition"
+        "Hostile Character 2 should have hostile disposition",
       );
       expect(hostileCharacter2?.hasPlayerOwner).to.be.false;
       expect(friendlyMonster1?.type).to.equal("monster");
       expect(friendlyMonster1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Monster 1 should have friendly disposition"
+        "Friendly Monster 1 should have friendly disposition",
       );
       expect(friendlyMonster1?.hasPlayerOwner).to.be.false;
       expect(friendlyMonster2?.type).to.equal("monster");
       expect(friendlyMonster2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Monster 2 should have friendly disposition"
+        "Friendly Monster 2 should have friendly disposition",
       );
       expect(friendlyMonster2?.hasPlayerOwner).to.be.false;
       expect(neutralMonster1?.type).to.equal("monster");
       expect(neutralMonster1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Monster 1 should have neutral disposition"
+        "Neutral Monster 1 should have neutral disposition",
       );
       expect(neutralMonster1?.hasPlayerOwner).to.be.false;
       expect(neutralMonster2?.type).to.equal("monster");
       expect(neutralMonster2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Monster 2 should have neutral disposition"
+        "Neutral Monster 2 should have neutral disposition",
       );
       expect(neutralMonster2?.hasPlayerOwner).to.be.false;
       expect(hostileMonster1?.type).to.equal("monster");
       expect(hostileMonster1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Monster 1 should have hostile disposition"
+        "Hostile Monster 1 should have hostile disposition",
       );
       expect(hostileMonster1?.hasPlayerOwner).to.be.false;
       expect(hostileMonster2?.type).to.equal("monster");
       expect(hostileMonster2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Monster 2 should have hostile disposition"
+        "Hostile Monster 2 should have hostile disposition",
       );
       expect(hostileMonster2?.hasPlayerOwner).to.be.false;
       expect(friendlyRetainer1?.type).to.equal("character");
       expect(friendlyRetainer1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Retainer 1 should have friendly disposition"
+        "Friendly Retainer 1 should have friendly disposition",
       );
       expect(friendlyRetainer1?.hasPlayerOwner).to.be.false;
       expect(friendlyRetainer2?.type).to.equal("character");
       expect(friendlyRetainer2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.FRIENDLY,
-        "Friendly Retainer 2 should have friendly disposition"
+        "Friendly Retainer 2 should have friendly disposition",
       );
       expect(friendlyRetainer2?.hasPlayerOwner).to.be.false;
       expect(neutralRetainer1?.type).to.equal("character");
       expect(neutralRetainer1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Retainer 1 should have neutral disposition"
+        "Neutral Retainer 1 should have neutral disposition",
       );
       expect(neutralRetainer1?.hasPlayerOwner).to.be.false;
       expect(neutralRetainer2?.type).to.equal("character");
       expect(neutralRetainer2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.NEUTRAL,
-        "Neutral Retainer 2 should have neutral disposition"
+        "Neutral Retainer 2 should have neutral disposition",
       );
       expect(neutralRetainer2?.hasPlayerOwner).to.be.false;
       expect(hostileRetainer1?.type).to.equal("character");
       expect(hostileRetainer1?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Retainer 1 should have hostile disposition"
+        "Hostile Retainer 1 should have hostile disposition",
       );
       expect(hostileRetainer1?.hasPlayerOwner).to.be.false;
       expect(hostileRetainer2?.type).to.equal("character");
       expect(hostileRetainer2?.prototypeToken?.disposition).to.equal(
         foundry.CONST.TOKEN_DISPOSITIONS.HOSTILE,
-        "Hostile Retainer 2 should have hostile disposition"
+        "Hostile Retainer 2 should have hostile disposition",
       );
       expect(hostileRetainer2?.hasPlayerOwner).to.be.false;
 
@@ -507,16 +483,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "group");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "reroll");
 
       await trashChat();
@@ -524,16 +494,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -554,65 +516,48 @@ export default ({
       expect(combatTracker).to.not.be.null;
       expect(combatTracker?.children?.length).to.equal(3);
       for (const group of game.combat.groups.contents) {
-        const groupHeader = combatTracker?.querySelector(
-          `li[data-group-key="${group.name}"]`
-        );
+        const groupHeader = combatTracker?.querySelector(`li[data-group-key="${group.name}"]`);
         expect(groupHeader).to.not.be.null;
         expect(groupHeader?.querySelector("ol.group-children")).to.not.be.null;
-        expect(
-          groupHeader?.querySelector("ol.group-children")?.children?.length
-        ).to.equal(group.members?.size);
+        expect(groupHeader?.querySelector("ol.group-children")?.children?.length).to.equal(group.members?.size);
       }
     });
 
     it("should roll initiative for all groups", async () => {
       expect(game.messages.size).to.equal(0);
       const smartRerollInitiativeButton = document.querySelector(
-        ".combat-tracker-header .combat-control[data-action='smartRerollInitiative']"
+        ".combat-tracker-header .combat-control[data-action='smartRerollInitiative']",
       );
       expect(smartRerollInitiativeButton).to.not.be.null;
-      smartRerollInitiativeButton?.dispatchEvent(
-        new MouseEvent("click", { bubbles: true, cancelable: true })
-      );
+      smartRerollInitiativeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
       await waitForInput();
       expect(game.messages.size).to.equal(3);
-      for (const group of game.combat.groups.contents.map(g => g.name)) {
+      for (const group of game.combat.groups.contents.map((g) => g.name)) {
         expect(
-          game.messages.contents.some((cm) =>
-            cm.flavor.includes(
-              game.i18n.format("OSE.roll.initiative", { group })
-            )
-          )
+          game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group }))),
         ).to.be.true;
       }
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
       const combatTracker = getCombatTrackerElement();
-      const greenHeader = combatTracker?.querySelector(
-        "li[data-group-key='green']"
-      );
+      const greenHeader = combatTracker?.querySelector("li[data-group-key='green']");
       expect(greenHeader).to.not.be.null;
       expect(greenHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        greenHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(greenHeader?.dataset?.initiative);
-      const purpleHeader = combatTracker?.querySelector(
-        "li[data-group-key='purple']"
+      expect(greenHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        greenHeader?.dataset?.initiative,
       );
+      const purpleHeader = combatTracker?.querySelector("li[data-group-key='purple']");
       expect(purpleHeader).to.not.be.null;
       expect(purpleHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        purpleHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(purpleHeader?.dataset?.initiative);
-      const redHeader = combatTracker?.querySelector(
-        "li[data-group-key='red']"
+      expect(purpleHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        purpleHeader?.dataset?.initiative,
       );
+      const redHeader = combatTracker?.querySelector("li[data-group-key='red']");
       expect(redHeader).to.not.be.null;
       expect(redHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        redHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(redHeader?.dataset?.initiative);
+      expect(redHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        redHeader?.dataset?.initiative,
+      );
     });
 
     it("should not reroll initiative for rolled groups on combat start", async () => {
@@ -628,11 +573,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(
-        game.combat?.groups?.some(
-          (g) => g.initiative !== groupInitiatives.get(g.name)
-        )
-      ).to.be.false;
+      expect(game.combat?.groups?.some((g) => g.initiative !== groupInitiatives.get(g.name))).to.be.false;
     });
 
     it("should roll initiative for unrolled groups on combat start", async () => {
@@ -642,8 +583,7 @@ export default ({
       await waitForInput();
 
       expect(game.messages.size).to.equal(0);
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .true;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.true;
       await game.combat.startCombat();
       await waitForInput();
       expect(game.combat?.started).to.be.true;
@@ -652,43 +592,32 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(3);
-      for (const group of game.combat.groups.contents.map(g => g.name)) {
+      for (const group of game.combat.groups.contents.map((g) => g.name)) {
         expect(
-          game.messages.contents.some((cm) =>
-            cm.flavor.includes(
-              game.i18n.format("OSE.roll.initiative", { group })
-            )
-          )
+          game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group }))),
         ).to.be.true;
       }
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
       const combatTracker = getCombatTrackerElement();
-      const greenHeader = combatTracker?.querySelector(
-        "li[data-group-key='green']"
-      );
+      const greenHeader = combatTracker?.querySelector("li[data-group-key='green']");
       expect(greenHeader).to.not.be.null;
       expect(greenHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        greenHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(greenHeader?.dataset?.initiative);
-      const purpleHeader = combatTracker?.querySelector(
-        "li[data-group-key='purple']"
+      expect(greenHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        greenHeader?.dataset?.initiative,
       );
+      const purpleHeader = combatTracker?.querySelector("li[data-group-key='purple']");
       expect(purpleHeader).to.not.be.null;
       expect(purpleHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        purpleHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(purpleHeader?.dataset?.initiative);
-      const redHeader = combatTracker?.querySelector(
-        "li[data-group-key='red']"
+      expect(purpleHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        purpleHeader?.dataset?.initiative,
       );
+      const redHeader = combatTracker?.querySelector("li[data-group-key='red']");
       expect(redHeader).to.not.be.null;
       expect(redHeader?.dataset?.initiative).to.not.be.undefined;
-      expect(
-        redHeader?.querySelector(".group-header .create-button")?.textContent
-      ).to.equal(redHeader?.dataset?.initiative);
+      expect(redHeader?.querySelector(".group-header .create-button")?.textContent).to.equal(
+        redHeader?.dataset?.initiative,
+      );
     });
 
     it("should mark combatants as active", async () => {
@@ -714,8 +643,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(3);
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 
@@ -724,16 +652,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "group");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "reset");
 
       await trashChat();
@@ -741,16 +663,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -771,8 +685,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(game.combat?.groups?.some((g) => g.initiative !== null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative !== null)).to.be.false;
     });
 
     it("should mark combatants as active", async () => {
@@ -793,8 +706,7 @@ export default ({
       await game?.combat?.smartRerollInitiative();
       await waitForInput();
       expect(game.messages.size).to.equal(3);
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
       await game?.combat?.nextRound();
       await waitForInput();
@@ -804,10 +716,8 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(3);
-      expect(game.combat?.groups?.some((g) => g.initiative !== null)).to.be
-        .false;
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(game.combat?.groups?.some((g) => g.initiative !== null)).to.be.false;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 
@@ -816,16 +726,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "group");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "keep");
 
       await trashChat();
@@ -833,16 +737,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -863,8 +759,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(3);
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
     });
 
     it("should mark combatants as active", async () => {
@@ -882,8 +777,7 @@ export default ({
     });
 
     it("should keep initiative for all groups on new round", async () => {
-      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be
-        .false;
+      expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
       const groupInitiatives: Map<string, number> = new Map();
       for (const group of game.combat?.groups) {
         groupInitiatives.set(group.name, group.initiative);
@@ -897,13 +791,8 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(
-        game.combat?.groups?.some(
-          (g) => g.initiative !== groupInitiatives.get(g.name)
-        )
-      ).to.be.false;
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(game.combat?.groups?.some((g) => g.initiative !== groupInitiatives.get(g.name))).to.be.false;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 
@@ -912,16 +801,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "individual");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "reroll");
 
       await trashChat();
@@ -929,16 +812,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -962,28 +837,23 @@ export default ({
 
     it("should roll initiative for all combatants", async () => {
       expect(game.messages.size).to.equal(0);
-      const rollAllButton = document.querySelector(
-        ".combat-tracker-header .combat-control[data-action='rollAll']"
-      );
+      const rollAllButton = document.querySelector(".combat-tracker-header .combat-control[data-action='rollAll']");
       expect(rollAllButton).to.not.be.null;
-      rollAllButton?.dispatchEvent(
-        new MouseEvent("click", { bubbles: true, cancelable: true })
-      );
+      rollAllButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
       await waitForInput();
       expect(game.messages.size).to.equal(20);
-      for (const combatant of game.combat.combatants.contents.map(g => g.name)) {
+      for (const combatant of game.combat.combatants.contents.map((g) => g.name)) {
         expect(
           game.messages.contents.some((cm) =>
             cm.flavor.includes(
               game.i18n.format("OSE.roll.individualInit", {
                 name: combatant,
-              })
-            )
-          )
+              }),
+            ),
+          ),
         ).to.be.true;
       }
-      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be
-        .false;
+      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be.false;
     });
 
     it("should not reroll initiative for all combatants on combat start", async () => {
@@ -999,11 +869,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(
-        game.combat?.combatants?.some(
-          (c) => c.initiative !== individualInitiatives.get(c.id)
-        )
-      ).to.be.false;
+      expect(game.combat?.combatants?.some((c) => c.initiative !== individualInitiatives.get(c.id))).to.be.false;
     });
 
     it("should mark combatants as active", async () => {
@@ -1029,8 +895,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(20);
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 
@@ -1039,16 +904,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "individual");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "reset");
 
       await trashChat();
@@ -1056,16 +915,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -1086,8 +937,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(game.combat?.combatants?.some((c) => c.initiative !== null)).to.be
-        .false;
+      expect(game.combat?.combatants?.some((c) => c.initiative !== null)).to.be.false;
     });
 
     it("should mark combatants as active", async () => {
@@ -1120,10 +970,8 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(20);
-      expect(game.combat?.combatants?.some((c) => c.initiative !== null)).to.be
-        .false;
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(game.combat?.combatants?.some((c) => c.initiative !== null)).to.be.false;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 
@@ -1132,16 +980,10 @@ export default ({
     let previousCombatRerollBehavior: string;
 
     before(async () => {
-      previousInitiativeSetting = game.settings.get(
-        game.system.id,
-        "initiative"
-      );
+      previousInitiativeSetting = game.settings.get(game.system.id, "initiative");
       await game.settings.set(game.system.id, "initiative", "individual");
 
-      previousCombatRerollBehavior = game.settings.get(
-        game.system.id,
-        "rerollInitiative"
-      );
+      previousCombatRerollBehavior = game.settings.get(game.system.id, "rerollInitiative");
       await game.settings.set(game.system.id, "rerollInitiative", "keep");
 
       await trashChat();
@@ -1149,16 +991,8 @@ export default ({
 
     after(async () => {
       await cleanupCombat();
-      await game.settings.set(
-        game.system.id,
-        "initiative",
-        previousInitiativeSetting
-      );
-      await game.settings.set(
-        game.system.id,
-        "rerollInitiative",
-        previousCombatRerollBehavior
-      );
+      await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
+      await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
       await cleanUpActorsByKey(key);
       await waitForInput();
     });
@@ -1179,8 +1013,7 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(20);
-      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be
-        .false;
+      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be.false;
     });
 
     it("should mark combatants as active", async () => {
@@ -1198,8 +1031,7 @@ export default ({
     });
 
     it("should keep initiative for all groups on new round", async () => {
-      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be
-        .false;
+      expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be.false;
       const individualInitiatives: Map<string, number> = new Map();
       for (const combatant of game.combat?.combatants) {
         individualInitiatives.set(combatant.id, combatant.initiative);
@@ -1213,13 +1045,8 @@ export default ({
       expect(game.combat?.groups?.size).to.equal(0);
       expect(game.combat?.combatants?.size).to.equal(20);
       expect(game.messages.size).to.equal(0);
-      expect(
-        game.combat?.combatants?.some(
-          (c) => c.initiative !== individualInitiatives.get(c.id)
-        )
-      ).to.be.false;
-      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be
-        .true;
+      expect(game.combat?.combatants?.some((c) => c.initiative !== individualInitiatives.get(c.id))).to.be.false;
+      expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
   });
 };

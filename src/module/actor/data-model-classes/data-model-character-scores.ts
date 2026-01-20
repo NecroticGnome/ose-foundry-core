@@ -173,15 +173,12 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #strMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#str.value
+      this.#str.value,
     );
   }
 
   get #strOpenDoorsMod() {
-    return OseDataModelCharacterScores.valueFromTable(
-      OseDataModelCharacterScores.openDoorMods,
-      this.#str.value
-    );
+    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.openDoorMods, this.#str.value);
   }
 
   get int() {
@@ -204,22 +201,16 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #intMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#int.value
+      this.#int.value,
     );
   }
 
   get #intLiteracyMod() {
-    return OseDataModelCharacterScores.valueFromTable(
-      OseDataModelCharacterScores.literacyMods,
-      this.#int.value
-    );
+    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.literacyMods, this.#int.value);
   }
 
   get #intSpokenLanguagesMod() {
-    return OseDataModelCharacterScores.valueFromTable(
-      OseDataModelCharacterScores.spokenMods,
-      this.#int.value
-    );
+    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.spokenMods, this.#int.value);
   }
 
   get wis() {
@@ -240,7 +231,7 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #wisMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#wis.value
+      this.#wis.value,
     );
   }
 
@@ -263,15 +254,12 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #dexMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#dex.value
+      this.#dex.value,
     );
   }
 
   get #dexInitMod() {
-    return OseDataModelCharacterScores.valueFromTable(
-      OseDataModelCharacterScores.cappedAttributeMods,
-      this.#dex.value
-    );
+    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.cappedAttributeMods, this.#dex.value);
   }
 
   get con() {
@@ -292,7 +280,7 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #conMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#con.value
+      this.#con.value,
     );
   }
 
@@ -317,15 +305,12 @@ export default class OseDataModelCharacterScores implements CharacterScores {
   get #chaMod() {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
-      this.#cha.value
+      this.#cha.value,
     );
   }
 
   get #chaReactionMod() {
-    return OseDataModelCharacterScores.valueFromTable(
-      OseDataModelCharacterScores.cappedAttributeMods,
-      this.#cha.value
-    );
+    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.cappedAttributeMods, this.#cha.value);
   }
 
   get #chaRetainMod() {

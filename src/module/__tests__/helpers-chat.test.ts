@@ -2,12 +2,8 @@
  * @file Contains tests for chat helpers
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../e2e";
-import {
-  addChatMessageButtons,
-  addChatMessageContextOptions,
-  functionsForTesting,
-} from "../helpers-chat";
+import type { QuenchMethods } from "../../e2e";
+import { addChatMessageButtons, addChatMessageContextOptions, functionsForTesting } from "../helpers-chat";
 
 const { applyChatCardDamage } = functionsForTesting;
 

@@ -1,7 +1,7 @@
 /**
  * @file Quench unit tests for the data model class that drives actor spells.
  */
-import { QuenchMethods } from "../../../../e2e";
+import type { QuenchMethods } from "../../../../e2e";
 import OseDataModelCharacterSpells from "../data-model-character-spells";
 
 export const key = "ose.actor.datamodel.character.spells";
@@ -21,11 +21,9 @@ const createMockSpellList = (spellOptions: any, ...levels: any) =>
   levels.reduce(
     (arr: Item[], lvCount: number, idx: number) => [
       ...arr,
-      ...Array.from({ length: lvCount }, () =>
-        createMockSpell(idx + 1, spellOptions)
-      ),
+      ...Array.from({ length: lvCount }, () => createMockSpell(idx + 1, spellOptions)),
     ],
-    []
+    [],
   );
 
 // Core goes to 6, but we'll go to 9 just in case
@@ -48,30 +46,21 @@ export default ({ describe, it, expect }: QuenchMethods) => {
     describe("Shows committed and max spell slots per level", () => {
       it("with no spells prepared", () => {
         const spells = [createMockSpell(1)];
-        const spellData = new OseDataModelCharacterSpells(
-          { 1: { max: 1 } },
-          spells as Item[]
-        );
+        const spellData = new OseDataModelCharacterSpells({ 1: { max: 1 } }, spells as Item[]);
         expect(spellData.slots[1].used).to.equal(0);
         expect(spellData.slots[1].max).to.equal(1);
       });
 
       it("with spells prepared, not cast", () => {
         const spells = [createMockSpell(1, { memorized: 1, cast: 1 })];
-        const spellData = new OseDataModelCharacterSpells(
-          { 1: { max: 1 } },
-          spells as Item[]
-        );
+        const spellData = new OseDataModelCharacterSpells({ 1: { max: 1 } }, spells as Item[]);
         expect(spellData.slots[1].used).to.equal(1);
         expect(spellData.slots[1].max).to.equal(1);
       });
 
       it("with spells prepared and cast", () => {
         const spells = [createMockSpell(1, { memorized: 1, cast: 0 })];
-        const spellData = new OseDataModelCharacterSpells(
-          { 1: { max: 1 } },
-          spells as Item[]
-        );
+        const spellData = new OseDataModelCharacterSpells({ 1: { max: 1 } }, spells as Item[]);
         expect(spellData.slots[1].used).to.equal(0);
         expect(spellData.slots[1].max).to.equal(1);
       });

@@ -1,9 +1,9 @@
 /**
  * @file A collection of helper utils for chat cards
  */
-import OseActor from "./actor/entity";
 
-import { OseContextMenuEntry } from "../global";
+import type { OseContextMenuEntry } from "../global";
+import OseActor from "./actor/entity";
 
 /**
  * Apply damage to a target actor
@@ -13,16 +13,9 @@ import { OseContextMenuEntry } from "../global";
  * @param {1 | -1} multiplier - The multiplier to apply to the damage
  * @param {string} nameOrId - The name or ID of the target actor
  */
-async function applyDamageToTarget(
-  actor: Actor | null,
-  amount: string,
-  multiplier: 1 | -1,
-  nameOrId: string
-) {
+async function applyDamageToTarget(actor: Actor | null, amount: string, multiplier: 1 | -1, nameOrId: string) {
   if (!game.user?.isGM || !(actor instanceof OseActor)) {
-    ui.notifications?.error(
-      game.i18n.format("OSE.error.cantDealDamageTo", { nameOrId })
-    );
+    ui.notifications?.error(game.i18n.format("OSE.error.cantDealDamageTo", { nameOrId }));
     return;
   }
   await actor.applyDamage(amount, multiplier);
@@ -37,33 +30,21 @@ async function applyDamageToTarget(
  */
 function applyChatCardDamage(html: HTMLElement, multiplier: 1 | -1) {
   const diceTotalTargets = html.querySelectorAll(".dice-total");
-  const lastDiceTotalTarget = diceTotalTargets[
-    diceTotalTargets.length - 1
-  ] as HTMLElement;
+  const lastDiceTotalTarget = diceTotalTargets[diceTotalTargets.length - 1] as HTMLElement;
   const amount = lastDiceTotalTarget?.textContent || "0";
   const dmgTgt = game.settings.get(game.system.id, "applyDamageOption");
   if (dmgTgt === CONFIG.OSE.apply_damage_options.originalTarget) {
-    const victimId = (html.querySelector(".chat-target") as HTMLElement)
-      ?.dataset.id;
+    const victimId = (html.querySelector(".chat-target") as HTMLElement)?.dataset.id;
     (async () => {
       const actor = ((await fromUuid(victimId || "")) as TokenDocument)?.actor;
-      await applyDamageToTarget(
-        actor,
-        amount,
-        multiplier,
-        actor?.name || victimId || "original target"
-      );
+      await applyDamageToTarget(actor, amount, multiplier, actor?.name || victimId || "original target");
     })();
   }
   if (dmgTgt === CONFIG.OSE.apply_damage_options.targeted) {
-    game.user?.targets.forEach((t) =>
-      applyDamageToTarget(t.actor, amount, multiplier, t.name)
-    );
+    game.user?.targets.forEach((t) => applyDamageToTarget(t.actor, amount, multiplier, t.name));
   }
   if (dmgTgt === CONFIG.OSE.apply_damage_options.selected) {
-    canvas.tokens?.controlled.forEach((t) =>
-      applyDamageToTarget(t.actor, amount, multiplier, t.name)
-    );
+    canvas.tokens?.controlled.forEach((t) => applyDamageToTarget(t.actor, amount, multiplier, t.name));
   }
 }
 
@@ -76,15 +57,13 @@ function canApplyDamage(html: HTMLElement) {
   if (!game.user?.isGM) return false;
 
   if (!html.querySelector(".dice-total")) return false;
-  const applyDamageOption = game.settings.get(
-    game.system.id,
-    "applyDamageOption"
-  );
+  const applyDamageOption = game.settings.get(game.system.id, "applyDamageOption");
   switch (applyDamageOption) {
-    case CONFIG.OSE.apply_damage_options.originalTarget:
+    case CONFIG.OSE.apply_damage_options.originalTarget: {
       const chatTargets = html.querySelectorAll(".chat-target");
       const lastChatTarget = chatTargets[chatTargets.length - 1] as HTMLElement;
       return !!lastChatTarget?.dataset.id;
+    }
 
     case CONFIG.OSE.apply_damage_options.targeted:
       return !!game.user?.targets?.size;
@@ -97,7 +76,7 @@ function canApplyDamage(html: HTMLElement) {
         game.i18n.format("OSE.error.unexpectedSettings", {
           configName: "applyDamageOption",
           configValue: applyDamageOption,
-        })
+        }),
       );
       return false;
   }
@@ -113,10 +92,7 @@ const canApply: OseContextMenuEntry["condition"] = (li) => canApplyDamage(li);
  * @param {Array} options - The list of context menu options
  * @returns {undefined}
  */
-export const addChatMessageContextOptions = (
-  _: HTMLElement,
-  options: OseContextMenuEntry[]
-) => {
+export const addChatMessageContextOptions = (_: HTMLElement, options: OseContextMenuEntry[]) => {
   options.push(
     {
       name: game.i18n.localize("OSE.messages.applyDamage"),
@@ -129,7 +105,7 @@ export const addChatMessageContextOptions = (
       icon: '<i class="fas fa-user-plus"></i>',
       condition: canApply,
       callback: (li) => applyChatCardDamage(li, -1),
-    }
+    },
   );
   return options;
 };
@@ -140,7 +116,7 @@ export const addChatMessageButtons = (msg: ChatMessage, html: HTMLElement) => {
   // Hide blind rolls
   const blindable = html.querySelector(".blindable") as HTMLElement;
   if (
-    // @ts-ignore need to add ChatMessage document property updates.
+    // @ts-expect-error need to add ChatMessage document property updates.
     msg?.blind &&
     !game.user?.isGM &&
     blindable &&

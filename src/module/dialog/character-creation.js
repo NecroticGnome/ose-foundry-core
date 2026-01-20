@@ -6,13 +6,12 @@ import OseDice from "../helpers-dice";
 
 export default class OseCharacterCreator extends FormApplication {
   static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.classes = ["ose", "dialog", "creator"];
-    options.id = "character-creator";
-    options.template = `${OSE.systemPath()}/templates/actors/dialogs/character-creation.html`;
-    options.width = 235;
-    options.submitOnClose = false;
-    return options;
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
+      classes: ["ose", "dialog", "creator"],
+      id: "character-creator",
+      template: `${OSE.systemPath()}/templates/actors/dialogs/character-creation.html`,
+      width: 235,
+    });
   }
 
   /* -------------------------------------------- */
@@ -63,12 +62,8 @@ export default class OseCharacterCreator extends FormApplication {
     const scores = Object.values(this.scores);
     const n = scores.length;
     const sum = scores.reduce((acc, next) => acc + next.value, 0);
-    const mean = parseFloat(sum) / n;
-    const std = Math.sqrt(
-      scores
-        .map((x) => (x.value - mean) ** 2)
-        .reduce((acc, next) => acc + next, 0) / n
-    );
+    const mean = Number.parseFloat(sum) / n;
+    const std = Math.sqrt(scores.map((x) => (x.value - mean) ** 2).reduce((acc, next) => acc + next, 0) / n);
 
     const stats = list.siblings(".roll-stats");
     stats.find(".sum").text(sum);
@@ -76,10 +71,7 @@ export default class OseCharacterCreator extends FormApplication {
     stats.find(".std").text(Math.round(100 * std) / 100);
 
     if (n >= 6) {
-      $(ev.currentTarget)
-        .closest("form")
-        .find('button[type="submit"]')
-        .removeAttr("disabled");
+      $(ev.currentTarget).closest("form").find('button[type="submit"]').removeAttr("disabled");
     }
 
     this.object.stats = {
@@ -93,10 +85,7 @@ export default class OseCharacterCreator extends FormApplication {
     // Increase counter
     this.counters[score] += 1;
 
-    const label =
-      score === "gold"
-        ? "Gold"
-        : game.i18n.localize(`OSE.scores.${score}.long`);
+    const label = score === "gold" ? "Gold" : game.i18n.localize(`OSE.scores.${score}.long`);
     const rollParts = ["3d6"];
     const data = {
       roll: {},
@@ -161,10 +150,7 @@ export default class OseCharacterCreator extends FormApplication {
   }
 
   // eslint-disable-next-line no-underscore-dangle
-  async _onSubmit(
-    event,
-    { updateData = null, preventClose = false, preventRender = false } = {}
-  ) {
+  async _onSubmit(event, { updateData = null, preventClose = false, preventRender = false } = {}) {
     const extendedData = { ...updateData, system: { scores: this.scores } };
     // eslint-disable-next-line no-underscore-dangle
     super._onSubmit(event, {
@@ -184,7 +170,7 @@ export default class OseCharacterCreator extends FormApplication {
     };
     const content = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/chat/roll-creation.html`,
-      templateData
+      templateData,
     );
 
     await ChatMessage.create({

@@ -1,7 +1,7 @@
 /**
  * @file A place to store Handlebars helpers for our templates
  */
-import OSE, { InventoryItemTag } from "./config";
+import OSE, { type InventoryItemTag } from "./config";
 
 const registerHelpers = async () => {
   // Handlebars template helpers
@@ -17,29 +17,15 @@ const registerHelpers = async () => {
     return "0";
   });
 
-  Handlebars.registerHelper(
-    "add",
-    (lh, rh) => parseInt(lh, 10) + parseInt(rh, 10)
-  );
+  Handlebars.registerHelper("add", (lh, rh) => Number.parseInt(lh, 10) + Number.parseInt(rh, 10));
 
-  Handlebars.registerHelper(
-    "subtract",
-    (lh, rh) => parseInt(lh, 10) - parseInt(rh, 10)
-  );
+  Handlebars.registerHelper("subtract", (lh, rh) => Number.parseInt(lh, 10) - Number.parseInt(rh, 10));
 
-  Handlebars.registerHelper("divide", (lh, rh) =>
-    Math.floor(parseFloat(lh) / parseFloat(rh))
-  );
+  Handlebars.registerHelper("divide", (lh, rh) => Math.floor(Number.parseFloat(lh) / Number.parseFloat(rh)));
 
-  Handlebars.registerHelper(
-    "mult",
-    (lh, rh) => Math.round(100 * parseFloat(lh) * parseFloat(rh)) / 100
-  );
+  Handlebars.registerHelper("mult", (lh, rh) => Math.round(100 * Number.parseFloat(lh) * Number.parseFloat(rh)) / 100);
 
-  Handlebars.registerHelper(
-    "roundWeight",
-    (weight) => Math.round(parseFloat(weight) / 100) / 10
-  );
+  Handlebars.registerHelper("roundWeight", (weight) => Math.round(Number.parseFloat(weight) / 100) / 10);
 
   Handlebars.registerHelper("getTagIcon", (tagValue: string) => {
     const tagKey = (Object.keys(CONFIG.OSE.tags) as InventoryItemTag[])
@@ -50,9 +36,7 @@ const registerHelpers = async () => {
   });
 
   Handlebars.registerHelper("counter", (status, value, max) =>
-    status
-      ? Math.clamp((100 * value) / max, 0, 100)
-      : Math.clamp(100 - (100 * value) / max, 0, 100)
+    status ? Math.clamp((100 * value) / max, 0, 100) : Math.clamp(100 - (100 * value) / max, 0, 100),
   );
 
   Handlebars.registerHelper("times", (n, block) => {
@@ -62,22 +46,13 @@ const registerHelpers = async () => {
     return accum;
   });
 
-  Handlebars.registerHelper(
-    "path",
-    (relativePath) => `${OSE.systemPath()}${relativePath}`
-  );
+  Handlebars.registerHelper("path", (relativePath) => `${OSE.systemPath()}${relativePath}`);
 
-  Handlebars.registerHelper(
-    "asset",
-    (relativePath) => `${OSE.assetsPath}${relativePath}`
-  );
+  Handlebars.registerHelper("asset", (relativePath) => `${OSE.assetsPath}${relativePath}`);
 
   Handlebars.registerHelper("ceil", (val) => Math.ceil(val));
 
-  Handlebars.registerHelper(
-    "partial",
-    (path) => `${OSE.systemPath()}/templates/${path}`
-  );
+  Handlebars.registerHelper("partial", (path) => `${OSE.systemPath()}/templates/${path}`);
 };
 
 export default registerHelpers;

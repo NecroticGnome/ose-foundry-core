@@ -36,22 +36,15 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
 
   #enabled: boolean;
 
-  constructor(
-    {
-      enabled,
-      ...maxSlots
-    }: { enabled?: boolean; [n: number]: { max: number } },
-    spellList: Item[] = []
-  ) {
+  constructor({ enabled, ...maxSlots }: { enabled?: boolean; [n: number]: { max: number } }, spellList: Item[] = []) {
     this.#spellList = spellList;
     this.#enabled = enabled || false;
 
     const usedSlots = this.#spellList?.reduce(this.#reducedUsedSlots, {}) || {};
 
     this.#slots = Object.keys(maxSlots || {}).reduce(
-      (list, item, idx) =>
-        this.#usedAndMaxSlots(list, item, idx, usedSlots, maxSlots),
-      {}
+      (list, item, idx) => this.#usedAndMaxSlots(list, item, idx, usedSlots, maxSlots),
+      {},
     );
   }
 
@@ -64,10 +57,7 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
   }
 
   get spellList() {
-    return this.#spellList.reduce(
-      (list, item) => reducedSpells(list, item),
-      {}
-    );
+    return this.#spellList.reduce((list, item) => reducedSpells(list, item), {});
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -88,7 +78,7 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
     item: Item | string,
     idx: number,
     usedSlots: { [n: number]: number },
-    maxSlots: { [n: number]: { max: number } }
+    maxSlots: { [n: number]: { max: number } },
   ) {
     if (item === "enabled") return list;
     const lv = idx;

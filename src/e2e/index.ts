@@ -3,6 +3,7 @@
 /**
  * @file Orchestration for our Quench tests
  */
+
 // ACTOR TESTING IMPORTS
 import actorDataModelCharacterTests, {
   key as actorDataModelCharacterKey,
@@ -54,10 +55,7 @@ import actorSheetMonsterTests, {
 } from "../module/actor/__tests__/sheet-monster.test";
 
 // COMBAT TESTING IMPORTS
-import combatTests, {
-  key as combatKey,
-  options as combatOptions,
-} from "../module/combat/__tests__/combat.test";
+import combatTests, { key as combatKey, options as combatOptions } from "../module/combat/__tests__/combat.test";
 
 // DIALOG TESTING IMPORTS
 import actorSheetCharacterDialogModifiersTest, {
@@ -159,60 +157,36 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   /* ------------------------------------------- */
   /* ACTOR TESTING                               */
   /* ------------------------------------------- */
-  quench.registerBatch(
-    actorDataModelCharacterKey,
-    actorDataModelCharacterTests,
-    actorDataModelCharacterOptions
-  );
-  quench.registerBatch(
-    actorDataModelCharacterACKey,
-    actorDataModelCharacterACTests,
-    actorDataModelCharacterACOptions
-  );
+  quench.registerBatch(actorDataModelCharacterKey, actorDataModelCharacterTests, actorDataModelCharacterOptions);
+  quench.registerBatch(actorDataModelCharacterACKey, actorDataModelCharacterACTests, actorDataModelCharacterACOptions);
   quench.registerBatch(
     actorDataModelCharacterEncumbranceKey,
     actorDataModelCharacterEncumbranceTests,
-    actorDataModelCharacterEncumbranceOptions
+    actorDataModelCharacterEncumbranceOptions,
   );
   quench.registerBatch(
     actorDataModelCharacterMoveKey,
     actorDataModelCharacterMoveTests,
-    actorDataModelCharacterMoveOptions
+    actorDataModelCharacterMoveOptions,
   );
   quench.registerBatch(
     actorDataModelCharacterScoresKey,
     actorDataModelCharacterScoresTests,
-    actorDataModelCharacterScoresOptions
+    actorDataModelCharacterScoresOptions,
   );
   quench.registerBatch(
     actorDataModelCharacterSpellsKey,
     actorDataModelCharacterSpellsTests,
-    actorDataModelCharacterSpellsOptions
+    actorDataModelCharacterSpellsOptions,
   );
-  quench.registerBatch(
-    actorDataModelMonsterKey,
-    actorDataModelMonsterTests,
-    actorDataModelMonsterOptions
-  );
+  quench.registerBatch(actorDataModelMonsterKey, actorDataModelMonsterTests, actorDataModelMonsterOptions);
 
   quench.registerBatch(actorEntityKey, actorEntityTests, actorEntityOptions);
 
   quench.registerBatch(actorSheetKey, actorSheetTests, actorSheetOptions);
-  quench.registerBatch(
-    actorSheetDragNDropKey,
-    actorSheetDragNDropTests,
-    actorSheetDragNDropOptions
-  );
-  quench.registerBatch(
-    actorSheetCharacterKey,
-    actorSheetCharacterTests,
-    actorSheetCharacterOptions
-  );
-  quench.registerBatch(
-    actorSheetMonsterKey,
-    actorSheetMonsterTests,
-    actorSheetMonsterOptions
-  );
+  quench.registerBatch(actorSheetDragNDropKey, actorSheetDragNDropTests, actorSheetDragNDropOptions);
+  quench.registerBatch(actorSheetCharacterKey, actorSheetCharacterTests, actorSheetCharacterOptions);
+  quench.registerBatch(actorSheetMonsterKey, actorSheetMonsterTests, actorSheetMonsterOptions);
 
   /* ------------------------------------------- */
   /* COMBAT TESTING                              */
@@ -227,48 +201,24 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   quench.registerBatch(
     actorSheetCharacterDialogModifiersKey,
     actorSheetCharacterDialogModifiersTest,
-    actorSheetCharacterDialogModifiersOptions
+    actorSheetCharacterDialogModifiersOptions,
   );
   quench.registerBatch(
     actorSheetDialogEntityTweaksKey,
     actorSheetDialogEntityTweaksTests,
-    actorSheetDialogEntityTweaksOptions
+    actorSheetDialogEntityTweaksOptions,
   );
 
   /* ------------------------------------------- */
   /* ITEM TESTING                                */
   /* ------------------------------------------- */
 
-  quench.registerBatch(
-    itemDataModelAbilityKey,
-    itemDataModelAbilityTests,
-    itemDataModelAbilityOptions
-  );
-  quench.registerBatch(
-    itemDataModelArmorKey,
-    itemDataModelArmorTests,
-    itemDataModelArmorOptions
-  );
-  quench.registerBatch(
-    itemDataModelContainerKey,
-    itemDataModelContainerTests,
-    itemDataModelContainerOptions
-  );
-  quench.registerBatch(
-    itemDataModelMiscKey,
-    itemDataModelMiscTests,
-    itemDataModelMiscOptions
-  );
-  quench.registerBatch(
-    itemDataModelSpellKey,
-    itemDataModelSpellTests,
-    itemDataModelSpellOptions
-  );
-  quench.registerBatch(
-    itemDataModelWeaponKey,
-    itemDataModelWeaponTests,
-    itemDataModelWeaponOptions
-  );
+  quench.registerBatch(itemDataModelAbilityKey, itemDataModelAbilityTests, itemDataModelAbilityOptions);
+  quench.registerBatch(itemDataModelArmorKey, itemDataModelArmorTests, itemDataModelArmorOptions);
+  quench.registerBatch(itemDataModelContainerKey, itemDataModelContainerTests, itemDataModelContainerOptions);
+  quench.registerBatch(itemDataModelMiscKey, itemDataModelMiscTests, itemDataModelMiscOptions);
+  quench.registerBatch(itemDataModelSpellKey, itemDataModelSpellTests, itemDataModelSpellOptions);
+  quench.registerBatch(itemDataModelWeaponKey, itemDataModelWeaponTests, itemDataModelWeaponOptions);
 
   quench.registerBatch(itemEntityKey, itemEntityTests, itemEntityOptions);
 
@@ -286,27 +236,11 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   /* HELPER TESTING                               */
   /* ------------------------------------------- */
 
-  quench.registerBatch(
-    helpersBehaviourKey,
-    helpersBehaviourTests,
-    helpersBehaviourOptions
-  );
+  quench.registerBatch(helpersBehaviourKey, helpersBehaviourTests, helpersBehaviourOptions);
   quench.registerBatch(helpersChatKey, helpersChatTests, helpersChatOptions);
   quench.registerBatch(helpersDiceKey, helpersDiceTests, helpersDiceOptions);
-  quench.registerBatch(
-    helpersHandlebarsKey,
-    helpersHandlebarsTests,
-    helpersHandlebarsOptions
-  );
-  quench.registerBatch(
-    helpersMacrosKey,
-    helpersMacrosTests,
-    helpersMacrosOptions
-  );
+  quench.registerBatch(helpersHandlebarsKey, helpersHandlebarsTests, helpersHandlebarsOptions);
+  quench.registerBatch(helpersMacrosKey, helpersMacrosTests, helpersMacrosOptions);
   quench.registerBatch(helpersPartyKey, helpersPartyTests, helpersPartyOptions);
-  quench.registerBatch(
-    helpersTreasureKey,
-    helpersTreasureTests,
-    helpersTreasureOptions
-  );
+  quench.registerBatch(helpersTreasureKey, helpersTreasureTests, helpersTreasureOptions);
 });

@@ -2,20 +2,14 @@
  * @file Contains tests for Party Sheet.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
-import {
-  cleanUpActorsByKey,
-  createMockActorKey,
-  openWindows,
-  waitForInput,
-} from "../../../e2e/testUtils";
+import type { QuenchMethods } from "../../../e2e";
+import { cleanUpActorsByKey, createMockActorKey, openWindows, waitForInput } from "../../../e2e/testUtils";
 import OsePartySheet from "../party-sheet";
 
 export const key = "ose.party.sheet";
 export const options = { displayName: "OSE: Party: Sheet" };
 
-const createMockActor = async (type: string, data: object = {}) =>
-  createMockActorKey(type, data, key);
+const createMockActor = async (type: string, data: object = {}) => createMockActorKey(type, data, key);
 
 export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
   describe("defaultOptions()", () => {
@@ -24,18 +18,12 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
       expect(partySheet.options.classes).contain("ose");
       expect(partySheet.options.classes).contain("dialog");
       expect(partySheet.options.classes).contain("party-sheet");
-      expect(partySheet.options.template).contain(
-        "/templates/apps/party-sheet.html"
-      );
+      expect(partySheet.options.template).contain("/templates/apps/party-sheet.html");
       expect(partySheet.options.width).equal(280);
       expect(partySheet.options.height).equal(400);
       assert(partySheet.options.resizable);
-      expect(partySheet.options.dragDrop[0].dragSelector).equal(
-        ".actor-list .actor"
-      );
-      expect(partySheet.options.dragDrop[0].dropSelector).equal(
-        ".party-members"
-      );
+      expect(partySheet.options.dragDrop[0].dragSelector).equal(".actor-list .actor");
+      expect(partySheet.options.dragDrop[0].dropSelector).equal(".party-members");
       assert(!partySheet.options.closeOnSubmit);
     });
   });
@@ -67,9 +55,7 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
     it("Creates string in dialog window title", async () => {
       OsePartySheet.showPartySheet();
       await waitForInput();
-      const dialogTitle = document.querySelector(
-        "div.party-sheet .window-title"
-      )?.innerHTML;
+      const dialogTitle = document.querySelector("div.party-sheet .window-title")?.innerHTML;
       expect(typeof dialogTitle).equal("string");
       const dialogs = openWindows("party-sheet");
       expect(dialogs.length).equal(1);
@@ -240,8 +226,6 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
 
   after(async () => {
     cleanUpActorsByKey(key);
-    game.folders?.contents
-      ?.filter((a) => a.name?.includes(`Test Folder ${key}`))
-      ?.forEach((a) => a.delete());
+    game.folders?.contents?.filter((a) => a.name?.includes(`Test Folder ${key}`))?.forEach((a) => a.delete());
   });
 };

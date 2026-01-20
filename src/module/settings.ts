@@ -1,7 +1,7 @@
 /**
  * @file Wire up system settings.
  */
-import { ApplyDamageOption, EncumbranceOption } from "./config";
+import type { ApplyDamageOption, EncumbranceOption } from "./config";
 
 /**
  * Perform setting registration.

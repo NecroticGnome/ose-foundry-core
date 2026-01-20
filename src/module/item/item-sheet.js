@@ -13,7 +13,7 @@ export default class OseItemSheet extends foundry.appv1.sheets.ItemSheet {
    * @returns {object}
    */
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(foundry.appv1.sheets.ItemSheet.defaultOptions, {
       classes: ["ose", "sheet", "item"],
       width: 520,
       height: 390,
@@ -52,7 +52,7 @@ export default class OseItemSheet extends foundry.appv1.sheets.ItemSheet {
     data.enriched = {
       description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         this.item.system?.description || "",
-        { async: true }
+        { async: true },
       ),
     };
     return data;

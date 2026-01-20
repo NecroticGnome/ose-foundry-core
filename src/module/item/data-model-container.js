@@ -1,17 +1,9 @@
 /**
  * @file The data model for Items of type Container
  */
-export default class OseDataModelContainer extends foundry.abstract
-  .TypeDataModel {
+export default class OseDataModelContainer extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const {
-      SchemaField,
-      StringField,
-      NumberField,
-      ArrayField,
-      ObjectField,
-      BooleanField,
-    } = foundry.data.fields;
+    const { SchemaField, StringField, NumberField, ArrayField, ObjectField, BooleanField } = foundry.data.fields;
     return {
       itemIds: new ArrayField(new StringField()),
       description: new StringField(),
@@ -32,27 +24,19 @@ export default class OseDataModelContainer extends foundry.abstract
     if (!this.itemIds) return null;
     if (!this?.parent?.parent?.items) return null;
     const { id } = this.parent;
-    return this.parent.parent.items.filter(
-      ({ system: { containerId } }) => id === containerId
-    );
+    return this.parent.parent.items.filter(({ system: { containerId } }) => id === containerId);
   }
 
   get totalWeight() {
     if (!this.contents) return 0;
 
-    return this.contents.reduce(
-      (acc, { system: { weight, quantity } }) =>
-        acc + weight * (quantity?.value || 1),
-      0
-    );
+    return this.contents.reduce((acc, { system: { weight, quantity } }) => acc + weight * (quantity?.value || 1), 0);
   }
 
   get manualTags() {
     if (!this.tags) return null;
 
-    const tagNames = new Set(
-      Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label)
-    );
+    const tagNames = new Set(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
     return this.tags
       .filter(({ value }) => !tagNames.has(value))
       .map(({ title, value }) => ({ title, value, label: value }));
@@ -61,9 +45,7 @@ export default class OseDataModelContainer extends foundry.abstract
   get autoTags() {
     const tagNames = Object.values(CONFIG.OSE.auto_tags);
 
-    const autoTags = this.tags.map(({ value }) =>
-      tagNames.find(({ label }) => value === label)
-    );
+    const autoTags = this.tags.map(({ value }) => tagNames.find(({ label }) => value === label));
 
     return [...autoTags, ...this.manualTags].flat().filter((t) => !!t);
   }
