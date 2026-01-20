@@ -1,12 +1,16 @@
+/// <reference types="@league-of-foundry-developers/foundry-vtt-types" />
+
 import { OseCombat } from "./module/combat";
 import type { OseConfig } from "./module/config";
 
 declare global {
-  interface LenientGlobalVariableTypes {
-    // Allowing game to be accessible as a typescript type regardless of whether or not the object has been initialized.
-    // See documentation for LenientGlobalVariableTypes at https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/FAQ
-    game: never;
-    canvas: never;
+  // Configure foundry-vtt-types for lenient typing
+  // Assume all initialization hooks have run for full Game type coverage
+  interface AssumeHookRan {
+    init: never;
+    i18nInit: never;
+    setup: never;
+    ready: never;
   }
 
   interface CONFIG {

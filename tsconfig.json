@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["@league-of-foundry-developers/foundry-vtt-types"],
     "target": "ESNext",
     "module": "ESNext",
     "allowJs": true,
@@ -14,7 +15,7 @@
       "ESNext.Promise",
       "DOM",
       "DOM.Iterable",
-      "DOM.AsyncIterable",
+      "DOM.AsyncIterable"
     ],
     "moduleResolution": "node",
     "strict": true,
@@ -35,13 +36,5 @@
       "@setup/*": ["./foundry/setup/*"]
     }
   },
-  "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "foundry/common/primitives/global.d.mts",
-    "foundry/client/global.d.mts",
-    "foundry/client/**/*.mjs",
-    "foundry/setup/**/*.mjs"
-  ]
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts"]
 }
