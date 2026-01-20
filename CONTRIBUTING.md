@@ -63,16 +63,16 @@ In each of these cases, there are multiple needs being served:
 
 ## Become a code contributor
 
-This guide should help you get the UFT development environment completely 
+This guide should help you get the development environment running.
 
 ### Developer Environment Installation
 
-Prerequisites: Node.js (v16 is recommended), a familiarity with command Foundry VTT with a valid license
+Prerequisites: Node.js (v20 or greater is recommended), a familiarity with Foundry VTT with a valid license
 
 [Node installers (beginner-friendly)](https://nodejs.org/en/download/)
 [Node on package managers (recommended, I use nvm)](https://nodejs.org/en/download/package-manager/#windows)
 
-1. With Node.js installed, run the command `npm i npm -g && npm -v` in your preferred command line interface to ensure **npm 7 or greater** is installed.
+1. With Node.js installed, verify npm is available by running `npm -v` in your preferred command line interface.
 1. (Star) and fork this repo.
 1. Clone your fork to a directory suitable for containing your code projects, such as `/yourusername/Github/`. It will create the `ose` directory. In the command line, your command should look like `git clone git@github.com:yourusername/ose.git`.
 1. Open `ose` in an IDE and/or your Terminal and install dependencies. In the command line, `cd ose && npm i`.
@@ -91,7 +91,7 @@ Prerequisites: Node.js (v16 is recommended), a familiarity with command Foundry 
    ```
 
 1. In your command line, run `npm run link`. A new system should now appear in your systems directory (or directories) but it doesn't yet run any code.
-1. In your command line, run `npm run build` (build once) or `npm run build:watch` (build continuously, whenever a change is saved). You now have a working copy of OSE's developer build. You should be able to install releases of `ose` alongside this build.
+1. In your command line, run `npm run build` (build once) or `npm run watch` (build continuously, whenever a change is saved). You now have a working copy of OSE's developer build. You should be able to install releases of `ose` alongside this build.
 
 ### Addendum: Git for Beginners
 
@@ -139,27 +139,27 @@ The maintainer of this repository has three versions of OSE installed in any giv
     vttred/
         ose/
     fvtt/
-        v9/
-        v9-userdata/Data/
+        v12/
+        v12-userdata/Data/
             systems/
                 ose/
                 ose-dev/
                 ose-test/
-    v10/
-         v10-userdata/Data/
-            systems/
-                ose/
-                ose-dev/
-                ose-test/
+        v13/
+            v13-userdata/Data/
+                systems/
+                    ose/
+                    ose-dev/
+                    ose-test/
 ```
 
-This is achieved with a `foundryconfig.json` files in each local version of the github repo on the maintainer's computer. Because of an npm script, each repo can make two symlinks, one for Foundry V9 and one for Foundry V10.
+This is achieved with `foundryconfig.json` files in each local version of the github repo on the maintainer's computer. Because of an npm script, each repo can make two symlinks, one for Foundry v12 and one for Foundry v13.
 
 `~/mygithubusername/ose/foundryconfig.json`
 
 ```json
 {
-  "dataPath": ["~/fvtt/v9-userdata", "~/fvtt/v10-userdata"],
+  "dataPath": ["~/fvtt/v12-userdata", "~/fvtt/v13-userdata"],
   "symlinkName": "ose-dev"
 }
 ```
@@ -168,7 +168,7 @@ This is achieved with a `foundryconfig.json` files in each local version of the 
 
 ```json
 {
-  "dataPath": ["~/fvtt/v9-userdata", "~/fvtt/v10-userdata"],
+  "dataPath": ["~/fvtt/v12-userdata", "~/fvtt/v13-userdata"],
   "symlinkName": "ose-test"
 }
 ```

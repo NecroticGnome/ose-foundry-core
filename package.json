@@ -23,7 +23,6 @@
   "license": "",
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
-    "@league-of-foundry-developers/foundry-vtt-types": "League-of-Foundry-Developers/foundry-vtt-types#main",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/livereload": "^0.9.2",
     "fs-extra": "^8.1.0",

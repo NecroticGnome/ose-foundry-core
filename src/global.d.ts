@@ -4,7 +4,7 @@ import type { OseConfig } from "./module/config";
 declare global {
   interface LenientGlobalVariableTypes {
     // Allowing game to be accessible as a typescript type regardless of whether or not the object has been initialized.
-    // See documentation for LenientGlobalVariableTypes in @league-of-foundry-developers/foundry-vtt-types
+    // See documentation for LenientGlobalVariableTypes at https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/FAQ
     game: never;
     canvas: never;
   }
