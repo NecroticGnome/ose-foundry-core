@@ -1,5 +1,4 @@
 import { OSE } from "../config";
-import { OSECombat } from "./combat";
 import { OSECombatant } from "./combatant";
 
 export default class OSECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {

@@ -39,7 +39,7 @@ export default ({ before, beforeEach, after, describe, it, expect, assert, ...co
     await createItem(type);
     const item = testActor().items.contents[0];
     const data = createItemMacroData(item);
-    const macro = await createOseMacro(data, 1);
+    await createOseMacro(data, 1);
     await waitForInput();
 
     const createdMacro = game.user.getHotbarMacros()[0];

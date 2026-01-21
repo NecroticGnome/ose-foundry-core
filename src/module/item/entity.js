@@ -67,7 +67,7 @@ export default class OseItem extends Item {
     });
   }
 
-  async getChatData(htmlOptions) {
+  async getChatData(_htmlOptions) {
     const itemType = this.type;
 
     const itemData = this.system;
@@ -91,8 +91,8 @@ export default class OseItem extends Item {
   }
 
   rollWeapon(options = {}) {
-    const isNPC = this.actor.type != "character";
-    const targets = 5;
+    const isNPC = this.actor.type !== "character";
+    const _targets = 5;
     const itemData = this.system;
 
     let type = isNPC ? "attack" : "melee";
@@ -538,7 +538,7 @@ export default class OseItem extends Item {
     return game.actors.get(actorId) || null;
   }
 
-  static _getChatCardTargets(card) {
+  static _getChatCardTargets(_card) {
     const { character } = game.user;
     const { controlled } = canvas.tokens;
     const targets = controlled.reduce((arr, t) => (t.actor ? [...arr, t.actor] : arr), []);

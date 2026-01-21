@@ -188,8 +188,6 @@ export class OSECombat extends foundry.documents.Combat {
         case "reroll":
           await this.smartRerollInitiative();
           break;
-
-        case "keep":
         default:
           break;
       }

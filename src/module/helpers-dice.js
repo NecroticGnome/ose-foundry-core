@@ -28,7 +28,7 @@ const OseDice = {
     };
 
     // Optionally include a situational bonus
-    if (form !== null && form.bonus.value) {
+    if (form?.bonus.value) {
       parts.push(form.bonus.value);
     }
 
@@ -283,7 +283,7 @@ const OseDice = {
     };
 
     // Optionally include a situational bonus
-    if (form !== null && form.bonus.value) parts.push(form.bonus.value);
+    if (form?.bonus.value) parts.push(form.bonus.value);
 
     const roll = new Roll(parts.join("+"), data);
     await roll.evaluate();
@@ -377,7 +377,7 @@ const OseDice = {
         action: "ok",
         label: game.i18n.localize("OSE.Roll"),
         icon: "fas fa-dice-d20",
-        callback: (event, button) => {
+        callback: (_event, button) => {
           rolled = true;
           rollData.form = button.form;
           roll = OseDice.sendRoll(rollData);
@@ -387,7 +387,7 @@ const OseDice = {
         action: "magic",
         label: game.i18n.localize("OSE.saves.magic.short"),
         icon: "fas fa-magic",
-        callback: (event, button) => {
+        callback: (_event, button) => {
           rolled = true;
           rollData.form = button.form;
           rollData.parts.push(`${rollData.data.roll.magic}`);
@@ -459,7 +459,7 @@ const OseDice = {
         action: "ok",
         label: game.i18n.localize("OSE.Roll"),
         icon: "fas fa-dice-d20",
-        callback: (event, button) => {
+        callback: (_event, button) => {
           rolled = true;
           rollData.form = button.form;
           roll = ["melee", "missile", "attack"].includes(data.roll.type)

@@ -113,7 +113,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
             label: game.i18n.localize("OSE.Ok"),
             icon: "fas fa-check",
             default: true,
-            callback: (event, button, html) => {
+            callback: (_event, button, _html) => {
               resolve(new foundry.applications.ux.FormDataExtended(button.form).object);
             },
           },
@@ -147,7 +147,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   _popLang(table, lang) {
     const data = this.actor.system;
-    const update = data[table].value.filter((el) => el != lang);
+    const update = data[table].value.filter((el) => el !== lang);
     const newData = {};
     newData[table] = { value: update };
     return this.actor.update({ system: newData });

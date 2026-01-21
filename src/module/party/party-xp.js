@@ -53,7 +53,7 @@ export default class OsePartyXP extends FormApplication {
     try {
       data = JSON.parse(event.dataTransfer.getData("text/plain"));
       if (data.type !== "Item") return;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

@@ -46,7 +46,7 @@ export default class OSECombatGroupSelector extends HandlebarsApplicationMixin(A
   // ===========================================================================
 
   /** @inheritDoc */
-  async _prepareContext(options) {
+  async _prepareContext(_options) {
     return {
       groups: OSE.colors,
       combatants: game.combat?.combatants || [],

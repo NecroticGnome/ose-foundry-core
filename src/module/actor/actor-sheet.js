@@ -192,11 +192,11 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     event.preventDefault();
     const item = this._getItemFromActor(event);
     if (event.target.dataset.field === "cast") {
-      return item.update({ "system.cast": Number.parseInt(event.target.value) });
+      return item.update({ "system.cast": Number.parseInt(event.target.value, 10) });
     }
     if (event.target.dataset.field === "memorize") {
       return item.update({
-        "system.memorized": Number.parseInt(event.target.value),
+        "system.memorized": Number.parseInt(event.target.value, 10),
       });
     }
   }
@@ -233,7 +233,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
         });
       }
       item.rollWeapon({ skipDialog: skipRollDialogCheck(event) });
-    } else if (item.type == "spell") {
+    } else if (item.type === "spell") {
       await item.spendSpell({ skipDialog: skipRollDialogCheck(event) });
     } else {
       await item.rollFormula({ skipDialog: skipRollDialogCheck(event) });
@@ -325,7 +325,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   // eslint-disable-next-line no-underscore-dangle
-  async _onDropFolder(event, data) {
+  async _onDropFolder(_event, data) {
     const folder = await fromUuid(data.uuid);
     if (!folder || folder.type !== "Item") return;
 
@@ -376,7 +376,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async _onContainerItemRemove(item, container) {
-    const newList = container.system.itemIds.filter((s) => s != item.id);
+    const newList = container.system.itemIds.filter((s) => s !== item.id);
     const itemObj = this.object.items.get(item.id);
     await container.update({ system: { itemIds: newList } });
     await itemObj.update({ system: { containerId: "" } });
@@ -452,7 +452,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
             label: game.i18n.localize("OSE.Ok"),
             icon: "fas fa-check",
             default: true,
-            callback: (event, button, html) => {
+            callback: (_event, button, _html) => {
               resolve(new foundry.applications.ux.FormDataExtended(button.form).object);
             },
           },
@@ -499,12 +499,12 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     if (event.target.dataset.field === "value") {
       return item.update({
-        "system.quantity.value": Number.parseInt(event.target.value),
+        "system.quantity.value": Number.parseInt(event.target.value, 10),
       });
     }
     if (event.target.dataset.field === "max") {
       return item.update({
-        "system.quantity.max": Number.parseInt(event.target.value),
+        "system.quantity.max": Number.parseInt(event.target.value, 10),
       });
     }
   }
@@ -522,7 +522,7 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
     resizable.each((_, el) => {
       const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize)}px`;
+      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize, 10)}px`;
     });
     return html;
   }
@@ -540,15 +540,15 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Resize divs
     resizable.each((_, el) => {
       const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize)}px`;
+      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize, 10)}px`;
     });
     // Resize editors
     const editors = html.find(".editor");
-    editors.each((id, editor) => {
+    editors.each((_id, editor) => {
       const container = editor.closest(".resizable-editor");
       if (container) {
         const heightDelta = this.position.height - this.options.height;
-        editor.style.height = `${heightDelta + Number.parseInt(container.dataset.editorSize)}px`;
+        editor.style.height = `${heightDelta + Number.parseInt(container.dataset.editorSize, 10)}px`;
       }
     });
   }

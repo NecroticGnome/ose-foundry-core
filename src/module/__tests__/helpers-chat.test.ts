@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../e2e";
-import { addChatMessageButtons, addChatMessageContextOptions, functionsForTesting } from "../helpers-chat";
+import { functionsForTesting } from "../helpers-chat";
 
 const { applyChatCardDamage } = functionsForTesting;
 

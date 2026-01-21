@@ -142,7 +142,7 @@ Hooks.once("setup", () => {
 });
 
 Hooks.once("ready", async () => {
-  Hooks.on("hotbarDrop", (bar, data, slot) => {
+  Hooks.on("hotbarDrop", (_bar, data, slot) => {
     if (["Macro", "RollTable", "Item"].includes(data.type)) {
       macros.createOseMacro(data, slot);
       // Returning false to stop the rest of hotbarDrop handling.
@@ -162,14 +162,14 @@ Hooks.on("activateActorDirectory", party.addControl);
  * @param {Application} app
  * @param {HTMLElement} html
  */
-Hooks.on("renderSettings", async (app, html) => {
+Hooks.on("renderSettings", async (_app, html) => {
   const gamesystem = html.querySelector("section.info");
   const template = `${OSE.systemPath()}/templates/chat/license.html`;
   const rendered = await foundry.applications.handlebars.renderTemplate(template);
   gamesystem.insertAdjacentHTML("afterend", rendered);
 });
 
-Hooks.on("renderChatLog", (app, html) => OseItem.chatListeners(html));
+Hooks.on("renderChatLog", (_app, html) => OseItem.chatListeners(html));
 Hooks.on("getChatLogEntryContext", chat.addChatMessageContextOptions);
 Hooks.on("getChatMessageContextOptions", chat.addChatMessageContextOptions);
 Hooks.on("renderChatMessageHTML", chat.addChatMessageButtons);

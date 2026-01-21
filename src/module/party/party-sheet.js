@@ -99,12 +99,12 @@ export default class OsePartySheet extends FormApplication {
           return this._onDropFolder(event, data);
         }
       }
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
 
-  async _onDropActor(event, data) {
+  async _onDropActor(_event, data) {
     if (data.type !== "Actor") {
       return;
     }
@@ -119,7 +119,7 @@ export default class OsePartySheet extends FormApplication {
     folder.children.forEach((folder) => this._recursiveAddFolder(folder.folder));
   }
 
-  async _onDropFolder(event, data) {
+  async _onDropFolder(_event, data) {
     const folder = await fromUuid(data.uuid);
     if (folder?.type !== "Actor") return;
 
@@ -133,7 +133,7 @@ export default class OsePartySheet extends FormApplication {
       const dragData = (await fromUuid(uuid)).toDragData();
       // Set data transfer
       event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
 
@@ -142,7 +142,7 @@ export default class OsePartySheet extends FormApplication {
 
   /* -------------------------------------------- */
 
-  async _dealXP(ev) {
+  async _dealXP(_ev) {
     new OsePartyXP(this.object, {}).render(true);
   }
 

@@ -74,7 +74,7 @@ export default class OseActor extends Actor {
   /* -------------------------------------------- */
   /*  Socket Listeners and Handlers
     /* -------------------------------------------- */
-  getExperience(value, options = {}) {
+  getExperience(value, _options = {}) {
     const actorData = this.system;
     const actorType = this.type;
     // @TODO this seems like not the best spot for defining the xpKey const
@@ -133,7 +133,7 @@ export default class OseActor extends Actor {
   }
 
   generateSave(hd) {
-    hd = hd.includes("+") ? Number.parseInt(hd) + 1 : Number.parseInt(hd);
+    hd = hd.includes("+") ? Number.parseInt(hd, 10) + 1 : Number.parseInt(hd, 10);
 
     // Compute saves
     let saves = {};
@@ -147,7 +147,7 @@ export default class OseActor extends Actor {
     // Compute Thac0
     let thac0 = 20;
     Object.keys(CONFIG.OSE.monster_thac0).forEach((k) => {
-      if (hd < Number.parseInt(k)) return;
+      if (hd < Number.parseInt(k, 10)) return;
       thac0 = CONFIG.OSE.monster_thac0[k];
     });
 
@@ -178,7 +178,7 @@ export default class OseActor extends Actor {
   /*  Rolls                                       */
   /* -------------------------------------------- */
 
-  async rollHP(options = {}) {
+  async rollHP(_options = {}) {
     const { total } = await new Roll(this.system.hp.hd).roll({ async: true });
     return this.update({ "system.hp": { max: total, value: total } });
   }
@@ -580,7 +580,7 @@ export default class OseActor extends Actor {
    * @returns
    */
   async applyDamage(amount = 0, multiplier = 1) {
-    amount = Math.floor(Number.parseInt(amount) * multiplier);
+    amount = Math.floor(Number.parseInt(amount, 10) * multiplier);
 
     const { value, max } = this.system.hp;
 

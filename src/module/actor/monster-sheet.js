@@ -104,7 +104,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
           label: game.i18n.localize("OSE.Ok"),
           icon: "fas fa-check",
           default: true,
-          callback: (event, button) => {
+          callback: (_event, button) => {
             const { hd } = new foundry.applications.ux.FormDataExtended(button.form).object;
             this.actor.generateSave(hd.replace(/[^\d+.-]/g, ""));
           },
@@ -125,7 +125,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
     try {
       data = JSON.parse(event.dataTransfer.getData("text/plain"));
       if (data.type !== "RollTable") return;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
 
@@ -140,13 +140,13 @@ export default class OseActorSheetMonster extends OseActorSheet {
   }
 
   /* -------------------------------------------- */
-  async _resetAttacks(event) {
+  async _resetAttacks(_event) {
     return Promise.all(
       this.actor.items
         .filter((i) => i.type === "weapon")
         .map((weapon) =>
           weapon.update({
-            "system.counter.value": Number.parseInt(weapon.system.counter.max),
+            "system.counter.value": Number.parseInt(weapon.system.counter.max, 10),
           }),
         ),
     );
@@ -158,12 +158,12 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
     if (event.target.dataset.field === "value") {
       return item.update({
-        "system.counter.value": Number.parseInt(event.target.value),
+        "system.counter.value": Number.parseInt(event.target.value, 10),
       });
     }
     if (event.target.dataset.field === "max") {
       return item.update({
-        "system.counter.max": Number.parseInt(event.target.value),
+        "system.counter.max": Number.parseInt(event.target.value, 10),
       });
     }
   }
@@ -209,7 +209,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
       actorObject.rollAppearing({ event: ev, check });
     });
 
-    html.find(".treasure-table a").contextmenu((ev) => {
+    html.find(".treasure-table a").contextmenu((_ev) => {
       this.actor.update({ "system.details.treasure.table": null });
     });
 
