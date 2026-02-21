@@ -6,13 +6,9 @@ type Slot = {
   max: number;
 };
 
-type Slots = {
-  [n: number]: Slot;
-};
+type Slots = Record<number, Slot>;
 
-type Spells = {
-  [n: number]: Item[];
-};
+type Spells = Record<number, Item[]>;
 
 const reducedSpells = (list: Spells, item: Item) => {
   const { lvl } = item.system;
@@ -30,28 +26,31 @@ export interface CharacterSpells {
 }
 
 export default class OseDataModelCharacterSpells implements CharacterSpells {
-  #slots = {};
+  #slots: Slots = {};
 
   #spellList: Item[] = [];
 
   #enabled: boolean;
 
   constructor(
-    {
-      enabled,
-      ...maxSlots
-    }: { enabled?: boolean; [n: number]: { max: number } },
-    spellList: Item[] = []
+    { enabled, ...maxSlots }: { enabled?: boolean } & Record<number, { max: number }>,
+    spellList: Item[] = [],
   ) {
     this.#spellList = spellList;
     this.#enabled = enabled || false;
 
-    const usedSlots = this.#spellList?.reduce(this.#reducedUsedSlots, {}) || {};
+    const usedSlots = this.#spellList?.reduce(this.#reducedUsedSlots, {} as Record<number, number>) || {};
 
-    this.#slots = Object.keys(maxSlots || {}).reduce(
-      (list, item, idx) =>
-        this.#usedAndMaxSlots(list, item, idx, usedSlots, maxSlots),
-      {}
+    const levels = Object.keys(maxSlots || {})
+      .filter((key) => key !== "enabled")
+      .map((key) => Number(key))
+      .filter((n) => Number.isFinite(n));
+
+    const maxLevel = levels.length ? Math.max(...levels) : 0;
+
+    this.#slots = Array.from({ length: maxLevel + 1 }).reduce<Slots>(
+      (list, item, idx) => this.#usedAndMaxSlots(list, item, idx, usedSlots, maxSlots),
+      {},
     );
   }
 
@@ -64,10 +63,7 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
   }
 
   get spellList() {
-    return this.#spellList.reduce(
-      (list, item) => reducedSpells(list, item),
-      {}
-    );
+    return this.#spellList.reduce((list, item) => reducedSpells(list, item), {});
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -88,12 +84,12 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
     item: Item | string,
     idx: number,
     usedSlots: { [n: number]: number },
-    maxSlots: { [n: number]: { max: number } }
+    maxSlots: { [n: number]: { max: number } },
   ) {
     if (item === "enabled") return list;
     const lv = idx;
     const max = maxSlots[lv]?.max || 0;
-    const used = usedSlots[lv];
+    const used = usedSlots[lv] ?? 0;
 
     return {
       ...list,

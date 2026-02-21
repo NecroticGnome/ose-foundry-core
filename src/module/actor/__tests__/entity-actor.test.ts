@@ -2,13 +2,7 @@
 
 /* eslint-disable simple-import-sort/imports */
 
-/**
- * @file Contains tests for Actor Entity.
- */
-// eslint-disable-next-line import/no-cycle
-import OseItem from "../../item/entity";
-
-import * as e2e from "../../../e2e";
+import type * as e2e from "../../../e2e";
 import {
   cleanUpActorsByKey,
   cleanUpCompendium,
@@ -24,6 +18,11 @@ import {
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
+/**
+ * @file Contains tests for Actor Entity.
+ */
+// eslint-disable-next-line import/no-cycle
+import OseItem from "../../item/entity";
 import OseActor from "../entity";
 
 export const key = "ose.actor.entity";
@@ -38,15 +37,7 @@ const createMockActor = async (type: string) =>
     type,
   });
 
-export default ({
-  describe,
-  it,
-  expect,
-  after,
-  afterEach,
-  before,
-  assert,
-}: e2e.QuenchMethods) => {
+export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.QuenchMethods) => {
   afterEach(async () => {
     await trashChat();
     cleanUpActorsByKey(key);
@@ -107,9 +98,9 @@ export default ({
 
   describe("createEmbeddedDocuments(embeddedName, data, context)", () => {
     after(async () => {
-      game.items
-        ?.filter((i) => i?.name?.indexOf(`Test ${key}`) >= 0)
-        .forEach((i) => i.delete());
+      for (const i of game.items?.filter((i) => i?.name?.indexOf(`Test ${key}`) >= 0) ?? []) {
+        await i.delete();
+      }
     });
     itemTypes.forEach((itemType) => {
       it(`Creates ${itemType.capitalize()} with correct default icon`, async () => {
@@ -179,21 +170,14 @@ export default ({
 
     it("Character from compendium does not have defaults applied on import", async () => {
       const compendium = await createMockCompendium("Actor");
-      const actor = await createMockActorKey(
-        "character",
-        { "prototypeToken.actorLink": false },
-        key
-      );
+      const actor = await createMockActorKey("character", { "prototypeToken.actorLink": false }, key);
 
       // Import Actor into Compendium and remove source actor
       const actorInCompendium = await compendium.importDocument(actor);
       await cleanUpActorsByKey(key);
 
       // Import Compendium Actor into world
-      const importedActor = await game.actors.importFromCompendium(
-        compendium,
-        actorInCompendium.id
-      );
+      const importedActor = await game.actors.importFromCompendium(compendium, actorInCompendium.id);
 
       // Perform test
       expect(importedActor.prototypeToken.actorLink).equal(false);
@@ -339,9 +323,7 @@ export default ({
     scoreSpread.forEach((hd) => {
       const savesData = saves.find((s) => hd >= s.low && hd <= s.high);
       const thac0Data = thac0.find((s) => hd >= s.low && hd <= s.high);
-      const thac0PlusData = thac0.find(
-        (s) => hd + 1 >= s.low && hd + 1 <= s.high
-      );
+      const thac0PlusData = thac0.find((s) => hd + 1 >= s.low && hd + 1 <= s.high);
       actor?.generateSave(`${hd}`);
 
       it(`hd ${hd} generates correct saves`, () => {
@@ -370,9 +352,7 @@ export default ({
   describe("rollHP(options)", async () => {
     const actor = (await createMockActor("monster")) as OseActor;
     const conScoreSpread = Array.from({ length: 20 }, (_el, idx) => idx + 1);
-    const conBonusSpread = [
-      -3, -3, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3,
-    ];
+    const conBonusSpread = [-3, -3, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3];
     const hdSpread = [4, 6, 8, 10, 12, 20];
     conScoreSpread.forEach((con, idx) => {
       hdSpread.forEach((hd) => {
@@ -520,9 +500,7 @@ export default ({
 
   describe("rollHitDice(options)", () => {
     const conScoreSpread = Array.from({ length: 20 }, (_el, idx) => idx + 1);
-    const conBonusSpread = [
-      -3, -3, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3,
-    ];
+    const conBonusSpread = [-3, -3, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3];
     const levelSpread = Array.from({ length: 9 }, (_el, idx) => idx + 1);
 
     conScoreSpread.forEach((con, idx) => {
@@ -546,12 +524,10 @@ export default ({
           expect(roll.terms[0].rolls.length).equal(2); // 1d8 + 0, 1
           expect(roll.terms[0].rolls[0].terms.length).equal(expectedTerms); // 1d8, +, 0
           expect(roll.terms[0].rolls[0].terms[0].expression).equal(
-            actor?.system.hp.hd // 1d8
+            actor?.system.hp.hd, // 1d8
           );
           expect(roll.terms[0].rolls[0].terms[1].operator).equal(modSign);
-          expect(roll.terms[0].rolls[0].terms[2].expression).equal(
-            (modUnsigned * level).toString()
-          );
+          expect(roll.terms[0].rolls[0].terms[2].expression).equal((modUnsigned * level).toString());
           expect(actor?.system.scores.con.mod).equal(conMod);
           await actor?.delete();
         });
@@ -584,9 +560,7 @@ export default ({
         await actor.rollAppearing({ check: "wilderness" });
         await waitForInput();
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0].content).contain(
-          game.i18n.format("OSE.roll.appearing", { type: "2" })
-        );
+        expect(game.messages?.contents[0].content).contain(game.i18n.format("OSE.roll.appearing", { type: "2" }));
         await actor.delete();
       });
 
@@ -596,9 +570,7 @@ export default ({
         await actor.rollAppearing({ check: "other" });
         await waitForInput();
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0].content).contain(
-          game.i18n.format("OSE.roll.appearing", { type: "1" })
-        );
+        expect(game.messages?.contents[0].content).contain(game.i18n.format("OSE.roll.appearing", { type: "1" }));
         await actor.delete();
       });
     });
@@ -619,7 +591,7 @@ export default ({
         expect(game.messages?.contents[0].content).contain(
           game.i18n.format("OSE.roll.exploration", {
             exploration: game.i18n.localize(`OSE.exploration.${expl}.long`),
-          })
+          }),
         );
         await actor.delete();
       });
@@ -646,9 +618,7 @@ export default ({
       await actor.rollDamage({ label: "test" });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        `test - ${game.i18n.localize("OSE.Damage")}`
-      );
+      expect(game.messages?.contents[0].content).contain(`test - ${game.i18n.localize("OSE.Damage")}`);
       await actor.delete();
     });
 
@@ -658,9 +628,7 @@ export default ({
       await actor.rollDamage({ label: "test" });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        `test - ${game.i18n.localize("OSE.Damage")}`
-      );
+      expect(game.messages?.contents[0].content).contain(`test - ${game.i18n.localize("OSE.Damage")}`);
       await actor.delete();
     });
 
@@ -673,9 +641,7 @@ export default ({
       });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        `test - ${game.i18n.localize("OSE.Damage")}`
-      );
+      expect(game.messages?.contents[0].content).contain(`test - ${game.i18n.localize("OSE.Damage")}`);
       expect(game.messages?.contents[0].content).contain("15");
       await actor.delete();
     });
@@ -691,9 +657,7 @@ export default ({
       });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        `test - ${game.i18n.localize("OSE.Damage")}`
-      );
+      expect(game.messages?.contents[0].content).contain(`test - ${game.i18n.localize("OSE.Damage")}`);
       expect(game.messages?.contents[0].content).contain("15 - 3");
       await actor.delete();
     });
@@ -718,9 +682,9 @@ export default ({
       await token.constructor.create(token, { parent: canvas.scene });
       await waitForInput();
       expect(game.user?.targets.size).equal(0);
-      canvas.tokens?.placeables.forEach((t: Token) =>
-        t.setTarget(true, { releaseOthers: false, groupSelection: true })
-      );
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(true, { releaseOthers: false, groupSelection: true });
+      }
       expect(canvas.tokens?.placeables[0].actor).not.null;
       expect(canvas.tokens?.placeables[0].actor?.system.ac.value).not.null;
       expect(game.user?.targets.size).equal(1);
@@ -730,7 +694,9 @@ export default ({
       });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      canvas.tokens?.placeables.forEach((t: Token) => t.setTarget(false));
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(false);
+      }
       expect(game.user?.targets.size).equal(0);
       await actor.delete();
     });
@@ -741,9 +707,9 @@ export default ({
       await token.constructor.create(token, { parent: canvas.scene });
       await waitForInput();
       expect(game.user?.targets.size).equal(0);
-      canvas.tokens?.placeables.forEach((t: Token) =>
-        t.setTarget(true, { releaseOthers: false, groupSelection: true })
-      );
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(true, { releaseOthers: false, groupSelection: true });
+      }
       expect(game.user?.targets.size).equal(2);
       expect(game.messages?.size).equal(0);
       await actor.targetAttack({ roll: { target: {} } }, "melee", {
@@ -751,7 +717,9 @@ export default ({
       });
       await waitForInput();
       expect(game.messages?.size).equal(2);
-      canvas.tokens?.placeables.forEach((t: Token) => t.setTarget(false));
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(false);
+      }
       expect(game.user?.targets.size).equal(0);
       await actor.delete();
     });
@@ -794,10 +762,7 @@ export default ({
     it("rolls a d20 if supplied no data", async () => {
       const actor = (await createMockActor("character")) as OseActor;
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {} },
-        { skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {} }, { skipDialog: true });
       expect(rolldata.formula).equal("1d20");
       await waitForInput();
       expect(game.messages?.size).equal(1);
@@ -809,15 +774,12 @@ export default ({
       const item = await createWorldTestItem("weapon");
       expect(item?.system.damage).is.not.undefined;
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {}, item },
-        { skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {}, item }, { skipDialog: true });
       expect(rolldata.formula).equal("1d20");
       await waitForInput();
       expect(game.messages?.size).equal(1);
       expect(game.messages?.contents[0].content).contain(
-        game.i18n.format("OSE.roll.attacksWith", { name: item?.name })
+        game.i18n.format("OSE.roll.attacksWith", { name: item?.name }),
       );
       expect(game.messages?.contents[0].content).contain("1d20");
       actor?.delete();
@@ -827,10 +789,7 @@ export default ({
     it("If missile attack, add dex mod to attack roll", async () => {
       const actor = (await createMockActor("character")) as OseActor;
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {} },
-        { type: "missile", skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {} }, { type: "missile", skipDialog: true });
       expect(rolldata.formula).equal("1d20 - 3");
       await waitForInput();
       expect(game.messages?.size).equal(1);
@@ -841,10 +800,7 @@ export default ({
       const actor = (await createMockActor("character")) as OseActor;
       await actor.update({ system: { scores: { str: { value: 18 } } } });
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {} },
-        { type: "melee", skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {} }, { type: "melee", skipDialog: true });
       expect(rolldata.formula).equal("1d20 + 3");
       await waitForInput();
       expect(game.messages?.size).equal(1);
@@ -860,16 +816,11 @@ export default ({
       const actor = (await createMockActor("character")) as OseActor;
       await actor.update({ system: { scores: { str: { value: 18 } } } });
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {} },
-        { type: "melee", skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {} }, { type: "melee", skipDialog: true });
       expect(rolldata.formula).equal("1d20 + 3");
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      expect(game.messages?.contents[0].content).contain(
-        game.i18n.localize("OSE.messages.InflictsDamage")
-      );
+      expect(game.messages?.contents[0].content).contain(game.i18n.localize("OSE.messages.InflictsDamage"));
       expect(game.messages?.contents[0].content).contain("1d6 + 3");
       await actor.delete();
 
@@ -882,10 +833,7 @@ export default ({
       const item = await createWorldTestItem("weapon");
       await item?.update({ system: { bonus: 18 } });
       expect(game.messages?.size).equal(0);
-      const rolldata = await actor.rollAttack(
-        { roll: {}, item },
-        { skipDialog: true }
-      );
+      const rolldata = await actor.rollAttack({ roll: {}, item }, { skipDialog: true });
       expect(rolldata.formula).equal("1d20 + 18");
       await waitForInput();
       expect(game.messages?.size).equal(1);

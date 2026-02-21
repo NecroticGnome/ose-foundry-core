@@ -1,7 +1,7 @@
 /**
  * @file Tests for the class representing a creature data model's AC
  */
-import { QuenchMethods } from "../../../../e2e";
+import type { QuenchMethods } from "../../../../e2e";
 import OseDataModelCharacterAC from "../data-model-character-ac";
 
 export const key = "ose.actor.datamodel.character.ac";
@@ -77,15 +77,11 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       describe("With shield", () => {
         it("When ascending", () => {
           const ac = new OseDataModelCharacterAC(true, itemsShield);
-          expect(ac.value).to.equal(
-            OseDataModelCharacterAC.baseAscending + shieldAC
-          );
+          expect(ac.value).to.equal(OseDataModelCharacterAC.baseAscending + shieldAC);
         });
         it("When descending", () => {
           const ac = new OseDataModelCharacterAC(false, itemsShield);
-          expect(ac.value).to.equal(
-            OseDataModelCharacterAC.baseDescending - shieldAC
-          );
+          expect(ac.value).to.equal(OseDataModelCharacterAC.baseDescending - shieldAC);
         });
       });
 
@@ -115,27 +111,15 @@ export default ({ describe, it, expect }: QuenchMethods) => {
           expect(ac.value).to.equal(base + positiveDexMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsArmor,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsArmor, positiveDexMod);
           expect(ac.value).to.equal(armorAC + positiveDexMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsShield,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsShield, positiveDexMod);
           expect(ac.value).to.equal(base + shieldAC + positiveDexMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsBoth,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsBoth, positiveDexMod);
           expect(ac.value).to.equal(armorAC + shieldAC + positiveDexMod);
         });
       });
@@ -146,27 +130,15 @@ export default ({ describe, it, expect }: QuenchMethods) => {
           expect(ac.value).to.equal(base - positiveDexMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsArmor,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsArmor, positiveDexMod);
           expect(ac.value).to.equal(armorAC - positiveDexMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsShield,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsShield, positiveDexMod);
           expect(ac.value).to.equal(base - shieldAC - positiveDexMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsBoth,
-            positiveDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsBoth, positiveDexMod);
           expect(ac.value).to.equal(armorAC - shieldAC - positiveDexMod);
         });
       });
@@ -179,27 +151,15 @@ export default ({ describe, it, expect }: QuenchMethods) => {
           expect(ac.value).to.equal(base + negativeDexMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsArmor,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsArmor, negativeDexMod);
           expect(ac.value).to.equal(armorAC + negativeDexMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsShield,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsShield, negativeDexMod);
           expect(ac.value).to.equal(base + shieldAC + negativeDexMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsBoth,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsBoth, negativeDexMod);
           expect(ac.value).to.equal(armorAC + shieldAC + negativeDexMod);
         });
       });
@@ -210,27 +170,15 @@ export default ({ describe, it, expect }: QuenchMethods) => {
           expect(ac.value).to.equal(base - negativeDexMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsArmor,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsArmor, negativeDexMod);
           expect(ac.value).to.equal(armorAC - negativeDexMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsShield,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsShield, negativeDexMod);
           expect(ac.value).to.equal(base - shieldAC - negativeDexMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsBoth,
-            negativeDexMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsBoth, negativeDexMod);
           expect(ac.value).to.equal(armorAC - shieldAC - negativeDexMod);
         });
       });
@@ -242,78 +190,38 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       describe("When ascending", () => {
         const base = OseDataModelCharacterAC.baseAscending;
         it("Unarmored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            [],
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, [], 0, positiveArbitraryMod);
           expect(ac.value).to.equal(base + positiveArbitraryMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsArmor,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsArmor, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(armorAC + positiveArbitraryMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsShield,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsShield, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(base + shieldAC + positiveArbitraryMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsBoth,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsBoth, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(armorAC + shieldAC + positiveArbitraryMod);
         });
       });
       describe("When descending", () => {
         const base = OseDataModelCharacterAC.baseDescending;
         it("Unarmored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            [],
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, [], 0, positiveArbitraryMod);
           expect(ac.value).to.equal(base - positiveArbitraryMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsArmor,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsArmor, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(armorAC - positiveArbitraryMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsShield,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsShield, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(base - shieldAC - positiveArbitraryMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsBoth,
-            0,
-            positiveArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsBoth, 0, positiveArbitraryMod);
           expect(ac.value).to.equal(armorAC - shieldAC - positiveArbitraryMod);
         });
       });
@@ -322,78 +230,38 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       describe("When ascending", () => {
         const base = OseDataModelCharacterAC.baseAscending;
         it("Unarmored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            [],
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, [], 0, negativeArbitraryMod);
           expect(ac.value).to.equal(base + negativeArbitraryMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsArmor,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsArmor, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(armorAC + negativeArbitraryMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsShield,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsShield, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(base + shieldAC + negativeArbitraryMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            true,
-            itemsBoth,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(true, itemsBoth, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(armorAC + shieldAC + negativeArbitraryMod);
         });
       });
       describe("When descending", () => {
         const base = OseDataModelCharacterAC.baseDescending;
         it("Unarmored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            [],
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, [], 0, negativeArbitraryMod);
           expect(ac.value).to.equal(base - negativeArbitraryMod);
         });
         it("Armored, no shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsArmor,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsArmor, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(armorAC - negativeArbitraryMod);
         });
         it("Unarmored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsShield,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsShield, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(base - shieldAC - negativeArbitraryMod);
         });
         it("Armored, shield", () => {
-          const ac = new OseDataModelCharacterAC(
-            false,
-            itemsBoth,
-            0,
-            negativeArbitraryMod
-          );
+          const ac = new OseDataModelCharacterAC(false, itemsBoth, 0, negativeArbitraryMod);
           expect(ac.value).to.equal(armorAC - shieldAC - negativeArbitraryMod);
         });
       });

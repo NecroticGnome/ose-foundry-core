@@ -2,9 +2,8 @@
  * @file Contains tests for Ability Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import OseDataModelAbility from "../data-model-ability";
-
 
 export const key = "ose.item.datamodel.ability";
 export const options = { displayName: "OSE: Item: Data Model: Ability" };
@@ -65,9 +64,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       ability.updateSource({ save: "death" });
       expect(ability.autoTags.length).equal(3);
       expect(Object.keys(ability.autoTags[2]).length).equal(2);
-      expect(ability.autoTags[2].label).equal(
-        game.i18n.localize("OSE.saves.death.long")
-      );
+      expect(ability.autoTags[2].label).equal(game.i18n.localize("OSE.saves.death.long"));
       expect(ability.autoTags[2].icon).equal("fa-skull");
     });
 
@@ -75,9 +72,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       ability.updateSource({ roll: "1d20+1" });
       expect(ability.autoTags.length).equal(4);
       expect(Object.keys(ability.autoTags[3]).length).equal(2);
-      expect(ability.autoTags[2].label).equal(
-        `${game.i18n.localize("OSE.items.Roll")} 1d20 + 1 =0`
-      );
+      expect(ability.autoTags[2].label).equal(`${game.i18n.localize("OSE.items.Roll")} 1d20 + 1 =0`);
     });
   });
 };

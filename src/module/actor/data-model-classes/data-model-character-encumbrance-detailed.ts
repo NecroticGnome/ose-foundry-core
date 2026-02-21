@@ -1,9 +1,7 @@
 /**
  * @file A class representing the "Detailed" encumbrance scheme from Old School Essentials: Classic Fantasy
  */
-import OseDataModelCharacterEncumbrance, {
-  CharacterEncumbrance,
-} from "./data-model-character-encumbrance";
+import OseDataModelCharacterEncumbrance, { type CharacterEncumbrance } from "./data-model-character-encumbrance";
 
 // import { OSE } from '../../config';
 
@@ -38,36 +36,24 @@ export default class OseDataModelCharacterEncumbranceDetailed
 
   #hasAdventuringGear;
 
-  constructor(
-    max = OseDataModelCharacterEncumbrance.baseEncumbranceCap,
-    items: Item[] = []
-  ) {
+  constructor(max = OseDataModelCharacterEncumbrance.baseEncumbranceCap, items: Item[] = []) {
     super(OseDataModelCharacterEncumbranceDetailed.type, max);
-    this.#hasAdventuringGear = items.some(
-      (i: Item) => i.type === "item" && !i.system.treasure
-    );
+    this.#hasAdventuringGear = items.some((i: Item) => i.type === "item" && !i.system.treasure);
     this.#weight =
-      items.reduce(
-        (acc, { type, system: { treasure, quantity, weight } }: Item) => {
-          if (type === "spell" || type === "ability") return acc;
+      items.reduce((acc, { type, system: { treasure, quantity, weight } }: Item) => {
+        if (type === "spell" || type === "ability") return acc;
 
-          let value = acc;
+        let value = acc;
 
-          if (type === "item" && treasure) value += quantity.value * weight;
-          if (["weapon", "armor", "container"].includes(type)) value += weight;
+        if (type === "item" && treasure) value += quantity.value * weight;
+        if (["weapon", "armor", "container"].includes(type)) value += weight;
 
-          return value;
-        },
-        0
-      ) +
-      (this.#hasAdventuringGear
-        ? OseDataModelCharacterEncumbranceDetailed.gearWeight
-        : 0);
+        return value;
+      }, 0) + (this.#hasAdventuringGear ? OseDataModelCharacterEncumbranceDetailed.gearWeight : 0);
   }
 
   static defineSchema() {
-    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
-      foundry.data.fields;
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
     return new SchemaField({
       variant: new StringField({

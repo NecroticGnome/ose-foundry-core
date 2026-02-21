@@ -7,9 +7,7 @@ import OseDataModelCharacterScores from "./data-model-classes/data-model-charact
 import OseDataModelCharacterSpells from "./data-model-classes/data-model-character-spells";
 
 const getItemsOfActorOfType = (actor, filterType, filterFn = null) =>
-  actor.items
-    .filter(({ type }) => type === filterType)
-    .filter(filterFn || (() => true));
+  actor.items.filter(({ type }) => type === filterType).filter(filterFn || (() => true));
 
 export default class OseDataModelCharacter extends foundry.abstract.TypeDataModel {
   prepareDerivedData() {
@@ -20,20 +18,13 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
       this.encumbrance.max,
       [...this.parent.items],
       {
-        significantTreasure: game.settings.get(
-          game.system.id,
-          "significantTreasure"
-        ),
+        significantTreasure: game.settings.get(game.system.id, "significantTreasure"),
         scores: this.scores,
       },
-      this.scores.str.mod
+      this.scores.str.mod,
     );
 
-    this.movement = new OseDataModelCharacterMove(
-      this.encumbrance,
-      this.config.movementAuto,
-      this.movement.base
-    );
+    this.movement = new OseDataModelCharacterMove(this.encumbrance, this.config.movementAuto, this.movement.base);
 
     // @todo Once we create the new character sheet,
     //       we shouldn't need to list both AC schemes
@@ -41,14 +32,14 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
       false,
       getItemsOfActorOfType(this.parent, "armor", (a) => a.system.equipped),
       this.scores.dex.mod,
-      this.ac.mod
+      this.ac.mod,
     );
 
     this.aac = new OseDataModelCharacterAC(
       true,
       getItemsOfActorOfType(this.parent, "armor", (a) => a.system.equipped),
       this.scores.dex.mod,
-      this.aac.mod
+      this.aac.mod,
     );
 
     this.spells = new OseDataModelCharacterSpells(this.spells, this.#spellList);
@@ -56,8 +47,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
 
   // @todo define schema options; stuff like min/max values and so on.
   static defineSchema() {
-    const { BooleanField, NumberField, ObjectField, SchemaField, StringField } =
-      foundry.data.fields;
+    const { BooleanField, NumberField, ObjectField, SchemaField, StringField } = foundry.data.fields;
 
     return {
       spells: new ObjectField(),
@@ -106,8 +96,9 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
    * @inheritdoc
    */
   static migrateData(source) {
-    this.#migrateCantrips(source);
+    OseDataModelCharacter.#migrateCantrips(source);
 
+    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 
@@ -134,51 +125,33 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
 
   get meleeMod() {
     const ascendingAcMod = this.usesAscendingAC ? this.thac0.bba || 0 : 0;
-    return (
-      (this.scores.str?.mod || 0) +
-      (this.thac0?.mod?.melee || 0) +
-      ascendingAcMod
-    );
+    return (this.scores.str?.mod || 0) + (this.thac0?.mod?.melee || 0) + ascendingAcMod;
   }
 
   get rangedMod() {
     const ascendingAcMod = this.usesAscendingAC ? this.thac0.bba || 0 : 0;
-    return (
-      (this.scores.dex?.mod || 0) +
-      (this.thac0?.mod?.missile || 0) +
-      ascendingAcMod
-    );
+    return (this.scores.dex?.mod || 0) + (this.thac0?.mod?.missile || 0) + ascendingAcMod;
   }
 
   get isNew() {
     const { str, int, wis, dex, con, cha } = this.scores;
-    return ![str, int, wis, dex, con, cha].reduce(
-      (acc, el) => acc + el.value,
-      0
-    );
+    return ![str, int, wis, dex, con, cha].reduce((acc, el) => acc + el.value, 0);
   }
 
   get containers() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "container",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "container", ({ system: { containerId } }) => !containerId);
   }
 
   get treasures() {
     return getItemsOfActorOfType(
       this.parent,
       "item",
-      ({ system: { treasure, containerId } }) => treasure && !containerId
+      ({ system: { treasure, containerId } }) => treasure && !containerId,
     );
   }
 
   get carriedTreasure() {
-    const total = this.treasures.reduce(
-      (acc, { system: { quantity, cost } }) => acc + quantity.value * cost,
-      0
-    );
+    const total = this.treasures.reduce((acc, { system: { quantity, cost } }) => acc + quantity.value * cost, 0);
     return Math.round(total * 100) / 100;
   }
 
@@ -186,40 +159,26 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
     return getItemsOfActorOfType(
       this.parent,
       "item",
-      ({ system: { treasure, containerId } }) => !treasure && !containerId
+      ({ system: { treasure, containerId } }) => !treasure && !containerId,
     );
   }
 
   get weapons() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "weapon",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "weapon", ({ system: { containerId } }) => !containerId);
   }
 
   get armor() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "armor",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "armor", ({ system: { containerId } }) => !containerId);
   }
 
   get abilities() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "ability",
-      ({ system: { containerId } }) => !containerId
-    ).sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    return getItemsOfActorOfType(this.parent, "ability", ({ system: { containerId } }) => !containerId).sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0),
+    );
   }
 
   get spellList() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "spell",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "spell", ({ system: { containerId } }) => !containerId);
   }
 
   get #spellList() {
@@ -230,23 +189,12 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
   get isSlow() {
     return this.weapons.length === 0
       ? false
-      : this.weapons.some(
-          (item) =>
-            !(
-              item.type !== "weapon" ||
-              !item.system.slow ||
-              !item.system.equipped
-            )
-        );
+      : this.weapons.some((item) => !(item.type !== "weapon" || !item.system.slow || !item.system.equipped));
   }
 
   get init() {
     const group = game.settings.get(game.system.id, "initiative") !== "group";
 
-    return group
-      ? (this.initiative.value || 0) +
-          (this.initiative.mod || 0) +
-          this.scores.dex.init
-      : 0;
+    return group ? (this.initiative.value || 0) + (this.initiative.mod || 0) + this.scores.dex.init : 0;
   }
 }

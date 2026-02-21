@@ -216,7 +216,7 @@ export const OSE = {
       return `${CONFIG.OSE.assetsPath}/melee.png`;
     },
     get missile() {
-      return `fa-bow-arrow`;
+      return "fa-bow-arrow";
     },
     get slow() {
       return `${CONFIG.OSE.assetsPath}/slow.png`;

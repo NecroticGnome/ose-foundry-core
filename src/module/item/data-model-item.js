@@ -3,14 +3,7 @@
  */
 export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const {
-      SchemaField,
-      StringField,
-      NumberField,
-      BooleanField,
-      ArrayField,
-      ObjectField,
-    } = foundry.data.fields;
+    const { SchemaField, StringField, NumberField, BooleanField, ArrayField, ObjectField } = foundry.data.fields;
     return {
       treasure: new BooleanField(),
       description: new StringField(),
@@ -40,17 +33,14 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   }
 
   static migrateData(source) {
-    if (source.details?.description && !source.description)
-      source.description = source.details.description;
+    if (source.details?.description && !source.description) source.description = source.details.description;
     return source;
   }
 
   get manualTags() {
     if (!this.tags) return null;
 
-    const tagNames = new Set(
-      Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label)
-    );
+    const tagNames = new Set(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
     return this.tags
       .filter(({ value }) => !tagNames.has(value))
       .map(({ title, value }) => ({ title, value, label: value }));
@@ -59,9 +49,7 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   get autoTags() {
     const tagNames = Object.values(CONFIG.OSE.auto_tags);
 
-    const autoTags = this.tags.map(({ value }) =>
-      tagNames.find(({ label }) => value === label)
-    );
+    const autoTags = this.tags.map(({ value }) => tagNames.find(({ label }) => value === label));
 
     return [...autoTags, ...this.manualTags].flat().filter((t) => !!t);
   }
@@ -69,15 +57,7 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel {
   get isCoinsOrGems() {
     if (!this.treasure) return false;
 
-    if (
-      this.tags?.some(
-        (t) =>
-          t.value === "gem" ||
-          t.value === "gems" ||
-          t.value === "coin" ||
-          t.value === "coins"
-      )
-    ) {
+    if (this.tags?.some((t) => t.value === "gem" || t.value === "gems" || t.value === "coin" || t.value === "coins")) {
       return true;
     }
 

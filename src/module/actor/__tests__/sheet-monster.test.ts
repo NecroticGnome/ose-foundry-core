@@ -2,7 +2,7 @@
  * @file Contains tests for Monster Sheet.
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import {
   cleanUpActorsByKey,
   closeSheets,
@@ -14,23 +14,16 @@ import {
   openV2Dialogs,
   waitForInput,
 } from "../../../e2e/testUtils";
-import OseActorSheetMonster from "../monster-sheet";
+import type OseActorSheetMonster from "../monster-sheet";
 
 export const key = "ose.actor.sheet.monster";
 export const options = { displayName: "OSE: Actor: Sheet: Monster" };
 
 export default ({ describe, it, expect, after, before }: QuenchMethods) => {
-  const orginalCtrlSetting = game.settings.get(
-    game.system.id,
-    "invertedCtrlBehavior"
-  );
+  const orginalCtrlSetting = game.settings.get(game.system.id, "invertedCtrlBehavior");
 
   after(async () => {
-    await game.settings.set(
-      game.system.id,
-      "invertedCtrlBehavior",
-      orginalCtrlSetting
-    );
+    await game.settings.set(game.system.id, "invertedCtrlBehavior", orginalCtrlSetting);
     await cleanUpActorsByKey(key);
     await closeSheets();
   });
@@ -45,9 +38,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(sheet.options.classes).contain("actor");
       expect(sheet.options.classes).contain("monster");
 
-      expect(sheet.options.template).contain(
-        "/templates/actors/monster-sheet.html"
-      );
+      expect(sheet.options.template).contain("/templates/actors/monster-sheet.html");
       expect(sheet.options.width).equal(450);
       expect(sheet.options.height).equal(560);
       expect(sheet.options.resizable).is.true;
@@ -85,9 +76,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(Object.keys(data)).contain("spells");
       expect(Object.keys(data)).contain("isNew");
 
-      expect(data?.config.morale).equal(
-        game.settings.get(game.system.id, "morale")
-      );
+      expect(data?.config.morale).equal(game.settings.get(game.system.id, "morale"));
       expect(Object.keys(data)).contain("system");
       expect(Object.keys(data?.system)).contain("details");
       expect(Object.keys(data?.system.details)).contain("treasure");
@@ -118,14 +107,13 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
   });
 
   describe("_onDrop(event)", () => {
-    const createMockRollTable = async () =>
-      CONFIG.RollTable.documentClass.create({ name: "Test RollTable" });
+    const createMockRollTable = async () => CONFIG.RollTable.documentClass.create({ name: "Test RollTable" });
 
     after(async () => {
       await cleanUpActorsByKey(key);
-      game.tables
-        ?.filter((rt) => rt.name === "Test RollTable")
-        .forEach((rt) => rt.delete());
+      for (const rt of game.tables?.filter((rt) => rt.name === "Test RollTable") ?? []) {
+        await rt.delete();
+      }
     });
 
     it("Can drag testing RollTable to Monster", async () => {
@@ -135,10 +123,8 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       await delay(500); // Wait for sheet to render and the roll table to exist in the DOM
 
       // Setup DOM elements
-      const dragElement = document.querySelector(
-        `#tables li[data-entry-id="${rollTable?.id}"]`
-      );
-      const dropElement = document.querySelector(`.monster .window-content`);
+      const dragElement = document.querySelector(`#tables li[data-entry-id="${rollTable?.id}"]`);
+      const dropElement = document.querySelector(".monster .window-content");
 
       // Check DOM elements
       expect(dragElement).not.null;
@@ -158,9 +144,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       await waitForInput();
 
       // Verify
-      expect(actor?.system.details.treasure.table).equal(
-        `@UUID[RollTable.${rollTable?.id}]`
-      );
+      expect(actor?.system.details.treasure.table).equal(`@UUID[RollTable.${rollTable?.id}]`);
     });
   });
 
@@ -182,7 +166,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(item.system.counter.value).equal(1);
 
       // Click on reset
-      $(`.item-reset`).trigger("click");
+      $(".item-reset").trigger("click");
       await waitForInput();
 
       expect(item.system.counter.value).equal(4);
@@ -246,11 +230,10 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
           expect(currentPattern).not.undefined;
           const patternIndex = colors.indexOf(currentPattern);
-          const nextIndex =
-            patternIndex + 1 === colors.length ? 0 : patternIndex + 1;
+          const nextIndex = patternIndex + 1 === colors.length ? 0 : patternIndex + 1;
 
           // Click the thing
-          $(`.item-pattern`).trigger("click");
+          $(".item-pattern").trigger("click");
           await delay(200);
 
           // Verify

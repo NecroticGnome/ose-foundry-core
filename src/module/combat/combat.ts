@@ -59,24 +59,15 @@ export class OSECombat extends foundry.documents.Combat {
    *                                               keep the turn on the same Combatant.
    * @private
    */
-  async #rollAbsolutelyEveryone({
-    excludeAlreadyRolled = false,
-    updateTurn = false,
-  } = {}) {
-    const formula = this.isGroupInitiative
-      ? OSECombat.GROUP_FORMULA
-      : OSECombat.FORMULA;
+  async #rollAbsolutelyEveryone({ excludeAlreadyRolled = false, updateTurn = false } = {}) {
+    const formula = this.isGroupInitiative ? OSECombat.GROUP_FORMULA : OSECombat.FORMULA;
 
     await this.rollInitiative(
-      this.combatants
-        .filter(
-          (c) => !c.defeated && (!excludeAlreadyRolled || c.initiative === null)
-        )
-        .map((c) => c.id),
+      this.combatants.filter((c) => !c.defeated && (!excludeAlreadyRolled || c.initiative === null)).map((c) => c.id),
       {
         formula,
         updateTurn,
-      }
+      },
     );
   }
 
@@ -89,10 +80,7 @@ export class OSECombat extends foundry.documents.Combat {
    * @param {boolean} [options.updateTurn=false] - Update the Combat turn after adding new initiative scores to
    *                                               keep the turn on the same Combatant.
    */
-  async smartRerollInitiative({
-    excludeAlreadyRolled = false,
-    updateTurn = false,
-  } = {}) {
+  async smartRerollInitiative({ excludeAlreadyRolled = false, updateTurn = false } = {}) {
     if (!this.isGroupInitiative) {
       return this.#rollAbsolutelyEveryone({ excludeAlreadyRolled, updateTurn });
     }
@@ -100,11 +88,7 @@ export class OSECombat extends foundry.documents.Combat {
     const updates = [];
     const messages = [];
     for (const group of this.groups) {
-      if (
-        group.members.size === 0 ||
-        (excludeAlreadyRolled && group.initiative !== null) ||
-        group.name === "slow"
-      ) {
+      if (group.members.size === 0 || (excludeAlreadyRolled && group.initiative !== null) || group.name === "slow") {
         continue;
       }
 
@@ -204,8 +188,6 @@ export class OSECombat extends foundry.documents.Combat {
         case "reroll":
           await this.smartRerollInitiative();
           break;
-
-        case "keep":
         default:
           break;
       }
@@ -256,9 +238,7 @@ export class OSECombat extends foundry.documents.Combat {
     if (this.#combatantGroups.has(groupName)) {
       await this.#combatantGroups.get(groupName);
     } else {
-      const groupCreation = this.createEmbeddedDocuments("CombatantGroup", [
-        { name: groupName, initiative: null },
-      ]);
+      const groupCreation = this.createEmbeddedDocuments("CombatantGroup", [{ name: groupName, initiative: null }]);
       this.#combatantGroups.set(groupName, groupCreation);
       await groupCreation;
     }
@@ -298,8 +278,8 @@ export class OSECombat extends foundry.documents.Combat {
   /** @override */
   _sortCombatants(a, b) {
     // First sort by initiative
-    const ia = Number.isNumeric(a.initiative) ? a.initiative : -Infinity;
-    const ib = Number.isNumeric(b.initiative) ? b.initiative : -Infinity;
+    const ia = Number.isNumeric(a.initiative) ? a.initiative : Number.NEGATIVE_INFINITY;
+    const ib = Number.isNumeric(b.initiative) ? b.initiative : Number.NEGATIVE_INFINITY;
     const initiativeDiff = ib - ia;
 
     if (initiativeDiff !== 0) return initiativeDiff;

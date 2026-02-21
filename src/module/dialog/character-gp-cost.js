@@ -13,12 +13,12 @@ export default class OseCharacterGpCost extends FormApplication {
   }
 
   static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.classes = ["ose", "dialog", "gp-cost"];
-    options.id = "sheet-gp-cost";
-    options.template = `${OSE.systemPath()}/templates/actors/dialogs/gp-cost-dialog.html`;
-    options.width = 240;
-    return options;
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
+      classes: ["ose", "dialog", "gp-cost"],
+      id: "sheet-gp-cost",
+      template: `${OSE.systemPath()}/templates/actors/dialogs/gp-cost-dialog.html`,
+      width: 240,
+    });
   }
 
   /* -------------------------------------------- */
@@ -30,9 +30,7 @@ export default class OseCharacterGpCost extends FormApplication {
    * @returns {string} - A localized window title
    */
   get title() {
-    return `${this.object.name}: ${game.i18n.localize(
-      "OSE.dialog.shoppingCart"
-    )}`;
+    return `${this.object.name}: ${game.i18n.localize("OSE.dialog.shoppingCart")}`;
   }
 
   /* -------------------------------------------- */
@@ -80,8 +78,7 @@ export default class OseCharacterGpCost extends FormApplication {
     const gp = await this.object.items.find((item) => {
       const itemData = item.system;
       return (
-        (item.name === game.i18n.localize("OSE.items.gp.short") ||
-          item.name === "GP") && // legacy behavior used GP, even for other languages
+        (item.name === game.i18n.localize("OSE.items.gp.short") || item.name === "GP") && // legacy behavior used GP, even for other languages
         itemData.treasure
       );
     });
@@ -91,9 +88,7 @@ export default class OseCharacterGpCost extends FormApplication {
     }
     const newGP = gp.system.quantity.value - totalCost;
     if (newGP >= 0) {
-      await this.object.updateEmbeddedDocuments("Item", [
-        { _id: gp.id, "system.quantity.value": newGP },
-      ]);
+      await this.object.updateEmbeddedDocuments("Item", [{ _id: gp.id, "system.quantity.value": newGP }]);
 
       // Mark all items in the cart as "paid for" by setting a flag
       await this.#markItemsAsPaid();
@@ -119,7 +114,7 @@ export default class OseCharacterGpCost extends FormApplication {
     const templateData = await this.getData();
     const content = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/chat/inventory-list.html`,
-      templateData
+      templateData,
     );
     ChatMessage.create({
       content,
@@ -137,17 +132,8 @@ export default class OseCharacterGpCost extends FormApplication {
     return data.items.reduce((total, item) => {
       const itemData = item.system;
       // Only count non-treasure physical items that haven't been paid for yet
-      if (
-        OseCharacterGpCost.physicalItemTypes.has(item.type) &&
-        !itemData.treasure &&
-        !item.flags?.ose?.paid
-      ) {
-        return (
-          total +
-          (itemData.quantity.max
-            ? itemData.cost * itemData.quantity.value
-            : itemData.cost)
-        );
+      if (OseCharacterGpCost.physicalItemTypes.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
+        return total + (itemData.quantity.max ? itemData.cost * itemData.quantity.value : itemData.cost);
       }
 
       return total;
@@ -166,11 +152,7 @@ export default class OseCharacterGpCost extends FormApplication {
     this.object.items.forEach((item) => {
       const itemData = item.system;
       // Mark all non-treasure physical items that haven't been paid for yet
-      if (
-        OseCharacterGpCost.physicalItemTypes.has(item.type) &&
-        !itemData.treasure &&
-        !item.flags?.ose?.paid
-      ) {
+      if (OseCharacterGpCost.physicalItemTypes.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
         updates.push({
           _id: item.id,
           "flags.ose.paid": true,

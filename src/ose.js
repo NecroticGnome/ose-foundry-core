@@ -7,7 +7,17 @@ import OseDataModelCharacter from "./module/actor/data-model-character";
 import OseDataModelMonster from "./module/actor/data-model-monster";
 import OseActor from "./module/actor/entity";
 import OseActorSheetMonster from "./module/actor/monster-sheet";
-
+import TokenRulerOSE from "./module/actor/token-ruler";
+import { OSECombat } from "./module/combat/combat";
+import OSECombatTracker from "./module/combat/combat-tracker";
+import { OSECombatant } from "./module/combat/combatant";
+import { OSE } from "./module/config";
+import registerFVTTModuleAPIs from "./module/fvttModuleAPIs";
+import * as chat from "./module/helpers-chat";
+import handlebarsHelpers from "./module/helpers-handlebars";
+import * as macros from "./module/helpers-macros";
+import * as party from "./module/helpers-party";
+import * as treasure from "./module/helpers-treasure";
 import OseDataModelAbility from "./module/item/data-model-ability";
 import OseDataModelArmor from "./module/item/data-model-armor";
 import OseDataModelContainer from "./module/item/data-model-container";
@@ -16,24 +26,11 @@ import OseDataModelSpell from "./module/item/data-model-spell";
 import OseDataModelWeapon from "./module/item/data-model-weapon";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
-
-import { OSE } from "./module/config";
-import registerFVTTModuleAPIs from "./module/fvttModuleAPIs";
-import * as chat from "./module/helpers-chat";
-import handlebarsHelpers from "./module/helpers-handlebars";
-import * as macros from "./module/helpers-macros";
-import * as party from "./module/helpers-party";
-import * as treasure from "./module/helpers-treasure";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
 import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
-
-import { OSECombat } from "./module/combat/combat";
-import OSECombatTracker from "./module/combat/combat-tracker";
-import { OSECombatant } from "./module/combat/combatant";
-import TokenRulerOSE from "./module/actor/token-ruler";
 
 import "./e2e";
 
@@ -61,8 +58,7 @@ Hooks.once("init", async () => {
 
   CONFIG.Combat.documentClass = OSECombat;
   CONFIG.Combatant.documentClass = OSECombatant;
-  const isGroupInitiative =
-    game.settings.get(game.system.id, "initiative") === "group";
+  const isGroupInitiative = game.settings.get(game.system.id, "initiative") === "group";
   CONFIG.Combat.initiative = {
     decimals: 2,
     formula: isGroupInitiative ? OSECombat.GROUP_FORMULA : OSECombat.FORMULA,
@@ -103,41 +99,23 @@ Hooks.once("init", async () => {
   };
 
   // Register sheet application classes
-  foundry.documents.collections.Actors.unregisterSheet(
-    "core",
-    foundry.appv1.sheets.ActorSheet
-  );
-  foundry.documents.collections.Actors.registerSheet(
-    game.system.id,
-    OseActorSheetCharacter,
-    {
-      types: ["character"],
-      makeDefault: true,
-      label: "OSE.SheetClassCharacter",
-    }
-  );
-  foundry.documents.collections.Actors.registerSheet(
-    game.system.id,
-    OseActorSheetMonster,
-    {
-      types: ["monster"],
-      makeDefault: true,
-      label: "OSE.SheetClassMonster",
-    }
-  );
+  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+  foundry.documents.collections.Actors.registerSheet(game.system.id, OseActorSheetCharacter, {
+    types: ["character"],
+    makeDefault: true,
+    label: "OSE.SheetClassCharacter",
+  });
+  foundry.documents.collections.Actors.registerSheet(game.system.id, OseActorSheetMonster, {
+    types: ["monster"],
+    makeDefault: true,
+    label: "OSE.SheetClassMonster",
+  });
 
-  foundry.documents.collections.Items.unregisterSheet(
-    "core",
-    foundry.appv1.sheets.ItemSheet
-  );
-  foundry.documents.collections.Items.registerSheet(
-    game.system.id,
-    OseItemSheet,
-    {
-      makeDefault: true,
-      label: "OSE.SheetClassItem",
-    }
-  );
+  foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+  foundry.documents.collections.Items.registerSheet(game.system.id, OseItemSheet, {
+    makeDefault: true,
+    label: "OSE.SheetClassItem",
+  });
 
   await templates();
 });
@@ -147,15 +125,12 @@ Hooks.once("init", async () => {
  */
 Hooks.once("setup", () => {
   // Localize CONFIG objects once up-front
-  ["saves_short", "saves_long", "scores", "armor", "colors", "tags"].forEach(
-    (o) => {
-      CONFIG.OSE[o] = Object.entries(CONFIG.OSE[o]).reduce((obj, e) => {
-        const localized = { ...obj };
-        localized[e[0]] = game.i18n.localize(e[1]);
-        return localized;
-      }, {});
-    }
-  );
+  ["saves_short", "saves_long", "scores", "armor", "colors", "tags"].forEach((o) => {
+    CONFIG.OSE[o] = Object.entries(CONFIG.OSE[o]).reduce((obj, e) => {
+      obj[e[0]] = game.i18n.localize(e[1]);
+      return obj;
+    }, {});
+  });
 
   // Custom languages
   const languages = game.settings.get(game.system.id, "languages");
@@ -166,7 +141,7 @@ Hooks.once("setup", () => {
 });
 
 Hooks.once("ready", async () => {
-  Hooks.on("hotbarDrop", (bar, data, slot) => {
+  Hooks.on("hotbarDrop", (_bar, data, slot) => {
     if (["Macro", "RollTable", "Item"].includes(data.type)) {
       macros.createOseMacro(data, slot);
       // Returning false to stop the rest of hotbarDrop handling.
@@ -186,16 +161,14 @@ Hooks.on("activateActorDirectory", party.addControl);
  * @param {Application} app
  * @param {HTMLElement} html
  */
-Hooks.on("renderSettings", async (app, html) => {
+Hooks.on("renderSettings", async (_app, html) => {
   const gamesystem = html.querySelector("section.info");
   const template = `${OSE.systemPath()}/templates/chat/license.html`;
-  const rendered = await foundry.applications.handlebars.renderTemplate(
-    template
-  );
+  const rendered = await foundry.applications.handlebars.renderTemplate(template);
   gamesystem.insertAdjacentHTML("afterend", rendered);
 });
 
-Hooks.on("renderChatLog", (app, html) => OseItem.chatListeners(html));
+Hooks.on("renderChatLog", (_app, html) => OseItem.chatListeners(html));
 Hooks.on("getChatLogEntryContext", chat.addChatMessageContextOptions);
 Hooks.on("getChatMessageContextOptions", chat.addChatMessageContextOptions);
 Hooks.on("renderChatMessageHTML", chat.addChatMessageButtons);
@@ -205,9 +178,7 @@ Hooks.on("updateActor", party.update);
  * @param {OSECombatTracker} app - The combat tracker application
  * @param {HTMLElement} html - The HTML element of the combat tracker
  */
-Hooks.on("renderCombatTracker", (app, html) =>
-  app.renderGroups(html instanceof HTMLElement ? html : html[0])
-);
+Hooks.on("renderCombatTracker", (app, html) => app.renderGroups(html instanceof HTMLElement ? html : html[0]));
 /**
  * @param {foundry.documents.CombatantGroup} combatantGroup - The combatant group being updated
  */
@@ -216,10 +187,7 @@ Hooks.on("updateCombatantGroup", async (combatantGroup) => {
 });
 /** @param {OSECombatant} combatant */
 Hooks.on("createCombatant", (combatant) => {
-  if (
-    game.settings.get(game.system.id, "initiative") !== "group" ||
-    !game.user.isGM
-  ) {
+  if (game.settings.get(game.system.id, "initiative") !== "group" || !game.user.isGM) {
     return;
   }
   combatant.assignGroup();
@@ -247,18 +215,13 @@ Hooks.on("renderActorSheet", (app, html) => {
         name: "OSE.items.Equip",
         icon: "<i class='fas fa-hand'></i>",
         condition: (el) => {
-          if (
-            app.actor?.type !== "character" ||
-            !app.object?.sheet?.isEditable
-          ) {
+          if (app.actor?.type !== "character" || !app.object?.sheet?.isEditable) {
             return false;
           }
 
           const id = el.dataset?.itemId;
           const item = app.actor?.items?.get(id);
-          return ["item", "armor", "weapon", "treasure", "container"].includes(
-            item?.type
-          );
+          return ["item", "armor", "weapon", "treasure", "container"].includes(item?.type);
         },
         callback: async (el) => {
           const id = el.dataset?.itemId;
@@ -299,7 +262,7 @@ Hooks.on("renderActorSheet", (app, html) => {
     ],
     {
       jQuery: false,
-    }
+    },
   );
 });
 

@@ -6,9 +6,7 @@ import { OSE } from "./config";
 // eslint-disable-next-line import/prefer-default-export
 export const augmentTable = (table, html) => {
   // Treasure Toggle
-  const isTreasureTable = Boolean(
-    table.document.getFlag(game.system.id, "treasure")
-  );
+  const isTreasureTable = Boolean(table.document.getFlag(game.system.id, "treasure"));
 
   const treasureTableToggle = document.createElement("div");
   treasureTableToggle.className = "toggle-treasure";
@@ -21,9 +19,7 @@ export const augmentTable = (table, html) => {
   head.append(treasureTableToggle);
 
   html.querySelector(".toggle-treasure").addEventListener("click", () => {
-    const isTreasure = Boolean(
-      table.document.getFlag(game.system.id, "treasure")
-    );
+    const isTreasure = Boolean(table.document.getFlag(game.system.id, "treasure"));
     table.document.setFlag(game.system.id, "treasure", !isTreasure);
   });
 
@@ -60,9 +56,7 @@ export const augmentTable = (table, html) => {
   const rollButton = document.createElement("button");
   rollButton.className = "roll-treasure";
   rollButton.type = "button";
-  rollButton.innerHTML = `<i class="fas fa-gem"></i> ${game.i18n.localize(
-    "OSE.table.treasure.roll"
-  )}`;
+  rollButton.innerHTML = `<i class="fas fa-gem"></i> ${game.i18n.localize("OSE.table.treasure.roll")}`;
 
   const footerRoll = html.querySelector(".form-footer [data-action='drawResult']");
   footerRoll.replaceWith(rollButton);
@@ -94,20 +88,17 @@ async function drawTreasure(table, data) {
         };
         const parsedUuid = foundry.utils.parseUuid(r.documentUuid);
         const documentCollection = parsedUuid?.collection?.metadata?.id ?? parsedUuid?.documentType ?? "";
-        if (
-          r.type === CONST.TABLE_RESULT_TYPES.DOCUMENT &&
-          documentCollection === "RollTable"
-        ) {
+        if (r.type === CONST.TABLE_RESULT_TYPES.DOCUMENT && documentCollection === "RollTable") {
           const embeddedTable = await fromUuid(r.documentUuid);
           await drawTreasure(embeddedTable, data.treasure[r.id]);
         }
       }
-    };
+    }
   } else {
     const { results } = await table.roll();
     for (const s of results) {
       data.treasure[s.id] = { img: s.img, text: await s.getHTML() };
-    };
+    }
   }
   return data;
 }
@@ -127,9 +118,7 @@ export async function rollTreasure(table, options = {}) {
 
   // Animation
   if (options.event) {
-    const results = $(options.event.currentTarget.parentElement)
-      .prev()
-      .find(".table-result");
+    const results = $(options.event.currentTarget.parentElement).prev().find(".table-result");
     results.each((_, item) => {
       item.classList.remove("active");
       if (data.treasure[item.dataset.resultId]) {
@@ -138,10 +127,10 @@ export async function rollTreasure(table, options = {}) {
     });
   }
 
-  await new Promise(resolve => requestAnimationFrame(resolve));
+  await new Promise((resolve) => requestAnimationFrame(resolve));
   const html = await foundry.applications.handlebars.renderTemplate(
     `${OSE.systemPath()}/templates/chat/roll-treasure.html`,
-    templateData
+    templateData,
   );
 
   const chatData = {
@@ -150,8 +139,7 @@ export async function rollTreasure(table, options = {}) {
   };
 
   const rollMode = game.settings.get("core", "rollMode");
-  if (["gmroll", "blindroll"].includes(rollMode))
-    chatData.whisper = ChatMessage.getWhisperRecipients("GM");
+  if (["gmroll", "blindroll"].includes(rollMode)) chatData.whisper = ChatMessage.getWhisperRecipients("GM");
   if (rollMode === "selfroll") chatData.whisper = [game.user._id];
   if (rollMode === "blindroll") chatData.blind = true;
 

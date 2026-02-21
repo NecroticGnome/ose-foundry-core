@@ -2,7 +2,7 @@
  * @file Contains tests for Armor Item Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import OseDataModelArmor from "../data-model-armor";
 
 export const key = "ose.item.datamodel.armor";
