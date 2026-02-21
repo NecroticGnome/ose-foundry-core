@@ -41,9 +41,11 @@ function applyChatCardDamage(html: HTMLElement, multiplier: 1 | -1) {
     })();
   }
   if (dmgTgt === CONFIG.OSE.apply_damage_options.targeted) {
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: async function called for side effects, promises intentionally not awaited
     game.user?.targets.forEach((t) => applyDamageToTarget(t.actor, amount, multiplier, t.name));
   }
   if (dmgTgt === CONFIG.OSE.apply_damage_options.selected) {
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: async function called for side effects, promises intentionally not awaited
     canvas.tokens?.controlled.forEach((t) => applyDamageToTarget(t.actor, amount, multiplier, t.name));
   }
 }

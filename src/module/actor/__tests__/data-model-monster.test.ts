@@ -416,7 +416,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(actor?.system.attackPatterns.transparent[1].name).equal("test ability");
     });
 
-    it("returns separated weapons and abilities whith patterns patterns", async () => {
+    it("returns separated weapons and abilities with patterns", async () => {
       const actor = await createMockActor();
       await actor?.createEmbeddedDocuments("Item", [
         // eslint-disable-next-line no-underscore-dangle
@@ -443,8 +443,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(Object.keys(actor?.system.attackPatterns)).contain("transparent");
       expect(Object.keys(actor?.system.attackPatterns)).contain("green");
       expect(actor?.system.attackPatterns.transparent.length).equal(2);
-      expect(actor?.system.attackPatterns.transparent[0].name).equal("test ability");
-      expect(actor?.system.attackPatterns.transparent[1].name).equal("test weapon");
+      expect(actor?.system.attackPatterns.transparent[0].name).equal("test weapon");
+      expect(actor?.system.attackPatterns.transparent[1].name).equal("test ability");
       expect(actor?.system.attackPatterns.green.length).equal(2);
       expect(actor?.system.attackPatterns.green[0].name).equal("test weapon green");
       expect(actor?.system.attackPatterns.green[1].name).equal("test ability green");

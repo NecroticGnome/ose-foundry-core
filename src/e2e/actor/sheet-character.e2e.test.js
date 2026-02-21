@@ -21,7 +21,7 @@ export const closeRollDialog = async () => {
   });
 };
 
-export default ({ before, beforeEach, after, afterEach, describe, it, expect, ...context }) => {
+export default ({ before, beforeEach, after, afterEach, describe, it, expect }) => {
   const testCharacterName = "Quench Test Character";
   const prepareActor = async (data) => {
     await trashChat();

@@ -51,15 +51,13 @@ export class OSECombatant extends Combatant {
    * @param {string} group - The name of the group to assign this combatant to. If empty, the group will be automatically determined.
    */
   async assignGroup(group: string) {
-    if (!group) {
-      group = this.groupRaw;
-    }
+    const targetGroup = group || this.groupRaw;
 
-    if (this.group?.name === group) {
+    if (this.group?.name === targetGroup) {
       return;
     }
 
-    await this.combat.assignGroup(this, group);
+    await this.combat.assignGroup(this, targetGroup);
   }
 
   /**

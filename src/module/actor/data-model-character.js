@@ -98,6 +98,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
   static migrateData(source) {
     OseDataModelCharacter.#migrateCantrips(source);
 
+    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 

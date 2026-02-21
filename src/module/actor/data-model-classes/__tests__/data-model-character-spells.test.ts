@@ -9,7 +9,7 @@ export const options = {
   displayName: "OSE: Actor: Data Model: Character Spells",
 };
 
-const createMockSpell = (lvl: number, spellOptions?: any): Item =>
+const createMockSpell = (lvl: number, spellOptions?: Record<string, unknown>): Item =>
   // eslint-disable-next-line new-cap
   new Item.implementation({
     name: `Mock Spell ${foundry.utils.randomID()}`,
@@ -17,13 +17,9 @@ const createMockSpell = (lvl: number, spellOptions?: any): Item =>
     system: { ...spellOptions, lvl },
   }) as Item;
 
-const createMockSpellList = (spellOptions: any, ...levels: any) =>
-  levels.reduce(
-    (arr: Item[], lvCount: number, idx: number) => [
-      ...arr,
-      ...Array.from({ length: lvCount }, () => createMockSpell(idx + 1, spellOptions)),
-    ],
-    [],
+const createMockSpellList = (spellOptions: Record<string, unknown>, ...levels: number[]): Item[] =>
+  levels.flatMap((lvCount: number, idx: number) =>
+    Array.from({ length: lvCount }, () => createMockSpell(idx + 1, spellOptions)),
   );
 
 // Core goes to 6, but we'll go to 9 just in case

@@ -38,7 +38,7 @@ type DragNDropItems = {
 
 type DragNDropDocuments = {
   actor: StoredDocument<Actor> | undefined;
-  compendium: CompendiumCollection<any> | undefined;
+  compendium: CompendiumCollection<CompendiumCollection.Metadata> | undefined;
 };
 
 /* --------------------------------------------- */
@@ -70,7 +70,7 @@ const executeDragNDrop = async (items: DragNDropItems) => {
   items.target.itemElement?.dispatchEvent(mockDropEvent);
 };
 
-export default ({ describe, it, expect, after, afterEach, beforeEach }: QuenchMethods) => {
+export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
   describe("_onDragStart(event)", () => {
     it("populates dataTransfer correctly", async () => {
       const actor = (await createMockActorKey("character", {}, key)) as OseActor;

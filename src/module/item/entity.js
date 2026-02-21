@@ -76,7 +76,9 @@ export default class OseItem extends Item {
     const props = [];
 
     if (itemType === "weapon") {
-      itemData.tags.forEach((t) => props.push(t.value));
+      for (const t of itemData.tags) {
+        props.push(t.value);
+      }
     }
     if (itemType === "spell") {
       props.push(`${itemData.class} ${itemData.lvl}`, itemData.range, itemData.duration);
@@ -256,7 +258,9 @@ export default class OseItem extends Item {
 
       case "ability": {
         const reqs = data.requirements.split(",");
-        reqs.forEach((req) => tagList.push({ label: req }));
+        for (const req of reqs) {
+          tagList.push({ label: req });
+        }
         break;
       }
     }
@@ -295,12 +299,13 @@ export default class OseItem extends Item {
       // Catch infos in brackets
       const matches = regExp.exec(val);
       let title = "";
+      let trimmedVal = "";
       if (matches) {
         title = matches[1];
-        val = val.slice(0, Math.max(0, matches.index)).trim();
+        trimmedVal = val.slice(0, Math.max(0, matches.index)).trim();
       } else {
-        val = val.trim();
-        title = val;
+        trimmedVal = val.trim();
+        title = trimmedVal;
       }
       // Auto fill checkboxes
       switch (title.toLowerCase()) {
@@ -321,15 +326,15 @@ export default class OseItem extends Item {
       }
 
       // Add the tag if it has a specific title or if it is not a checkbox
-      if (title !== val || (!newData.melee && !newData.slow && !newData.missile)) {
+      if (title !== trimmedVal || (!newData.melee && !newData.slow && !newData.missile)) {
         update.push({
           title,
-          value: val,
-          label: val,
+          value: trimmedVal,
+          label: trimmedVal,
         });
       }
 
-      if (val === "Two-handed" && this.type === "weapon") {
+      if (trimmedVal === "Two-handed" && this.type === "weapon") {
         newData.itemslots = 2;
       }
     });
@@ -505,7 +510,8 @@ export default class OseItem extends Item {
       case "save": {
         if (targets.length === 0) {
           ui.notifications.error(game.i18n.localize("OSE.error.noTokenControlled"));
-          return (button.disabled = false);
+          button.disabled = false;
+          return button.disabled;
         }
         for (const t of targets) {
           await t.rollSave(button.dataset.save, { event });
@@ -541,7 +547,7 @@ export default class OseItem extends Item {
   static _getChatCardTargets(_card) {
     const { character } = game.user;
     const { controlled } = canvas.tokens;
-    const targets = controlled.reduce((arr, t) => (t.actor ? [...arr, t.actor] : arr), []);
+    const targets = controlled.filter((t) => t.actor).map((t) => t.actor);
     if (character && controlled.length === 0) targets.push(character);
     return targets;
   }

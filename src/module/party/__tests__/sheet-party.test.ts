@@ -226,6 +226,8 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
 
   after(async () => {
     cleanUpActorsByKey(key);
-    game.folders?.contents?.filter((a) => a.name?.includes(`Test Folder ${key}`))?.forEach((a) => a.delete());
+    for (const a of game.folders?.contents?.filter((a) => a.name?.includes(`Test Folder ${key}`)) ?? []) {
+      await a.delete();
+    }
   });
 };

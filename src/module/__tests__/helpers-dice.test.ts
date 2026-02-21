@@ -513,6 +513,7 @@ export default ({ describe, it, after, afterEach, before, expect }: QuenchMethod
           parts: ["1d10"],
           skipDialog,
           data: { roll: { blindroll: false } },
+          title: "Test Roll",
         });
         await waitForInput();
         expect(game.messages.size).equal(1);
@@ -525,6 +526,7 @@ export default ({ describe, it, after, afterEach, before, expect }: QuenchMethod
         OseDice.RollSave({
           parts: ["1d10"],
           data: { roll: { blindroll: false } },
+          title: "Test Roll",
         });
         await waitForInput();
         const dialog = document.querySelector(".dialog");
@@ -549,6 +551,7 @@ export default ({ describe, it, after, afterEach, before, expect }: QuenchMethod
           parts: ["1d10"],
           skipDialog,
           data: { roll: { blindroll: false } },
+          title: "Test Roll",
         });
         await waitForInput();
         expect(game.messages.size).equal(1);
@@ -561,6 +564,7 @@ export default ({ describe, it, after, afterEach, before, expect }: QuenchMethod
         OseDice.Roll({
           parts: ["1d10"],
           data: { roll: { blindroll: false } },
+          title: "Test Roll",
         });
         await waitForInput();
         const dialog = document.querySelector(".dialog");

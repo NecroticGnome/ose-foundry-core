@@ -112,14 +112,16 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     18: "OSE.NativePlus3",
   };
 
-  static valueFromTable(table: { [str: string]: any }, val: number) {
-    let output;
-    for (let i = 0; i <= val; i += 1) {
-      if (table[i] !== undefined) {
-        output = table[i];
+  static valueFromTable<T>(table: Record<number, T> & { 0: T }, val: number): T {
+    const clampedVal = Math.max(0, Math.floor(val));
+
+    for (let i = clampedVal; i >= 0; i -= 1) {
+      if (Object.hasOwn(table, i)) {
+        return table[i] ?? table[0];
       }
     }
-    return output;
+
+    return table[0];
   }
 
   #str: IncomingScore = { value: 0, bonus: 0 };
@@ -170,15 +172,18 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #strMod() {
+  get #strMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#str.value,
-    );
+    ) as number;
   }
 
-  get #strOpenDoorsMod() {
-    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.openDoorMods, this.#str.value);
+  get #strOpenDoorsMod(): number {
+    return OseDataModelCharacterScores.valueFromTable(
+      OseDataModelCharacterScores.openDoorMods,
+      this.#str.value,
+    ) as number;
   }
 
   get int() {
@@ -198,19 +203,25 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #intMod() {
+  get #intMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#int.value,
-    );
+    ) as number;
   }
 
-  get #intLiteracyMod() {
-    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.literacyMods, this.#int.value);
+  get #intLiteracyMod(): string {
+    return OseDataModelCharacterScores.valueFromTable(
+      OseDataModelCharacterScores.literacyMods,
+      this.#int.value,
+    ) as string;
   }
 
-  get #intSpokenLanguagesMod() {
-    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.spokenMods, this.#int.value);
+  get #intSpokenLanguagesMod(): string {
+    return OseDataModelCharacterScores.valueFromTable(
+      OseDataModelCharacterScores.spokenMods,
+      this.#int.value,
+    ) as string;
   }
 
   get wis() {
@@ -228,11 +239,11 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #wisMod() {
+  get #wisMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#wis.value,
-    );
+    ) as number;
   }
 
   get dex() {
@@ -251,15 +262,18 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #dexMod() {
+  get #dexMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#dex.value,
-    );
+    ) as number;
   }
 
-  get #dexInitMod() {
-    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.cappedAttributeMods, this.#dex.value);
+  get #dexInitMod(): number {
+    return OseDataModelCharacterScores.valueFromTable(
+      OseDataModelCharacterScores.cappedAttributeMods,
+      this.#dex.value,
+    ) as number;
   }
 
   get con() {
@@ -277,11 +291,11 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #conMod() {
+  get #conMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#con.value,
-    );
+    ) as number;
   }
 
   get cha() {
@@ -302,22 +316,25 @@ export default class OseDataModelCharacterScores implements CharacterScores {
     };
   }
 
-  get #chaMod() {
+  get #chaMod(): number {
     return OseDataModelCharacterScores.valueFromTable(
       OseDataModelCharacterScores.standardAttributeMods,
       this.#cha.value,
-    );
+    ) as number;
   }
 
-  get #chaReactionMod() {
-    return OseDataModelCharacterScores.valueFromTable(OseDataModelCharacterScores.cappedAttributeMods, this.#cha.value);
+  get #chaReactionMod(): number {
+    return OseDataModelCharacterScores.valueFromTable(
+      OseDataModelCharacterScores.cappedAttributeMods,
+      this.#cha.value,
+    ) as number;
   }
 
-  get #chaRetainMod() {
+  get #chaRetainMod(): number {
     return this.#chaMod + 4;
   }
 
-  get #chaLoyaltyMod() {
+  get #chaLoyaltyMod(): number {
     return this.#chaMod + 7;
   }
 }

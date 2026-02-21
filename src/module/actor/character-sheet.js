@@ -60,6 +60,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     data.system.init = this.actor.system.init;
 
     // Sort by sort order (see ActorSheet)
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: .sort() is called for side effects on each array, return value unused
     [...Object.values(data.owned), ...Object.values(data?.spells?.spellList || {}), data.abilities].forEach((o) =>
       o.sort((a, b) => (a.sort || 0) - (b.sort || 0)),
     );

@@ -98,7 +98,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
 
   describe("createEmbeddedDocuments(embeddedName, data, context)", () => {
     after(async () => {
-      game.items?.filter((i) => i?.name?.indexOf(`Test ${key}`) >= 0).forEach((i) => i.delete());
+      for (const i of game.items?.filter((i) => i?.name?.indexOf(`Test ${key}`) >= 0) ?? []) {
+        await i.delete();
+      }
     });
     itemTypes.forEach((itemType) => {
       it(`Creates ${itemType.capitalize()} with correct default icon`, async () => {
@@ -680,9 +682,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await token.constructor.create(token, { parent: canvas.scene });
       await waitForInput();
       expect(game.user?.targets.size).equal(0);
-      canvas.tokens?.placeables.forEach((t: Token) =>
-        t.setTarget(true, { releaseOthers: false, groupSelection: true }),
-      );
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(true, { releaseOthers: false, groupSelection: true });
+      }
       expect(canvas.tokens?.placeables[0].actor).not.null;
       expect(canvas.tokens?.placeables[0].actor?.system.ac.value).not.null;
       expect(game.user?.targets.size).equal(1);
@@ -692,7 +694,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       });
       await waitForInput();
       expect(game.messages?.size).equal(1);
-      canvas.tokens?.placeables.forEach((t: Token) => t.setTarget(false));
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(false);
+      }
       expect(game.user?.targets.size).equal(0);
       await actor.delete();
     });
@@ -703,9 +707,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await token.constructor.create(token, { parent: canvas.scene });
       await waitForInput();
       expect(game.user?.targets.size).equal(0);
-      canvas.tokens?.placeables.forEach((t: Token) =>
-        t.setTarget(true, { releaseOthers: false, groupSelection: true }),
-      );
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(true, { releaseOthers: false, groupSelection: true });
+      }
       expect(game.user?.targets.size).equal(2);
       expect(game.messages?.size).equal(0);
       await actor.targetAttack({ roll: { target: {} } }, "melee", {
@@ -713,7 +717,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       });
       await waitForInput();
       expect(game.messages?.size).equal(2);
-      canvas.tokens?.placeables.forEach((t: Token) => t.setTarget(false));
+      for (const t of canvas.tokens?.placeables ?? []) {
+        t.setTarget(false);
+      }
       expect(game.user?.targets.size).equal(0);
       await actor.delete();
     });

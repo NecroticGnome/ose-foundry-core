@@ -12,7 +12,7 @@ export const delay = (ms: number) =>
 /**
  * If there are messages, purge them.
  */
-export const trashChat = (): any => {
+export const trashChat = (): undefined | Promise<Document[]> => {
   if (game.messages?.size) return game.messages?.documentClass.deleteDocuments([], { deleteAll: true });
 };
 
@@ -65,8 +65,10 @@ export const getActiveNotifications = (): HTMLElement[] =>
  *
  * @param obj
  */
-export const objectIsNotification = (obj: any): obj is Notification =>
-  typeof obj?.message === "string" && typeof obj?.type === "string" && typeof obj?.remove === "function";
+export const objectIsNotification = (obj: unknown): obj is Notification =>
+  typeof (obj as Record<string, unknown>)?.message === "string" &&
+  typeof (obj as Record<string, unknown>)?.type === "string" &&
+  typeof (obj as Record<string, unknown>)?.remove === "function";
 
 /**
  * Returns the random number required to roll a specific number on a die.
@@ -143,19 +145,19 @@ export const cleanUpMacros = async () => {
 };
 
 export const cleanUpActorsByKey = async (key: string) => {
-  for (const a of game.actors?.filter((a) => a.name === `Test Actor ${key}`)) {
+  for (const a of game.actors?.filter((a) => a.name === `Test Actor ${key}`) ?? []) {
     await a.delete();
   }
 };
 
 export const cleanUpWorldItems = async () => {
-  for (const a of game.items?.filter((a) => a?.name?.includes("New World Test"))) {
+  for (const a of game.items?.filter((a) => a?.name?.includes("New World Test")) ?? []) {
     await a.delete();
   }
 };
 
 export const cleanUpScenes = async () => {
-  for (const s of game.scenes?.filter((s) => s.name === "Mock Scene")) {
+  for (const s of game.scenes?.filter((s) => s.name === "Mock Scene") ?? []) {
     await s.delete();
   }
 };

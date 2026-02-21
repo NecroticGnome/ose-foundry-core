@@ -8,14 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "**",
-      "!**/lang/**/*.json",
-      "!**/*.d.ts",
-      "!**/dist/**",
-      "!**/foundry/**",
-      "!!**/templates/**/*.html"
-    ]
+    "includes": ["**", "!**/lang/**/*.json", "!**/*.d.ts", "!**/dist", "!**/foundry", "!!**/templates/**/*.html"]
   },
   "formatter": {
     "enabled": true,
@@ -93,5 +86,20 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/e2e/index.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "complexity": {
+            "noBannedTypes": "off"
+          }
+        }
+      }
+    }
+  ]
 }

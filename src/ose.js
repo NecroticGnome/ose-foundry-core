@@ -127,9 +127,8 @@ Hooks.once("setup", () => {
   // Localize CONFIG objects once up-front
   ["saves_short", "saves_long", "scores", "armor", "colors", "tags"].forEach((o) => {
     CONFIG.OSE[o] = Object.entries(CONFIG.OSE[o]).reduce((obj, e) => {
-      const localized = { ...obj };
-      localized[e[0]] = game.i18n.localize(e[1]);
-      return localized;
+      obj[e[0]] = game.i18n.localize(e[1]);
+      return obj;
     }, {});
   });
 

@@ -62,7 +62,8 @@ const registerSettings = () => {
     config: true,
     requiresReload: true,
     choices: Object.values(CONFIG.OSE.encumbranceOptions).reduce((obj, enc) => {
-      return { ...obj, [enc.type]: enc.localizedLabel };
+      obj[enc.type] = enc.localizedLabel;
+      return obj;
     }, {}) as SettingConfig<EncumbranceOption>["choices"],
   });
 

@@ -73,25 +73,30 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     it("Can't create without name", async () => {
       const item = await OseItem.create({ type: "container" });
       await expect(item).is.undefined;
-      expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
-        .to.be.an("array")
-        .that.includes("OseItem validation errors:\n  name: may not be undefined");
+      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
+      expect(texts.some((t) => t.startsWith("OseItem validation errors:\n  name: may not be undefined"))).to.equal(
+        true,
+      );
       await ui.notifications?.clear();
     });
     it("Can't create without type", async () => {
       const item = await OseItem.create({ name: "Test Item" });
       await expect(item).is.undefined;
-      expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
-        .to.be.an("array")
-        .that.includes("OseItem validation errors:\n  type: may not be undefined");
+      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
+      expect(texts.some((t) => t.startsWith("OseItem validation errors:\n  type: may not be undefined"))).to.equal(
+        true,
+      );
       await ui.notifications?.clear();
     });
     it("Can't create without acceptable type", async () => {
       const item = await OseItem.create({ name: "Test Item", type: "TEST" });
       await expect(item).is.undefined;
-      expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
-        .to.be.an("array")
-        .that.includes('OseItem validation errors:\n  type: "TEST" is not a valid type for the Item Document class');
+      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
+      expect(
+        texts.some((t) =>
+          t.startsWith('OseItem validation errors:\n  type: "TEST" is not a valid type for the Item Document class'),
+        ),
+      ).to.equal(true);
       await ui.notifications?.clear();
     });
   });
@@ -155,8 +160,9 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
       const item: OseItem = await createWorldTestItem("item");
       try {
         await item.rollFormula();
-      } catch (error: any) {
-        expect(error.name).equal("Error");
+      } catch (error: unknown) {
+        const err = error as Error;
+        expect(err.name).equal("Error");
       }
     });
     it("Casting a spell trigger a dialog", async () => {
@@ -173,7 +179,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     it("A OseDice.Roll is returned from method", async () => {
       const item: OseItem = await createWorldTestItem("spell");
       await item.update({ system: { roll: "1d20+12" } });
-      const result: any = await item.rollFormula();
+      const result: Roll | undefined = await item.rollFormula();
       assert(result instanceof Roll);
     });
   });

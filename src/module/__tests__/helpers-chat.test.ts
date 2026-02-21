@@ -3,16 +3,13 @@
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../e2e";
-import { functionsForTesting } from "../helpers-chat";
-
-const { applyChatCardDamage } = functionsForTesting;
 
 export const key = "ose.helpers.chat";
 export const options = {
   displayName: "OSE: Helpers: Chat",
 };
 
-export default ({ describe, it, before, after, expect }: QuenchMethods) => {
+export default ({ describe }: QuenchMethods) => {
   // @todo: How do we test these properly?
   describe("applyChatCardDamage(roll, multiplier)", () => {});
   describe("addChatMessageContextOptions(_, options)", () => {});

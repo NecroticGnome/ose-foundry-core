@@ -6,7 +6,7 @@ export const options = {
   displayName: "The Character Sheet: Item Macros",
 };
 
-export default ({ before, beforeEach, after, describe, it, expect, assert, ...context }) => {
+export default ({ before, after, describe, it, expect }) => {
   const testCharacterName = "Quench Test Character";
   const prepareActor = async (data) => {
     await trashChat();

@@ -45,7 +45,7 @@ type DragNDropItems = {
 
 type DragNDropDocuments = {
   actor: StoredDocument<Actor> | undefined;
-  compendium: CompendiumCollection<any> | undefined;
+  compendium: CompendiumCollection<CompendiumCollection.Metadata> | undefined;
 };
 
 /* --------------------------------------------- */
@@ -119,7 +119,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
         // Setup what to click
         const clickElement = document.querySelector(`${tab} .item-name`);
         const descriptionElement = clickElement?.parentElement?.nextElementSibling;
-        expect([...descriptionElement?.classList])
+        expect([...(descriptionElement?.classList ?? [])])
           .to.be.an("array")
           .that.does.not.include("expanded");
 
@@ -128,7 +128,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
         await delay(200);
 
         // Verify method
-        expect([...descriptionElement?.classList])
+        expect([...(descriptionElement?.classList ?? [])])
           .to.be.an("array")
           .that.includes("expanded");
 
@@ -300,16 +300,15 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
           const actor = await getActor();
           expect(actor?.items.size).equal(1);
-
           const summaryElement = document.querySelector(
             `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
-          expect([...summaryElement?.classList])
+          expect([...(summaryElement?.classList ?? [])])
             .to.be.an("array")
             .that.does.not.include("expanded");
 
           await clickItemSummary(tab);
-          expect([...summaryElement?.classList])
+          expect([...(summaryElement?.classList ?? [])])
             .to.be.an("array")
             .that.includes("expanded");
         });
@@ -324,11 +323,12 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
           const summaryElement = document.querySelector(
             `#OseActorSheetCharacter-Actor-${actor.id} section .tab[data-tab="${tab}"] .item-summary`,
           );
-          expect([...summaryElement?.classList])
+          expect([...(summaryElement?.classList ?? [])])
             .to.be.an("array")
             .that.includes("expanded");
+
           await clickItemSummary(tab);
-          expect([...summaryElement?.classList])
+          expect([...(summaryElement?.classList ?? [])])
             .to.be.an("array")
             .that.does.not.include("expanded");
         });
@@ -435,7 +435,9 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
         await waitForInput();
         expect(game.messages?.size).equal(1);
         expect(game.messages?.contents[0]?.content).contain(`New Actor Test ${itemType.capitalize()}`);
-        actor?.items.forEach((i: OseItem) => i.delete());
+        for (const i of actor?.items ?? []) {
+          await i.delete();
+        }
       });
 
       after(async () => {

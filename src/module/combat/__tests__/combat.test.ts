@@ -562,7 +562,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should not reroll initiative for rolled groups on combat start", async () => {
       const groupInitiatives: Map<string, number> = new Map();
-      for (const group of game.combat?.groups) {
+      for (const group of game.combat?.groups ?? []) {
         groupInitiatives.set(group.name, group.initiative);
       }
       await game.combat.startCombat();
@@ -779,7 +779,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     it("should keep initiative for all groups on new round", async () => {
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
       const groupInitiatives: Map<string, number> = new Map();
-      for (const group of game.combat?.groups) {
+      for (const group of game.combat?.groups ?? []) {
         groupInitiatives.set(group.name, group.initiative);
       }
 
@@ -858,7 +858,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should not reroll initiative for all combatants on combat start", async () => {
       const individualInitiatives: Map<string, number> = new Map();
-      for (const combatant of game.combat?.combatants) {
+      for (const combatant of game.combat?.combatants ?? []) {
         individualInitiatives.set(combatant.id, combatant.initiative);
       }
       await game.combat.startCombat();
@@ -958,7 +958,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await game?.combat?.smartRerollInitiative();
       await waitForInput();
       expect(game.messages.size).to.equal(20);
-      for (const group of game.combat?.groups) {
+      for (const group of game.combat?.groups ?? []) {
         expect(group?.initiative).to.not.be.null;
       }
 
@@ -1033,7 +1033,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     it("should keep initiative for all groups on new round", async () => {
       expect(game.combat?.combatants?.some((c) => c.initiative === null)).to.be.false;
       const individualInitiatives: Map<string, number> = new Map();
-      for (const combatant of game.combat?.combatants) {
+      for (const combatant of game.combat?.combatants ?? []) {
         individualInitiatives.set(combatant.id, combatant.initiative);
       }
 

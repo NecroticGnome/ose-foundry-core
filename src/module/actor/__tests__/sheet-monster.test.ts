@@ -111,7 +111,9 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
     after(async () => {
       await cleanUpActorsByKey(key);
-      game.tables?.filter((rt) => rt.name === "Test RollTable").forEach((rt) => rt.delete());
+      for (const rt of game.tables?.filter((rt) => rt.name === "Test RollTable") ?? []) {
+        await rt.delete();
+      }
     });
 
     it("Can drag testing RollTable to Monster", async () => {

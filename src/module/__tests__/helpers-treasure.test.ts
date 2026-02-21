@@ -27,7 +27,9 @@ const createMockTreasureTable = async () => {
 
 const cleanUpTables = async () => {
   const tables = game.tables?.filter((t) => t.name === `Mock Table ${key}` || t.name === `Mock Treasure Table ${key}`);
-  tables?.forEach((t) => t.delete());
+  for (const t of tables ?? []) {
+    await t.delete();
+  }
 };
 
 export default ({ describe, it, expect, after }: QuenchMethods) => {

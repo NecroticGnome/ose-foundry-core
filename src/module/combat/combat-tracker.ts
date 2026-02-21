@@ -140,7 +140,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
     }
 
     const list = html.querySelector(".directory-list, .combat-tracker");
-    for (const combatantGroup of this.viewed?.groups?.values()) {
+    for (const combatantGroup of this.viewed?.groups?.values() ?? []) {
       if (!combatantGroup.members?.size) {
         continue;
       }

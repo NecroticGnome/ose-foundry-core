@@ -13,11 +13,8 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
   prepareDerivedData() {
     this.encumbrance = new OseDataModelCharacterEncumbranceDisabled();
     this.spells = new OseDataModelCharacterSpells(this.spells, this.#spellList);
-    this.movement = new OseDataModelCharacterMove(
-      this.encumbrance,
-      (this.config.movementAuto = false),
-      this.movement.base,
-    );
+    this.config.movementAuto = false;
+    this.movement = new OseDataModelCharacterMove(this.encumbrance, false, this.movement.base);
   }
 
   /**
@@ -27,6 +24,7 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
     OseDataModelMonster.#migrateMonsterLanguages(source);
     OseDataModelMonster.#migrateCantrips(source);
 
+    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 
@@ -174,10 +172,10 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
         return b.type.localeCompare(a.type) || a.name.localeCompare(b.name);
       })
       .reduce((prev, curr) => {
-        const updated = { ...prev };
         const { pattern } = curr.system;
-        if (!updated[pattern]) updated[pattern] = [];
-        return { ...updated, [pattern]: [...updated[pattern], curr] };
+        if (!prev[pattern]) prev[pattern] = [];
+        prev[pattern].push(curr);
+        return prev;
       }, {});
   }
 

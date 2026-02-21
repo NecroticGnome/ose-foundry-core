@@ -25,14 +25,14 @@ export default ({ describe, it, expect }: QuenchMethods) => {
   const numberToScores = (number: number) =>
     Object.fromEntries(scoreKeys.map((scoreKey) => [scoreKey, { value: number, bonus: 0 }]));
 
-  const buildTestCases = (score: number, scoreKey: string, mod: string, table: any) => {
+  const buildTestCases = (score: number, scoreKey: string, mod: string, table: number) => {
     const scoresToUse = numberToScores(score);
     const scoresObj = new OseDataModelCharacterScores(scoresToUse);
     return it(`${score}`, () => {
       expect(scoresObj[scoreKey][mod]).to.equal(fromTable(table, score));
     });
   };
-  const buildTestCasesWithModifiers = (score: number, scoreKey: string, mod: string, table: any, added: number) => {
+  const buildTestCasesWithModifiers = (score: number, scoreKey: string, mod: string, table: number, added: number) => {
     const scoresToUse = numberToScores(score);
     const scoresObj = new OseDataModelCharacterScores(scoresToUse);
     return it(`${score}`, () => {

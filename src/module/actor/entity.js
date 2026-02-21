@@ -8,7 +8,7 @@ import OseItem from "../item/entity";
  * @param {[]} arr - an array
  * @returns {[]} - an array
  */
-const removeFalsyElements = (arr) => arr.reduce((a, b) => (b ? [...a, b] : a), []);
+const removeFalsyElements = (arr) => arr.filter((b) => b);
 
 export default class OseActor extends Actor {
   static migrateData(source) {
@@ -63,7 +63,7 @@ export default class OseActor extends Actor {
   }
 
   async createEmbeddedDocuments(embeddedName, data = [], context = {}) {
-    data.map((item) => {
+    data.forEach((item) => {
       if (item.img === undefined) {
         item.img = OseItem.defaultIcons[item.type];
       }
@@ -133,11 +133,11 @@ export default class OseActor extends Actor {
   }
 
   generateSave(hd) {
-    hd = hd.includes("+") ? Number.parseInt(hd, 10) + 1 : Number.parseInt(hd, 10);
+    const parsedHd = hd.includes("+") ? Number.parseInt(hd, 10) + 1 : Number.parseInt(hd, 10);
 
     // Compute saves
     let saves = {};
-    for (let i = 0; i <= hd; i++) {
+    for (let i = 0; i <= parsedHd; i++) {
       const tmp = CONFIG.OSE.monster_saves[i];
       if (tmp) {
         saves = tmp;
@@ -580,13 +580,13 @@ export default class OseActor extends Actor {
    * @returns
    */
   async applyDamage(amount = 0, multiplier = 1) {
-    amount = Math.floor(Number.parseInt(amount, 10) * multiplier);
+    const damage = Math.floor(Number.parseInt(amount, 10) * multiplier);
 
     const { value, max } = this.system.hp;
 
     // Update the Actor
     return this.update({
-      "system.hp.value": Math.clamp(value - amount, 0, max),
+      "system.hp.value": Math.clamp(value - damage, 0, max),
     });
   }
 }

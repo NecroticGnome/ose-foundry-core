@@ -10,12 +10,14 @@ const createMockMacro = () =>
     command: "console.log('Testing Macro');",
   });
 
-const cleanUpMacros = () => {
+const cleanUpMacros = async () => {
   const mockMacros = game.macros.filter((o) => o.name.indexOf("Mock Macro") >= 0);
-  mockMacros.forEach((o) => o.delete());
+  for (const o of mockMacros) {
+    await o.delete();
+  }
 };
 
-export default ({ describe, it, expect, assert, ...context }) => {
+export default ({ describe, it, expect }) => {
   afterEach(() => cleanUpMacros());
 
   describe("Macro", () => {
