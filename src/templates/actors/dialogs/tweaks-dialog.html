@@ -50,9 +50,17 @@
     </div>
   </div>
   <div class="form-group">
+    <label>{{localize "OSE.details.magic.bonus"}}</label>
+    <div class="form-fields">
+      <input type="text" name="system.details.magic.bonus" id="magic" value="{{@root.system.details.magic.bonus}}"
+        data-dtype="Number" />
+    </div>
+  </div>
+  <div class="form-group">
     <label>{{localize "OSE.MeleeBonus"}}</label>
     <div class="form-fields">
-      <input type="text" name="system.thac0.mod.melee" id="melee" value="{{@root.system.thac0.mod.melee}}" data-dtype="Number" />
+      <input type="text" name="system.thac0.mod.melee" id="melee" value="{{@root.system.thac0.mod.melee}}"
+        data-dtype="Number" />
     </div>
   </div>
   <div class="form-group">
