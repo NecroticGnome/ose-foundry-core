@@ -206,6 +206,7 @@ export default class OseActor extends Actor {
         type: "above",
         target: actorData.saves[save].value,
         magic: actorType === "character" ? actorData.scores.wis.mod + actorData.details.magic.bonus: 0,
+        poison: actorType === "character" ? actorData.details.magic.bonus: 0,
       },
       details: game.i18n.format("OSE.roll.details.save", { save: label }),
     };
