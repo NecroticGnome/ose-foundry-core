@@ -67,6 +67,7 @@
   "OSE.details.experience.next": "Prochain Niveau",
   "OSE.details.experience.share": "Part d'Expérience",
   "OSE.details.experience.award": "XP de Récompense",
+  "OSE.details.magic.bonus": "Bonus de Résistance Magique",
   "OSE.details.treasure": "Type de Trésor",
   "OSE.details.treasureTable": "Table",
   "OSE.details.treasureTableHint": "Lâchez une Table aléatoire pour la lier",
@@ -108,6 +109,7 @@
   "OSE.saves.spell.long": "Sorts Bâtons",
   "OSE.saves.magic.long": "Sauv. Magie",
   "OSE.saves.magic.short": "vs Magie",
+  "OSE.saves.poison.short": "vs Poison",
 
   "OSE.Health": "Points de Vie",
   "OSE.HealthMax": "Points de Vie Maximaux",
