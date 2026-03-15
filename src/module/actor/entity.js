@@ -28,6 +28,17 @@ export default class OseActor extends Actor {
       delete source.system.movement.value;
     }
 
+    // Add magic resist bonus field for characters, defaulting to 0
+    if (
+      source?.type === "character" &&
+      source?.system?.details &&
+      source?.system?.details?.magic?.bonus === undefined
+    ) {
+      source.system.details.magic = {
+        bonus: 0,
+      };
+    }
+
     return source;
   }
 
