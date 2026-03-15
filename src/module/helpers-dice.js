@@ -438,6 +438,20 @@ const OseDice = {
         },
       },
       {
+        action: "Poison",
+        label: game.i18n.localize("OSE.saves.poison.short"),
+        icon: "fas fa-skull",
+        callback: (event, button) => {
+          rolled = true;
+          rollData.form = button.form;
+          rollData.parts.push(`${rollData.data.roll.poison}`);
+          rollData.title += ` ${game.i18n.localize("OSE.saves.poison.short")} (${
+            rollData.data.roll.poison
+          })`;
+          roll = OseDice.sendRoll(rollData);
+        },
+      },
+      {
         action: "cancel",
         icon: "fas fa-times",
         label: game.i18n.localize("OSE.Cancel"),
