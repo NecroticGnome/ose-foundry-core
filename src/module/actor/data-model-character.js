@@ -108,6 +108,13 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
   static migrateData(source) {
     this.#migrateCantrips(source);
 
+    // Add magic resist bonus field for characters, defaulting to 0
+    if (source?.details && source?.details?.magic?.bonus === undefined) {
+      source.details.magic = {
+        bonus: 0,
+      };
+    }
+
     return super.migrateData(source);
   }
 

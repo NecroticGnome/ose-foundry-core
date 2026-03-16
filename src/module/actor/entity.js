@@ -1,7 +1,10 @@
 import OseItem from "../item/entity";
 
+
+
 import skipRollDialogCheck from "../helpers-behaviour";
 import OseDice from "../helpers-dice";
+
 
 /**
  * Used in the rollAttack function to remove zeroes from rollParts arrays
@@ -26,17 +29,6 @@ export default class OseActor extends Actor {
     if (source?.system?.movement?.value && !source?.system?.details.movement) {
       source.system.details.movement = source.system.movement.value;
       delete source.system.movement.value;
-    }
-
-    // Add magic resist bonus field for characters, defaulting to 0
-    if (
-      source?.type === "character" &&
-      source?.system?.details &&
-      source?.system?.details?.magic?.bonus === undefined
-    ) {
-      source.system.details.magic = {
-        bonus: 0,
-      };
     }
 
     return source;
