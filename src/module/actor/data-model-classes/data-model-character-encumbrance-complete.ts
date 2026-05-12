@@ -1,9 +1,7 @@
 /**
  * @file A class representing the "Complete" encumbrance scheme from Old School Essentials: Classic Fantasy
  */
-import OseDataModelCharacterEncumbrance, {
-  CharacterEncumbrance,
-} from "./data-model-character-encumbrance";
+import OseDataModelCharacterEncumbrance, { type CharacterEncumbrance } from "./data-model-character-encumbrance";
 
 // import { OSE } from '../../config';
 
@@ -31,25 +29,17 @@ export default class OseDataModelCharacterEncumbranceComplete
 
   #weight;
 
-  constructor(
-    max = OseDataModelCharacterEncumbrance.baseEncumbranceCap,
-    items: Item[] = []
-  ) {
+  constructor(max = OseDataModelCharacterEncumbrance.baseEncumbranceCap, items: Item[] = []) {
     super(OseDataModelCharacterEncumbranceComplete.type, max);
-    this.#weight = items.reduce(
-      (acc, { type, system: { quantity, weight } }: Item) => {
-        if (type === "item") return acc + quantity.value * weight;
-        if (["weapon", "armor", "container"].includes(type))
-          return acc + weight;
-        return acc;
-      },
-      0
-    );
+    this.#weight = items.reduce((acc, { type, system: { quantity, weight } }: Item) => {
+      if (type === "item") return acc + quantity.value * weight;
+      if (["weapon", "armor", "container"].includes(type)) return acc + weight;
+      return acc;
+    }, 0);
   }
 
   static defineSchema() {
-    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
-      foundry.data.fields;
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
     return new SchemaField({
       variant: new StringField({

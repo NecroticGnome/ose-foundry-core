@@ -2,7 +2,7 @@
  * @file Contains tests for Ability Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import { cleanUpWorldItems, createWorldTestItem } from "../../../e2e/testUtils";
 
 export const key = "ose.item.sheet";

@@ -2,13 +2,8 @@
  * @file Contains tests for Character Modifiers sheet.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
-import {
-  cleanUpActorsByKey,
-  createMockActorKey,
-  openWindows,
-  waitForInput,
-} from "../../../e2e/testUtils";
+import type { QuenchMethods } from "../../../e2e";
+import { cleanUpActorsByKey, createMockActorKey, openWindows, waitForInput } from "../../../e2e/testUtils";
 import OseCharacterModifiers from "../character-modifiers";
 
 export const key = "ose.actor.sheet.character.dialog.modifiers";
@@ -16,8 +11,7 @@ export const options = {
   displayName: "OSE: Actor: Dialog Sheet: Character Modifiers",
 };
 
-const createMockActor = async (type: string, data: object = {}) =>
-  createMockActorKey(type, data, key);
+const createMockActor = async (type: string, data: object = {}) => createMockActorKey(type, data, key);
 
 export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
   describe("defaultOptions()", () => {
@@ -27,9 +21,7 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
       expect(sheet.options.classes).contain("ose");
       expect(sheet.options.classes).contain("dialog");
       expect(sheet.options.classes).contain("modifiers");
-      expect(sheet.options.template).contain(
-        "/templates/actors/dialogs/modifiers-dialog.html"
-      );
+      expect(sheet.options.template).contain("/templates/actors/dialogs/modifiers-dialog.html");
       expect(sheet.options.width).equal(240);
     });
   });
@@ -40,9 +32,7 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
       const sheet = new OseCharacterModifiers(actor);
       sheet.render(true);
       await waitForInput();
-      const dialogTitle = document.querySelector(
-        "div.modifiers .window-title"
-      )?.innerHTML;
+      const dialogTitle = document.querySelector("div.modifiers .window-title")?.innerHTML;
       expect(typeof dialogTitle).equal("string");
       const dialogs = openWindows("modifiers");
       expect(dialogs.length).equal(1);

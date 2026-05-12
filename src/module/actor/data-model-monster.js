@@ -3,32 +3,28 @@
  */
 // Encumbrance schemes
 import OseDataModelCharacterEncumbranceDisabled from "./data-model-classes/data-model-character-encumbrance-disabled";
-import OseDataModelCharacterSpells from "./data-model-classes/data-model-character-spells";
 import OseDataModelCharacterMove from "./data-model-classes/data-model-character-move";
+import OseDataModelCharacterSpells from "./data-model-classes/data-model-character-spells";
 
 const getItemsOfActorOfType = (actor, filterType, filterFn = null) =>
-  actor.items
-    .filter(({ type }) => type === filterType)
-    .filter(filterFn || (() => true));
+  actor.items.filter(({ type }) => type === filterType).filter(filterFn || (() => true));
 
 export default class OseDataModelMonster extends foundry.abstract.TypeDataModel {
   prepareDerivedData() {
     this.encumbrance = new OseDataModelCharacterEncumbranceDisabled();
     this.spells = new OseDataModelCharacterSpells(this.spells, this.#spellList);
-    this.movement = new OseDataModelCharacterMove(
-      this.encumbrance,
-      (this.config.movementAuto = false),
-      this.movement.base
-    );
+    this.config.movementAuto = false;
+    this.movement = new OseDataModelCharacterMove(this.encumbrance, false, this.movement.base);
   }
 
   /**
    * @inheritdoc
    */
   static migrateData(source) {
-    this.#migrateMonsterLanguages(source);
-    this.#migrateCantrips(source);
+    OseDataModelMonster.#migrateMonsterLanguages(source);
+    OseDataModelMonster.#migrateCantrips(source);
 
+    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 
@@ -63,8 +59,7 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
 
   // @todo define schema options; stuff like min/max values and so on.
   static defineSchema() {
-    const { StringField, NumberField, BooleanField, ObjectField, SchemaField } =
-      foundry.data.fields;
+    const { StringField, NumberField, BooleanField, ObjectField, SchemaField } = foundry.data.fields;
 
     return {
       spells: new ObjectField(),
@@ -113,25 +108,18 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
   }
 
   get isNew() {
-    return !Object.values(this.saves).reduce(
-      (prev, curr) => prev + (parseInt(curr?.value, 10) || 0),
-      0
-    );
+    return !Object.values(this.saves).reduce((prev, curr) => prev + (Number.parseInt(curr?.value, 10) || 0), 0);
   }
 
   get containers() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "container",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "container", ({ system: { containerId } }) => !containerId);
   }
 
   get treasures() {
     return getItemsOfActorOfType(
       this.parent,
       "item",
-      ({ system: { treasure, containerId } }) => treasure && !containerId
+      ({ system: { treasure, containerId } }) => treasure && !containerId,
     ).sort((a, b) => a.name.localeCompare(b.name));
   }
 
@@ -139,48 +127,36 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
     return getItemsOfActorOfType(
       this.parent,
       "item",
-      ({ system: { treasure, containerId } }) => !treasure && !containerId
+      ({ system: { treasure, containerId } }) => !treasure && !containerId,
     ).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   get weapons() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "weapon",
-      ({ system: { containerId } }) => !containerId
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    return getItemsOfActorOfType(this.parent, "weapon", ({ system: { containerId } }) => !containerId).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   }
 
   get armor() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "armor",
-      ({ system: { containerId } }) => !containerId
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    return getItemsOfActorOfType(this.parent, "armor", ({ system: { containerId } }) => !containerId).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   }
 
   get abilities() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "ability",
-      ({ system: { containerId } }) => !containerId
-    ).sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    return getItemsOfActorOfType(this.parent, "ability", ({ system: { containerId } }) => !containerId).sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0),
+    );
   }
 
   get attackPatterns() {
     return [...this.weapons, ...this.abilities]
       .sort((a, b) => {
         // Transparent attack patterns always go last.
-        if (
-          a.system.pattern !== "transparent" &&
-          b.system.pattern === "transparent"
-        ) {
+        if (a.system.pattern !== "transparent" && b.system.pattern === "transparent") {
           return -1;
         }
-        if (
-          a.system.pattern === "transparent" &&
-          b.system.pattern !== "transparent"
-        ) {
+        if (a.system.pattern === "transparent" && b.system.pattern !== "transparent") {
           return 1;
         }
 
@@ -196,34 +172,26 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
         return b.type.localeCompare(a.type) || a.name.localeCompare(b.name);
       })
       .reduce((prev, curr) => {
-        const updated = { ...prev };
         const { pattern } = curr.system;
-        if (!updated[pattern]) updated[pattern] = [];
-        return { ...updated, [pattern]: [...updated[pattern], curr] };
+        if (!prev[pattern]) prev[pattern] = [];
+        prev[pattern].push(curr);
+        return prev;
       }, {});
   }
 
   get #spellList() {
-    return getItemsOfActorOfType(
-      this.parent,
-      "spell",
-      ({ system: { containerId } }) => !containerId
-    );
+    return getItemsOfActorOfType(this.parent, "spell", ({ system: { containerId } }) => !containerId);
   }
 
   get isSlow() {
     return this.weapons.length === 0
       ? false
-      : this.weapons.every(
-          (item) => !(item.type !== "weapon" || !item.system.slow)
-        );
+      : this.weapons.every((item) => !(item.type !== "weapon" || !item.system.slow));
   }
 
   get init() {
     const group = game.settings.get(game.system.id, "initiative") !== "group";
 
-    return group
-      ? (this.initiative.value || 0) + (this.initiative.mod || 0)
-      : 0;
+    return group ? (this.initiative.value || 0) + (this.initiative.mod || 0) : 0;
   }
 }

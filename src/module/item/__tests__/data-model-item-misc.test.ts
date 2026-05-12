@@ -2,7 +2,7 @@
  * @file Contains tests for Misc Item Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import OseDataModelItem from "../data-model-item";
 
 export const key = "ose.item.datamodel.misc";
@@ -43,9 +43,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       expect(miscItem.tags.length).equal(1);
       expect(miscItem.autoTags[0].label).equal(CONFIG.OSE.tags.blunt);
       expect(miscItem.autoTags[0].icon).equal("fa-hammer-crash");
-      expect(miscItem.autoTags[0].image).equal(
-        `${CONFIG.OSE.assetsPath}/blunt.png`
-      );
+      expect(miscItem.autoTags[0].image).equal(`${CONFIG.OSE.assetsPath}/blunt.png`);
     });
   });
 };

@@ -4,7 +4,6 @@
 import OSE from "../config";
 import OseActorSheet from "./actor-sheet";
 
-
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -15,7 +14,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
    * @returns {object} - The sheet's default options
    */
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(OseActorSheet.defaultOptions, {
       classes: ["ose", "sheet", "monster", "actor"],
       template: `${OSE.systemPath()}/templates/actors/monster-sheet.html`,
       width: 450,
@@ -64,18 +63,16 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
     // Settings
     data.config.morale = game.settings.get(game.system.id, "morale");
-    monsterData.details.treasure.link =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        monsterData.details.treasure.table,
-        { async: true }
-      );
+    monsterData.details.treasure.link = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      monsterData.details.treasure.table,
+      { async: true },
+    );
     data.isNew = this.actor.isNew();
 
-    data.enrichedBiography =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.object.system.details.biography,
-        { async: true }
-      );
+    data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.object.system.details.biography,
+      { async: true },
+    );
 
     // Monsters don't show an encumbrance bar
     data.encumbranceTemplate = "";
@@ -92,7 +89,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
     const templateData = { choices };
     const dlg = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/actors/dialogs/monster-saves.html`,
-      templateData
+      templateData,
     );
     // Create Dialog window
     return new foundry.applications.api.DialogV2({
@@ -107,10 +104,8 @@ export default class OseActorSheetMonster extends OseActorSheet {
           label: game.i18n.localize("OSE.Ok"),
           icon: "fas fa-check",
           default: true,
-          callback: (event, button) => {
-            const { hd } = new foundry.applications.ux.FormDataExtended(
-              button.form
-            ).object;
+          callback: (_event, button) => {
+            const { hd } = new foundry.applications.ux.FormDataExtended(button.form).object;
             this.actor.generateSave(hd.replace(/[^\d+.-]/g, ""));
           },
         },
@@ -130,15 +125,13 @@ export default class OseActorSheetMonster extends OseActorSheet {
     try {
       data = JSON.parse(event.dataTransfer.getData("text/plain"));
       if (data.type !== "RollTable") return;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
 
     let link = "";
     if (data.pack) {
-      const tableDatum = game.packs
-        .get(data.pack)
-        .index.find((el) => el._id === data.id);
+      const tableDatum = game.packs.get(data.pack).index.find((el) => el._id === data.id);
       link = `@UUID[${data.uuid}]{${tableDatum.name}}`;
     } else {
       link = `@UUID[${data.uuid}]`;
@@ -147,15 +140,15 @@ export default class OseActorSheetMonster extends OseActorSheet {
   }
 
   /* -------------------------------------------- */
-  async _resetAttacks(event) {
+  async _resetAttacks(_event) {
     return Promise.all(
       this.actor.items
         .filter((i) => i.type === "weapon")
         .map((weapon) =>
           weapon.update({
-            "system.counter.value": parseInt(weapon.system.counter.max),
-          })
-        )
+            "system.counter.value": Number.parseInt(weapon.system.counter.max, 10),
+          }),
+        ),
     );
   }
 
@@ -165,12 +158,12 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
     if (event.target.dataset.field === "value") {
       return item.update({
-        "system.counter.value": parseInt(event.target.value),
+        "system.counter.value": Number.parseInt(event.target.value, 10),
       });
     }
     if (event.target.dataset.field === "max") {
       return item.update({
-        "system.counter.max": parseInt(event.target.value),
+        "system.counter.max": Number.parseInt(event.target.value, 10),
       });
     }
   }
@@ -216,7 +209,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
       actorObject.rollAppearing({ event: ev, check });
     });
 
-    html.find(".treasure-table a").contextmenu((ev) => {
+    html.find(".treasure-table a").contextmenu((_ev) => {
       this.actor.update({ "system.details.treasure.table": null });
     });
 
@@ -238,8 +231,6 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
     html.find(".item-pattern").click((ev) => this._cycleAttackPatterns(ev));
 
-    html
-      .find('button[data-action="generate-saves"]')
-      .click(() => this.generateSave());
+    html.find('button[data-action="generate-saves"]').click(() => this.generateSave());
   }
 }

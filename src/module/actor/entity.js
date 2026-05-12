@@ -1,10 +1,6 @@
-import OseItem from "../item/entity";
-
-
-
 import skipRollDialogCheck from "../helpers-behaviour";
 import OseDice from "../helpers-dice";
-
+import OseItem from "../item/entity";
 
 /**
  * Used in the rollAttack function to remove zeroes from rollParts arrays
@@ -12,11 +8,9 @@ import OseDice from "../helpers-dice";
  * @param {[]} arr - an array
  * @returns {[]} - an array
  */
-const removeFalsyElements = (arr) =>
-  arr.reduce((a, b) => (b ? [...a, b] : a), []);
+const removeFalsyElements = (arr) => arr.filter((b) => b);
 
 export default class OseActor extends Actor {
-
   static migrateData(source) {
     // Fixing missing img
     if (source?.img === "") {
@@ -69,7 +63,7 @@ export default class OseActor extends Actor {
   }
 
   async createEmbeddedDocuments(embeddedName, data = [], context = {}) {
-    data.map((item) => {
+    data.forEach((item) => {
       if (item.img === undefined) {
         item.img = OseItem.defaultIcons[item.type];
       }
@@ -80,7 +74,7 @@ export default class OseActor extends Actor {
   /* -------------------------------------------- */
   /*  Socket Listeners and Handlers
     /* -------------------------------------------- */
-  getExperience(value, options = {}) {
+  getExperience(value, _options = {}) {
     const actorData = this.system;
     const actorType = this.type;
     // @TODO this seems like not the best spot for defining the xpKey const
@@ -89,9 +83,7 @@ export default class OseActor extends Actor {
     if (actorType !== "character") {
       return;
     }
-    const modified = Math.floor(
-      value + (actorData.details.xp.bonus * value) / 100
-    );
+    const modified = Math.floor(value + (actorData.details.xp.bonus * value) / 100);
     return this.update({
       [xpKey]: modified + actorData.details.xp.value,
     }).then(() => {
@@ -137,21 +129,15 @@ export default class OseActor extends Actor {
   }
 
   get isOwnerOrObserver() {
-    return (
-      this.isOwner ||
-      this.testUserPermission(
-        game.user,
-        CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER
-      )
-    );
+    return this.isOwner || this.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER);
   }
 
   generateSave(hd) {
-    hd = hd.includes("+") ? parseInt(hd) + 1 : parseInt(hd);
+    const parsedHd = hd.includes("+") ? Number.parseInt(hd, 10) + 1 : Number.parseInt(hd, 10);
 
     // Compute saves
     let saves = {};
-    for (let i = 0; i <= hd; i++) {
+    for (let i = 0; i <= parsedHd; i++) {
       const tmp = CONFIG.OSE.monster_saves[i];
       if (tmp) {
         saves = tmp;
@@ -161,7 +147,7 @@ export default class OseActor extends Actor {
     // Compute Thac0
     let thac0 = 20;
     Object.keys(CONFIG.OSE.monster_thac0).forEach((k) => {
-      if (hd < parseInt(k)) return;
+      if (hd < Number.parseInt(k, 10)) return;
       thac0 = CONFIG.OSE.monster_thac0[k];
     });
 
@@ -192,7 +178,7 @@ export default class OseActor extends Actor {
   /*  Rolls                                       */
   /* -------------------------------------------- */
 
-  async rollHP(options = {}) {
+  async rollHP(_options = {}) {
     const { total } = await new Roll(this.system.hp.hd).roll({ async: true });
     return this.update({ "system.hp": { max: total, value: total } });
   }
@@ -208,14 +194,13 @@ export default class OseActor extends Actor {
       roll: {
         type: "above",
         target: actorData.saves[save].value,
-        magic: actorType === "character" ? actorData.scores.wis.mod + actorData.details.magic.bonus: 0,
-        poison: actorType === "character" ? actorData.details.magic.bonus: 0,
+        magic: actorType === "character" ? actorData.scores.wis.mod + actorData.details.magic.bonus : 0,
+        poison: actorType === "character" ? actorData.details.magic.bonus : 0,
       },
       details: game.i18n.format("OSE.roll.details.save", { save: label }),
     };
 
-    const rollMethod =
-      actorType === "character" ? OseDice.RollSave : OseDice.Roll;
+    const rollMethod = actorType === "character" ? OseDice.RollSave : OseDice.Roll;
 
     // Roll and return
     return rollMethod({
@@ -360,16 +345,14 @@ export default class OseActor extends Actor {
 
     const actorData = this.system;
 
-    const label = game.i18n.localize(`OSE.roll.hd`);
+    const label = game.i18n.localize("OSE.roll.hd");
     let rollParts = [actorData.hp.hd];
 
     if (actorType === "character") {
       // A character always gains at least 1 hit point per Hit Die,
       // regardless of CON modifier.
       rollParts = [
-        `max(${actorData.hp.hd} + ${
-          actorData.scores.con.mod * actorData.details.level
-        }, ${actorData.hp.hd[0]})`,
+        `max(${actorData.hp.hd} + ${actorData.scores.con.mod * actorData.details.level}, ${actorData.hp.hd[0]})`,
       ];
     }
 
@@ -555,14 +538,12 @@ export default class OseActor extends Actor {
     // and str/dex modifier only if it's non-zero
     let attackMods = [];
 
-    if (options.type === "melee")
-      attackMods = [data.scores.str.mod, data.thac0.mod.melee];
+    if (options.type === "melee") attackMods = [data.scores.str.mod, data.thac0.mod.melee];
 
     dmgParts.push(...removeFalsyElements(attackMods));
 
     // Add missile mod to attack roll only (missile attacks don't get bonus damage)
-    if (options.type === "missile")
-      attackMods = [data.scores.dex.mod, data.thac0.mod.missile];
+    if (options.type === "missile") attackMods = [data.scores.dex.mod, data.thac0.mod.missile];
 
     // Add weapon bonus to attack roll only (already added to dmgParts)
     if (attData.item) attackMods.push(attData.item?.system?.bonus);
@@ -600,13 +581,13 @@ export default class OseActor extends Actor {
    * @returns
    */
   async applyDamage(amount = 0, multiplier = 1) {
-    amount = Math.floor(parseInt(amount) * multiplier);
+    const damage = Math.floor(Number.parseInt(amount, 10) * multiplier);
 
     const { value, max } = this.system.hp;
 
     // Update the Actor
     return this.update({
-      "system.hp.value": Math.clamp(value - amount, 0, max),
+      "system.hp.value": Math.clamp(value - damage, 0, max),
     });
   }
 }

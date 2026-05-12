@@ -3,10 +3,8 @@
 We do our best to recognize several ways one can contribute to this project.
 
 - [Become a translation contributor](/#Become%20a%20translation%20contributor), from English to your native language.
-- [Become a user research contributor](/#Become%20a%20user%20research%20contributor), interviewing users of UFT-based game systems, and collecting it into insights and user stories.
 - [Become a design contributor](/#Become%20a%20design%20contributor) by researching, prototyping, and drawing new interfaces and user experiences.
-- [Become a documentation contributor](/#Become%20a%20documentation%20contributor), using primarily English skills and user knowledge of UFT to expand or find errors in our documentation.
-- [Join the welcome brigade](/#Join%20the%20welcome%20brigade), greeting and telling new people to the project how to get started or field their troubleshooting issues.
+- [Become a documentation contributor](/#Become%20a%20documentation%20contributor), using primarily English skills and user knowledge of OSE to expand or find errors in our documentation.
 - **[Become a code contributor](/#Become%20a%20code%20contributor), using basic or intermediate knowledge of JavaScript to improve how the game system functions.**
 
 This guide will go over each.
@@ -21,7 +19,7 @@ We don't always have the time and resources to help everyone personally, so we w
 
 ## Become a translation contributor
 
-UFT uses a [Crowdin project][crowdin project] to collect translation contributions. A free Crowdin account is required. You will be able to sign up for the "Unofficial OSE" project on your own and immediately start contributing (obsolete name, but the project is still in use).
+The OSE system uses a [Crowdin project][crowdin project] to collect translation contributions. A free Crowdin account is required. You will be able to sign up for the "OSE" project on your own and immediately start contributing.
 
 ### Adding new translation strings
 
@@ -31,51 +29,65 @@ Crowdin provides [detailed instructions][crowdin docs for translators] for new t
 
 By default, only the top 30 languages by number of speakers are listed in Crowdin. If you want to contribute translations for a new language, first make sure that Foundry VTT already has a ["core" translation module][core translation] for that language, otherwise you won't be able to use OSE translations in that language. Then contact the Crowdin project administrator, who will notify you when the new language is added to the project.
 
-## Become a user researcher
-
 ## Become a design contributor
 
-We recognize two types of design contributors: user experience designers and graphical interface designers. Both are absolutely necessary for making UFT the best experience it can be for gamemasters and players.
+Design contributions help improve the visual appearance and user experience of the OSE system. We welcome contributions from designers with various skill sets.
 
 ### Contributing user experience designs
 
-A user experience designer will scrap together
+User experience (UX) designers help improve how gamemasters and players interact with the system. UX contributions might include:
+
+- Analyzing and documenting user workflows
+- Identifying pain points in common tasks (character creation, inventory management, combat tracking)
+- Proposing improved information architecture
+- Creating wireframes or mockups for new features
+- Conducting usability testing and documenting findings
+- Improving accessibility for users with disabilities
+
+To contribute UX designs, please open a GitHub discussion describing the problem you've identified and your proposed solution. Include mockups, user flows, or other documentation that helps explain your design.
 
 ### Contributing graphical interface designs
 
-UFT has accounts on both Penpot and 
+Graphical interface (UI) designers help make the OSE system visually appealing and consistent. UI contributions might include:
+
+- Designing icons for items, abilities, or UI elements
+- Creating character sheet layouts and styling
+- Improving typography and color schemes
+- Designing dialog boxes and modal windows
+- Creating themed variants (light/dark modes, alternate aesthetics)
+- Improving visual hierarchy and information density
+
+For UI contributions, please open a GitHub discussion with visual examples (screenshots, mockups, or design files). We appreciate designs that respect the Old-School Essentials aesthetic while maintaining good usability.
 
 ## Become a documentation contributor
 
-We are transitioning to a double-pronged documentation approach: 
+We have a double-pronged documentation approach:
 
-1. User help, provided to gamemasters and players who need an extra push into getting started or finding their way around a UFT game system.
-1. Contributor help, provided to contributors of the game system (especially new contributors) who often need guidance to remember how to contribute to the project as a whole.
+1. User help, provided to gamemasters and players who need an extra push into getting started or finding their way around the OSE game system.
+1. Contributor help, provided to contributors of the game system (especially new contributors) who often need guidance on how to successfully contribute to the project as a whole.
 
 In each of these cases, there are multiple needs being served:
 
-* Gamemaster or player who wants to be guided inside of Foundry itself (with the help of the Tours system)
-* Gamemaster or player who wants to read or reference a document to find out if/how to do something (such as a user docs webpage)
-* Code author who needs to remember what a specific function or code file does (in-line comments, docs webpage)
-* Other type of contributor who needs guidance on contribution steps or third-party webapps they need to use (markdown files inside the project, contributor docs webpage)
-
-## Join the welcome brigade
+- Gamemaster or player who wants to be guided inside of Foundry itself (with the help of the Tours system)
+- Gamemaster or player who wants to read or reference a document to find out if/how to do something (such as a user docs webpage)
+- Code author who needs to remember what a specific function or code file does (in-line comments, docs webpage)
+- Other type of contributor who needs guidance on contribution steps or third-party webapps they need to use (markdown files inside the project, contributor docs webpage)
 
 ## Become a code contributor
 
-This guide should help you get the UFT development environment completely 
+This guide should help you get the development environment running.
 
 ### Developer Environment Installation
 
-Prerequisites: Node.js (v16 is recommended), a familiarity with command Foundry VTT with a valid license
+Prerequisites: Node.js (v20 or greater is recommended), a familiarity with Foundry VTT with a valid license
 
 [Node installers (beginner-friendly)](https://nodejs.org/en/download/)
-[Node on package managers (recommended, I use nvm)](https://nodejs.org/en/download/package-manager/#windows)
+[Node on package managers (recommended)](https://nodejs.org/en/download/package-manager/)
 
-1. With Node.js installed, run the command `npm i npm -g && npm -v` in your preferred command line interface to ensure **npm 7 or greater** is installed.
+1. With Node.js installed, verify npm is available by running `npm -v` in your preferred command line interface.
 1. (Star) and fork this repo.
-1. Clone your fork to a directory suitable for containing your code projects, such as `/yourusername/Github/`. It will create the `ose` directory. In the command line, your command should look like `git clone git@github.com:yourusername/ose.git`.
-1. Open `ose` in an IDE and/or your Terminal and install dependencies. In the command line, `cd ose && npm i`.
+1. Clone your fork to a directory suitable for containing your code projects, such as `/yourusername/Github/`. It will create the `ose-foundry-core` directory. In the command line, your command should look like `git clone git@github.com:yourusername/ose-foundry-core.git`.
+1. Open `ose-foundry-core` in an IDE and/or your Terminal and install dependencies. In the command line, `cd ose-foundry-core && npm i`.
 1. Copy the `foundryconfig.json.example` file to your repo's root directory, and rename it `foundryconfig.json`
 
    `/foundryconfig.json`
@@ -91,11 +103,11 @@ Prerequisites: Node.js (v16 is recommended), a familiarity with command Foundry 
    ```
 
 1. In your command line, run `npm run link`. A new system should now appear in your systems directory (or directories) but it doesn't yet run any code.
-1. In your command line, run `npm run build` (build once) or `npm run build:watch` (build continuously, whenever a change is saved). You now have a working copy of OSE's developer build. You should be able to install releases of `ose` alongside this build.
+1. In your command line, run `npm run build` (build once) or `npm run watch` (build continuously, whenever a change is saved). You now have a working copy of OSE's developer build. You should be able to install releases of `Old-School Essentials` alongside this build.
 
 ### Addendum: Git for Beginners
 
-Many contributors to Unofficial OSE on Foundry VTT are inexperienced with git. GitHub provides their [quickstart tutorial](https://docs.github.com/en/get-started/quickstart/hello-world) which we recommend as a first step toward becoming an OSE Contributor.
+Many contributors to OSE on Foundry VTT are inexperienced with git. GitHub provides their [quickstart tutorial](https://docs.github.com/en/get-started/quickstart/hello-world) which we recommend as a first step toward becoming an OSE Contributor.
 
 Here are some next steps to get started on your first code contribution.
 
@@ -106,7 +118,7 @@ Here are some next steps to get started on your first code contribution.
 
 ## Troubleshooting
 
-To ask for a hand to help onboard you before making your first contribution to this repo, I recommend joining our [Unofficial OSE on Foundry VTT Discord server](https://discord.gg/qGrxRK2yD5).
+To ask for a hand to help onboard you before making your first contribution to this repo, I recommend joining our [OSE on Foundry VTT Discord server](https://discord.gg/qGrxRK2yD5).
 
 ### Errors from `node gyp` when running `npm i` on Windows.
 
@@ -118,15 +130,11 @@ On Windows you may have to run your shell/command prompt in administrator mode t
 
 ### Error: Cannot find module 'rollup'
 
-You may have skipped `npm i npm -g && npm -v`. If it shows npm version <7.0, then you may have an older version of Node or older operating system and need to upgrade.
+You may need to verify npm is installed by running `npm -v`. If npm is not available, try reinstalling Node.js and run `npm i` again.
 
 ### Error: Cannot find module (any module except rollup)
 
-You will need to `npm i` occasionally as we put out updates to the build process. We try to communicate whenever there's a change in devDependencies on Discord and in release notes.
-
-## Repeat Contributors
-
-Repeat contributors may ask via Discord direct message (@corporat#1282) or email (ose@vtt.red) to be added to a list of people who are interested in referrals for contract work.
+You will need to `npm i` occasionally as we put out updates to the build process.
 
 ## Addendum: Multiple Builds of OSE in the same Foundry VTT installation
 
@@ -135,31 +143,31 @@ The maintainer of this repository has three versions of OSE installed in any giv
 ```console
 ~/
     mygithubusername/
-        ose/
-    vttred/
-        ose/
+        ose-foundry-core/
+    NecroticGnome/
+        ose-foundry-core/
     fvtt/
-        v9/
-        v9-userdata/Data/
+        v13/
+        v13-userdata/Data/
             systems/
                 ose/
                 ose-dev/
                 ose-test/
-    v10/
-         v10-userdata/Data/
+        v14/
+        v14-userdata/Data/
             systems/
                 ose/
                 ose-dev/
                 ose-test/
 ```
 
-This is achieved with a `foundryconfig.json` files in each local version of the github repo on the maintainer's computer. Because of an npm script, each repo can make two symlinks, one for Foundry V9 and one for Foundry V10.
+This is achieved with `foundryconfig.json` files in each local version of the github repo on the maintainer's computer. Because of an npm script, each repo can make two symlinks, one for Foundry v12 and one for Foundry v13.
 
 `~/mygithubusername/ose/foundryconfig.json`
 
 ```json
 {
-  "dataPath": ["~/fvtt/v9-userdata", "~/fvtt/v10-userdata"],
+  "dataPath": ["~/fvtt/v13-userdata", "~/fvtt/v14-userdata"],
   "symlinkName": "ose-dev"
 }
 ```
@@ -168,7 +176,7 @@ This is achieved with a `foundryconfig.json` files in each local version of the 
 
 ```json
 {
-  "dataPath": ["~/fvtt/v9-userdata", "~/fvtt/v10-userdata"],
+  "dataPath": ["~/fvtt/v13-userdata", "~/fvtt/v14-userdata"],
   "symlinkName": "ose-test"
 }
 ```

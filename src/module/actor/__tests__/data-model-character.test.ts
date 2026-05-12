@@ -2,12 +2,8 @@
  * @file Quench unit tests for the Character data model class.
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../../e2e";
-import {
-  cleanUpActorsByKey,
-  createMockActorKey,
-  getMockActorKey,
-} from "../../../e2e/testUtils";
+import type { QuenchMethods } from "../../../e2e";
+import { cleanUpActorsByKey, createMockActorKey, getMockActorKey } from "../../../e2e/testUtils";
 import OseDataModelCharacter from "../data-model-character";
 import OseDataModelCharacterScores from "../data-model-classes/data-model-character-scores";
 
@@ -20,10 +16,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
   const dataModel = new OseDataModelCharacter();
   const ascendingACSetting = game.settings.get(game.system.id, "ascendingAC");
   const initiativeSetting = game.settings.get(game.system.id, "initiative");
-  const encumbranceSetting = game.settings.get(
-    game.system.id,
-    "encumbranceOption"
-  );
+  const encumbranceSetting = game.settings.get(game.system.id, "encumbranceOption");
 
   after(async () => {
     game.settings.set(game.system.id, "ascendingAC", ascendingACSetting);
@@ -184,9 +177,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
   describe("usesAscendingAC()", () => {
     it("successfully reads from settings", () => {
-      expect(dataModel.usesAscendingAC).equal(
-        game.settings.get(game.system.id, "ascendingAC")
-      );
+      expect(dataModel.usesAscendingAC).equal(game.settings.get(game.system.id, "ascendingAC"));
     });
   });
 
@@ -292,7 +283,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.true;
     });
@@ -312,7 +303,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.false;
     });
@@ -331,7 +322,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.true;
     });
@@ -350,7 +341,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
             },
           },
         },
-        key
+        key,
       );
       expect(testActor?.system.isNew).to.be.false;
     });
@@ -365,9 +356,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       const actor = await createMockActor();
       expect(actor?.items.contents.length).equal(0);
       expect(actor?.system.containers.length).equal(0);
-      await actor?.createEmbeddedDocuments("Item", [
-        { type: "container", name: "test container" },
-      ]);
+      await actor?.createEmbeddedDocuments("Item", [{ type: "container", name: "test container" }]);
       expect(actor?.items.contents.length).equal(1);
       const itemContainer = actor?.items.getName("test container");
       expect(itemContainer).to.not.be.undefined;
@@ -402,9 +391,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       const actor = await createMockActor();
       expect(actor?.items.contents.length).equal(0);
       expect(actor?.system.treasures.length).equal(0);
-      await actor?.createEmbeddedDocuments("Item", [
-        { type: "container", name: "test container" },
-      ]);
+      await actor?.createEmbeddedDocuments("Item", [{ type: "container", name: "test container" }]);
       const container = actor?.items.getName("test container");
       expect(container).to.not.be.undefined;
       expect(container?.name).equal("test container");
@@ -480,9 +467,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       const actor = await createMockActor();
       expect(actor?.items.contents.length).equal(0);
       expect(actor?.system.carriedTreasure).equal(0);
-      await actor?.createEmbeddedDocuments("Item", [
-        { type: "container", name: "test container" },
-      ]);
+      await actor?.createEmbeddedDocuments("Item", [{ type: "container", name: "test container" }]);
       const container = actor?.items.getName("test container");
       expect(container).to.not.be.undefined;
       expect(container?.name).equal("test container");
@@ -587,9 +572,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
         const actor = await createMockActor();
         expect(actor?.items.contents.length).equal(0);
         expect(actor?.system[getter].length).equal(0);
-        await actor?.createEmbeddedDocuments("Item", [
-          { type, name: `test ${type}` },
-        ]);
+        await actor?.createEmbeddedDocuments("Item", [{ type, name: `test ${type}` }]);
         expect(actor?.items.contents.length).equal(1);
         const testItem = actor?.items.getName(`test ${type}`);
         expect(testItem).to.not.be.undefined;
@@ -638,9 +621,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
           },
         ]);
         expect(actor?.items.contents.length).equal(3);
-        const itemInContainer = actor?.items.getName(
-          `test ${type} in container`
-        );
+        const itemInContainer = actor?.items.getName(`test ${type} in container`);
         expect(itemInContainer).to.not.be.undefined;
         expect(itemInContainer?.name).equal(`test ${type} in container`);
         const testItem = actor?.items.getName(`test ${type}`);

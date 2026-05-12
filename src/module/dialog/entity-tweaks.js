@@ -5,11 +5,12 @@ import OSE from "../config";
 
 export default class OseEntityTweaks extends FormApplication {
   static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.classes = ["sheet-tweaks"];
-    options.template = `${OSE.systemPath()}/templates/actors/dialogs/tweaks-dialog.html`;
-    options.width = 380;
-    return options;
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
+      classes: ["sheet-tweaks"],
+      id: "entity-tweaks",
+      template: `${OSE.systemPath()}/templates/actors/dialogs/tweaks-dialog.html`,
+      width: 380,
+    });
   }
 
   /* -------------------------------------------- */
@@ -69,8 +70,7 @@ export default class OseEntityTweaks extends FormApplication {
     if (
       CONFIG.OSE.encumbrance.type === "itembased" &&
       (formData[encumbranceMax] === this.object.system.encumbrance.defaultMax ||
-        formData[encumbranceMax] ===
-          this.object.system.encumbrance.alternateMax)
+        formData[encumbranceMax] === this.object.system.encumbrance.alternateMax)
     ) {
       formData[encumbranceMax] = null;
     }

@@ -31,21 +31,14 @@ export async function createOseMacro(data, slot) {
     });
     return game.user.assignHotbarMacro(macro, slot);
   }
-  if (data.type !== "Item")
-    return ui.notifications.warn(
-      game.i18n.localize("OSE.warn.macrosNotAnItem")
-    );
+  if (data.type !== "Item") return ui.notifications.warn(game.i18n.localize("OSE.warn.macrosNotAnItem"));
   if (data.uuid.indexOf("Item.") <= 0)
-    return ui.notifications.warn(
-      game.i18n.localize("OSE.warn.macrosOnlyForOwnedItems")
-    );
+    return ui.notifications.warn(game.i18n.localize("OSE.warn.macrosOnlyForOwnedItems"));
   const { item } = data;
 
   // Create the macro command
   const command = `game.ose.rollItemMacro("${item.name}");`;
-  let macro = game.macros.contents.find(
-    (m) => m.name === item.name && m.command === command
-  );
+  let macro = game.macros.contents.find((m) => m.name === item.name && m.command === command);
   if (!macro || macro.ownership[game.userId] === undefined) {
     macro = await Macro.create({
       name: item.name,
@@ -71,9 +64,7 @@ export function rollItemMacro(itemName) {
   const speaker = ChatMessage.getSpeaker();
   // Active actor, or inactive actor + token on scene allowed
   if (!(speaker.actor && speaker.scene))
-    return ui.notifications.warn(
-      game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene")
-    );
+    return ui.notifications.warn(game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene"));
 
   let actor;
   if (speaker.token) actor = game.actors.tokens[speaker.token];
@@ -86,14 +77,14 @@ export function rollItemMacro(itemName) {
       game.i18n.format("OSE.warn.moreThanOneItemWithName", {
         actorName: actor.name,
         itemName,
-      })
+      }),
     );
   } else if (items.length === 0) {
     return ui.notifications.error(
       game.i18n.format("OSE.error.noItemWithName", {
         actorName: actor.name,
         itemName,
-      })
+      }),
     );
   }
   const item = items[0];
@@ -113,7 +104,7 @@ export function rollTableMacro(tableUuId) {
       return ui.notifications.error(
         game.i18n.format("OSE.error.noRollTableWithUuId", {
           uuid: tableUuId,
-        })
+        }),
       );
     }
     //

@@ -2,7 +2,7 @@
  * @file Contains tests for Quench for testing macros
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../e2e";
+import type { QuenchMethods } from "../../e2e";
 import {
   cleanUpActorsByKey,
   cleanUpMacros,
@@ -26,20 +26,12 @@ export const key = "ose.helpers.macro";
 export const options = { displayName: "OSE: Helpers: Macro" };
 
 /* MOCKING HELPERS */
-const createMockActor = async (type: string, data: object = {}) =>
-  createMockActorKey(type, data, key);
+const createMockActor = async (type: string, data: object = {}) => createMockActorKey(type, data, key);
 
 /* CLEAN UP HELPERS */
 const cleanUpActors = () => cleanUpActorsByKey(key);
 
-export default ({
-  describe,
-  it,
-  expect,
-  before,
-  after,
-  afterEach,
-}: QuenchMethods) => {
+export default ({ describe, it, expect, before, after, afterEach }: QuenchMethods) => {
   before(async () => {
     game?.scenes?.active?.update({ active: false });
     await ui.notifications?.clear();
@@ -67,8 +59,7 @@ export default ({
   describe("createOseMacro(data, slot)", () => {
     it("Can create macro", async () => {
       const macro = await createMockMacro();
-      expect(game.macros?.contents.find((m) => m.uuid === macro?.uuid)).not
-        .undefined;
+      expect(game.macros?.contents.find((m) => m.uuid === macro?.uuid)).not.undefined;
     });
 
     it("Can drag Macro to hotbar", async () => {
@@ -88,9 +79,7 @@ export default ({
       const macroSlot = 9;
       const notification = await createOseMacro(data, macroSlot);
       expect(objectIsNotification(notification)).equal(true);
-      expect(notification.message).equal(
-        game.i18n.localize("OSE.warn.macrosNotAnItem")
-      );
+      expect(notification.message).equal(game.i18n.localize("OSE.warn.macrosNotAnItem"));
       await actor?.delete();
     });
 
@@ -101,22 +90,13 @@ export default ({
       const macroSlot = 9;
       const notification = await createOseMacro(data, macroSlot);
       expect(objectIsNotification(notification)).equal(true);
-      expect(notification.message).equal(
-        game.i18n.localize("OSE.warn.macrosOnlyForOwnedItems")
-      );
+      expect(notification.message).equal(game.i18n.localize("OSE.warn.macrosOnlyForOwnedItems"));
       await actor?.delete();
       await worldItem?.delete();
     });
 
     describe("Dragging all item types creates macros", () => {
-      const itemTypes = new Set([
-        "spell",
-        "ability",
-        "armor",
-        "weapon",
-        "item",
-        "container",
-      ]);
+      const itemTypes = new Set(["spell", "ability", "armor", "weapon", "item", "container"]);
       itemTypes.forEach((type) => {
         it(`Dragging Actor ${type.capitalize()} to hotbar craetes macro`, async () => {
           const actor = await createMockActor("character");
@@ -134,9 +114,7 @@ export default ({
 
           await createOseMacro(data, macroSlot);
           const macro = game.user?.getHotbarMacros()[macroSlot - 1];
-          expect(macro?.macro?.command).equal(
-            `game.ose.rollItemMacro("New Actor Test ${type.capitalize()}");`
-          );
+          expect(macro?.macro?.command).equal(`game.ose.rollItemMacro("New Actor Test ${type.capitalize()}");`);
           await actor?.delete();
         });
       });
@@ -151,13 +129,9 @@ export default ({
       await game.user?.update({ character: actor?.id });
       expect(ChatMessage.getSpeaker().scene).is.null;
       expect(ChatMessage.getSpeaker().actor).is.not.null;
-      const notification = await rollItemMacro(
-        `New Actor Test ${type.capitalize()}`
-      );
+      const notification = await rollItemMacro(`New Actor Test ${type.capitalize()}`);
       expect(objectIsNotification(notification)).equal(true);
-      expect(notification.message).equal(
-        game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene")
-      );
+      expect(notification.message).equal(game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene"));
       await actor?.delete();
     });
 
@@ -170,13 +144,9 @@ export default ({
       await game.user?.update({ character: null });
       expect(ChatMessage.getSpeaker().scene).is.not.null;
       expect(ChatMessage.getSpeaker().actor).is.null;
-      const notification = await rollItemMacro(
-        `New Actor Test ${type.capitalize()}`
-      );
+      const notification = await rollItemMacro(`New Actor Test ${type.capitalize()}`);
       expect(objectIsNotification(notification)).equal(true);
-      expect(notification.message).equal(
-        game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene")
-      );
+      expect(notification.message).equal(game.i18n.localize("OSE.warn.macrosNoTokenOwnedInScene"));
       await actor?.delete();
       await scene?.delete();
     });
@@ -214,7 +184,7 @@ export default ({
           game.i18n.format("OSE.warn.moreThanOneItemWithName", {
             actorName: actor?.name,
             itemName: `New Actor Test ${type.capitalize()}`,
-          })
+          }),
         );
       await waitForInput();
       expect(openV2Dialogs().length).equal(1);
@@ -230,12 +200,8 @@ export default ({
       expect(scene?.tokenVision).equal(true);
       await createActorTestItem(actor, type);
       await game.user?.update({ character: actor?.id });
-      await actor?.items
-        .getName(`New Actor Test ${type.capitalize()}`)
-        ?.delete();
-      const notification = await rollItemMacro(
-        `New Actor Test ${type.capitalize()}`
-      );
+      await actor?.items.getName(`New Actor Test ${type.capitalize()}`)?.delete();
+      const notification = await rollItemMacro(`New Actor Test ${type.capitalize()}`);
       await waitForInput();
       expect(objectIsNotification(notification)).equal(true);
       expect(notification.type).equal("error");
@@ -243,7 +209,7 @@ export default ({
         game.i18n.format("OSE.error.noItemWithName", {
           actorName: actor?.name,
           itemName: `New Actor Test ${type.capitalize()}`,
-        })
+        }),
       );
       await actor?.delete();
       await scene?.delete();

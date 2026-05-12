@@ -10,14 +10,7 @@ export default class OseDataModelArmor extends foundry.abstract.TypeDataModel {
   };
 
   static defineSchema() {
-    const {
-      SchemaField,
-      StringField,
-      NumberField,
-      BooleanField,
-      ArrayField,
-      ObjectField,
-    } = foundry.data.fields;
+    const { SchemaField, StringField, NumberField, BooleanField, ArrayField, ObjectField } = foundry.data.fields;
     return {
       type: new StringField({
         initial: "light",
@@ -50,9 +43,7 @@ export default class OseDataModelArmor extends foundry.abstract.TypeDataModel {
   get manualTags() {
     if (!this.tags) return null;
 
-    const tagNames = new Set(
-      Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label)
-    );
+    const tagNames = new Set(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
     return this.tags
       .filter(({ value }) => !tagNames.has(value))
       .map(({ title, value }) => ({
@@ -65,15 +56,9 @@ export default class OseDataModelArmor extends foundry.abstract.TypeDataModel {
   get autoTags() {
     const tagNames = Object.values(CONFIG.OSE.auto_tags);
 
-    const autoTags = this.tags.map(({ value }) =>
-      tagNames.find(({ label }) => value === label)
-    );
+    const autoTags = this.tags.map(({ value }) => tagNames.find(({ label }) => value === label));
 
-    return [
-      { label: OseDataModelArmor.ArmorTypes[this.type], icon: "fa-tshirt" },
-      ...autoTags,
-      ...this.manualTags,
-    ]
+    return [{ label: OseDataModelArmor.ArmorTypes[this.type], icon: "fa-tshirt" }, ...autoTags, ...this.manualTags]
       .flat()
       .filter((t) => !!t);
   }

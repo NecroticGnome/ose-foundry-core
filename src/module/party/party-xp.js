@@ -6,7 +6,7 @@ import OseParty from "./party";
 
 export default class OsePartyXP extends FormApplication {
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
       classes: ["ose", "dialog", "party-xp"],
       template: `${OSE.systemPath()}/templates/apps/party-xp.html`,
       width: 300,
@@ -53,7 +53,7 @@ export default class OsePartyXP extends FormApplication {
     try {
       data = JSON.parse(event.dataTransfer.getData("text/plain"));
       if (data.type !== "Item") return;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -71,13 +71,11 @@ export default class OsePartyXP extends FormApplication {
 
     const html = $(this.form);
     const totalXP = html.find('input[name="total"]').val();
-    const baseXpShare = parseFloat(totalXP) / currentParty.length;
+    const baseXpShare = Number.parseFloat(totalXP) / currentParty.length;
 
     currentParty.forEach((a) => {
       const actorData = a?.system;
-      const xpShare = Math.floor(
-        (actorData.details.xp.share / 100) * baseXpShare
-      );
+      const xpShare = Math.floor((actorData.details.xp.share / 100) * baseXpShare);
       html.find(`li[data-actor-id='${a.id}'] input`).val(xpShare);
     });
   }
@@ -92,7 +90,7 @@ export default class OsePartyXP extends FormApplication {
       const id = qRow.data("actorId");
       const actor = OseParty.currentParty.find((e) => e.id === id);
       if (value) {
-        actor.getExperience(Math.floor(parseInt(value, 10)));
+        actor.getExperience(Math.floor(Number.parseInt(value, 10)));
       }
     });
   }

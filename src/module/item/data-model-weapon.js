@@ -3,14 +3,7 @@
  */
 export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const {
-      SchemaField,
-      StringField,
-      NumberField,
-      BooleanField,
-      ArrayField,
-      ObjectField,
-    } = foundry.data.fields;
+    const { SchemaField, StringField, NumberField, BooleanField, ArrayField, ObjectField } = foundry.data.fields;
     return {
       damage: new StringField(),
       description: new StringField(),
@@ -75,9 +68,7 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
   get manualTags() {
     if (!this.tags) return null;
 
-    const tagNames = new Set(
-      Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label)
-    );
+    const tagNames = new Set(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
     return this.tags.filter(({ value }) => !tagNames.has(value));
   }
 
@@ -101,9 +92,7 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
   get autoTags() {
     const tagNames = Object.values(CONFIG.OSE.auto_tags);
 
-    const autoTags = this.tags.map(({ value }) =>
-      tagNames.find(({ label }) => value === label)
-    );
+    const autoTags = this.tags.map(({ value }) => tagNames.find(({ label }) => value === label));
 
     return [
       { label: this.damage ?? "", icon: "fa-tint" },

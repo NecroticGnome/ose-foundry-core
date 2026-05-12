@@ -2,14 +2,8 @@
  * @file Contains tests for party helpers
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../e2e";
-import {
-  cleanUpActorsByKey,
-  closeDialogs,
-  createMockActorKey,
-  openDialogs,
-  waitForInput,
-} from "../../e2e/testUtils";
+import type { QuenchMethods } from "../../e2e";
+import { cleanUpActorsByKey, closeDialogs, createMockActorKey, openDialogs, waitForInput } from "../../e2e/testUtils";
 import { update } from "../helpers-party";
 import OsePartySheet from "../party/party-sheet";
 
@@ -19,8 +13,7 @@ export const options = {
 };
 
 /* MOCKING HELPERS */
-const createMockActor = async (type: string, data: object = {}) =>
-  createMockActorKey(type, data, key);
+const createMockActor = async (type: string, data: object = {}) => createMockActorKey(type, data, key);
 
 /* CLEAN UP HELPERS */
 const cleanUpActors = () => cleanUpActorsByKey(key);
@@ -48,9 +41,7 @@ export default ({ describe, it, expect, after }: QuenchMethods) => {
       await waitForInput();
       await OsePartySheet?.partySheet?.render(true);
       await waitForInput();
-      const partyMember = document
-        .querySelector(".party-members .actor")
-        ?.getAttribute("data-actor-id");
+      const partyMember = document.querySelector(".party-members .actor")?.getAttribute("data-actor-id");
       expect(partyMember).equal(actor?.id);
       expect(openDialogs().length).equal(1);
       await closeDialogs();

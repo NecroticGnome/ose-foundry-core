@@ -2,9 +2,7 @@
  * @file A class representing the "Disabled" encumbrance scheme;
  *       we aren't tracking carry weight here.
  */
-import OseDataModelCharacterEncumbrance, {
-  CharacterEncumbrance,
-} from "./data-model-character-encumbrance";
+import OseDataModelCharacterEncumbrance, { type CharacterEncumbrance } from "./data-model-character-encumbrance";
 
 // import { OSE } from '../../config';
 
@@ -35,8 +33,7 @@ export default class OseDataModelCharacterEncumbranceDisabled
   }
 
   static defineSchema() {
-    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } =
-      foundry.data.fields;
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
     return new SchemaField({
       variant: new StringField({

@@ -14,7 +14,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
    * @returns {object} - The default options for this sheet.
    */
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(OseActorSheet.defaultOptions, {
       classes: ["ose", "sheet", "actor", "character"],
       template: `${OSE.systemPath()}/templates/actors/character-sheet.html`,
       width: 450,
@@ -60,11 +60,10 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     data.system.init = this.actor.system.init;
 
     // Sort by sort order (see ActorSheet)
-    [
-      ...Object.values(data.owned),
-      ...Object.values(data?.spells?.spellList || {}),
-      data.abilities,
-    ].forEach((o) => o.sort((a, b) => (a.sort || 0) - (b.sort || 0)));
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: .sort() is called for side effects on each array, return value unused
+    [...Object.values(data.owned), ...Object.values(data?.spells?.spellList || {}), data.abilities].forEach((o) =>
+      o.sort((a, b) => (a.sort || 0) - (b.sort || 0)),
+    );
   }
 
   generateScores() {
@@ -84,16 +83,14 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     // Prepare owned items
     this._prepareItems(data);
 
-    data.enrichedBiography =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.object.system.details.biography,
-        { async: true }
-      );
-    data.enrichedNotes =
-      await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.object.system.details.notes,
-        { async: true }
-      );
+    data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.object.system.details.biography,
+      { async: true },
+    );
+    data.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      this.object.system.details.notes,
+      { async: true },
+    );
 
     return data;
   }
@@ -104,7 +101,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     const templateData = { choices };
     const dlg = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/actors/dialogs/lang-create.html`,
-      templateData
+      templateData,
     );
     // Create Dialog window
     return new Promise((resolve) => {
@@ -117,7 +114,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
             label: game.i18n.localize("OSE.Ok"),
             icon: "fas fa-check",
             default: true,
-            callback: (event, button, html) => {
+            callback: (_event, button, _html) => {
               resolve(new foundry.applications.ux.FormDataExtended(button.form).object);
             },
           },
@@ -151,7 +148,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   _popLang(table, lang) {
     const data = this.actor.system;
-    const update = data[table].value.filter((el) => el != lang);
+    const update = data[table].value.filter((el) => el !== lang);
     const newData = {};
     newData[table] = { value: update };
     return this.actor.update({ system: newData });
@@ -266,7 +263,6 @@ export default class OseActorSheetCharacter extends OseActorSheet {
           equipped: !item.system.equipped,
         },
       });
-
     });
 
     html.find("a[data-action='generate-scores']").click((ev) => {

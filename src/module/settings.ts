@@ -1,7 +1,7 @@
 /**
  * @file Wire up system settings.
  */
-import { ApplyDamageOption, EncumbranceOption } from "./config";
+import type { ApplyDamageOption, EncumbranceOption } from "./config";
 
 /**
  * Perform setting registration.
@@ -62,7 +62,8 @@ const registerSettings = () => {
     config: true,
     requiresReload: true,
     choices: Object.values(CONFIG.OSE.encumbranceOptions).reduce((obj, enc) => {
-      return { ...obj, [enc.type]: enc.localizedLabel };
+      obj[enc.type] = enc.localizedLabel;
+      return obj;
     }, {}) as SettingConfig<EncumbranceOption>["choices"],
   });
 

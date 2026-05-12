@@ -37,26 +37,16 @@ export default class OseDataModelCharacterAC implements CharacterAC {
    * @param {number} dexMod - The bonus/penalty, from -3 to +3, applied to AC.
    * @param {number} mod - Miscellaneous modifier to AC
    */
-  constructor(
-    isAscending: boolean = false,
-    armor: Item[] = [],
-    dexMod: number = 0,
-    mod: number = 0
-  ) {
+  constructor(isAscending = false, armor: Item[] = [], dexMod = 0, mod = 0) {
     this.#isAscending = isAscending;
     this.#armor = armor;
     this.#dexMod = dexMod;
     this.#mod = mod;
-    this.#acProp = this.#isAscending
-      ? OseDataModelCharacterAC.propAscending
-      : OseDataModelCharacterAC.propDescending;
+    this.#acProp = this.#isAscending ? OseDataModelCharacterAC.propAscending : OseDataModelCharacterAC.propDescending;
   }
 
   #getShieldBonus(): number {
-    return (
-      this.#armor.find(({ system: { type } }: Item) => type === "shield")
-        ?.system[this.#acProp].value || 0
-    );
+    return this.#armor.find(({ system: { type } }: Item) => type === "shield")?.system[this.#acProp].value || 0;
   }
 
   /**
@@ -66,9 +56,7 @@ export default class OseDataModelCharacterAC implements CharacterAC {
    * @returns {number} - The base AC value
    */
   get base(): number {
-    return this.#isAscending
-      ? OseDataModelCharacterAC.baseAscending
-      : OseDataModelCharacterAC.baseDescending;
+    return this.#isAscending ? OseDataModelCharacterAC.baseAscending : OseDataModelCharacterAC.baseDescending;
   }
 
   /**
@@ -77,9 +65,7 @@ export default class OseDataModelCharacterAC implements CharacterAC {
    * @returns {number} - The character's naked AC
    */
   get naked(): number {
-    return this.#isAscending
-      ? this.base + this.#dexMod
-      : this.base - this.#dexMod;
+    return this.#isAscending ? this.base + this.#dexMod : this.base - this.#dexMod;
   }
 
   /**
@@ -98,9 +84,7 @@ export default class OseDataModelCharacterAC implements CharacterAC {
    * @returns {number | null} - The AC value from worn armor
    */
   get #armored(): number | null {
-    const armor = this.#armor.find(
-      ({ system: { type } }: Item) => type !== "shield"
-    )?.system[this.#acProp].value;
+    const armor = this.#armor.find(({ system: { type } }: Item) => type !== "shield")?.system[this.#acProp].value;
     // Null if any falsy value but 0
     if (!armor && armor !== 0) return null;
 
@@ -115,9 +99,7 @@ export default class OseDataModelCharacterAC implements CharacterAC {
    */
   get value(): number {
     const base = this.#armored === null ? this.naked : this.#armored;
-    return this.#isAscending
-      ? base + this.shield + this.mod
-      : base - this.shield - this.mod;
+    return this.#isAscending ? base + this.shield + this.mod : base - this.shield - this.mod;
   }
 
   // @TODO This will need to be editable once we get to creatures

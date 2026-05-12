@@ -11,15 +11,13 @@ const Party = {
 
 export default class OsePartySheet extends FormApplication {
   static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
       classes: ["ose", "dialog", "party-sheet"],
       template: `${OSE.systemPath()}/templates/apps/party-sheet.html`,
       width: 280,
       height: 400,
       resizable: true,
-      dragDrop: [
-        { dragSelector: ".actor-list .actor", dropSelector: ".party-members" },
-      ],
+      dragDrop: [{ dragSelector: ".actor-list .actor", dropSelector: ".party-members" }],
       closeOnSubmit: false,
     });
   }
@@ -101,12 +99,12 @@ export default class OsePartySheet extends FormApplication {
           return this._onDropFolder(event, data);
         }
       }
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
 
-  async _onDropActor(event, data) {
+  async _onDropActor(_event, data) {
     if (data.type !== "Actor") {
       return;
     }
@@ -117,11 +115,15 @@ export default class OsePartySheet extends FormApplication {
   }
 
   _recursiveAddFolder(folder) {
-    folder.contents.forEach((actor) => this._addActorToParty(actor));
-    folder.children.forEach((folder) => this._recursiveAddFolder(folder.folder));
+    for (const actor of folder.contents) {
+      this._addActorToParty(actor);
+    }
+    for (const child of folder.children) {
+      this._recursiveAddFolder(child.folder);
+    }
   }
 
-  async _onDropFolder(event, data) {
+  async _onDropFolder(_event, data) {
     const folder = await fromUuid(data.uuid);
     if (folder?.type !== "Actor") return;
 
@@ -135,7 +137,7 @@ export default class OsePartySheet extends FormApplication {
       const dragData = (await fromUuid(uuid)).toDragData();
       // Set data transfer
       event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
 
@@ -144,7 +146,7 @@ export default class OsePartySheet extends FormApplication {
 
   /* -------------------------------------------- */
 
-  async _dealXP(ev) {
+  async _dealXP(_ev) {
     new OsePartyXP(this.object, {}).render(true);
   }
 
@@ -164,11 +166,9 @@ export default class OsePartySheet extends FormApplication {
       getActor(event).sheet.render(true);
     });
 
-    html
-      .find(".field-img button[data-action='remove-actor']")
-      .click(async (event) => {
-        await this._removeActorFromParty(getActor(event));
-        this.render(true);
-      });
+    html.find(".field-img button[data-action='remove-actor']").click(async (event) => {
+      await this._removeActorFromParty(getActor(event));
+      this.render(true);
+    });
   }
 }

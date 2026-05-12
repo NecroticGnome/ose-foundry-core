@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://foundryvtt.com/packages/ose/">
-    <img alt="Unofficial OSE on Foundry VTT logo" src="https://raw.githubusercontent.com/NecroticGnome/ose-foundry-core/main/docs/images/old-school-essentials-logo.webp" width="500" />
+    <img alt="OSE on Foundry VTT logo" src="https://raw.githubusercontent.com/NecroticGnome/ose-foundry-core/main/docs/images/old-school-essentials-logo.webp" width="500" />
   </a>
 </p>
 <h1 align="center">

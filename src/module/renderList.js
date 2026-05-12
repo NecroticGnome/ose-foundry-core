@@ -18,13 +18,11 @@ export const RenderCompendium = async (object) => {
   const content = await object.collection.getDocuments();
 
   for (const item of render) {
-    const foundryDocument = content.find(
-      (e) => e.id === item.dataset.entryId
-    );
+    const foundryDocument = content.find((e) => e.id === item.dataset.entryId);
 
     const tagsHtml = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/actors/partials/item-auto-tags-partial.html`,
-      { tags: foundryDocument.system.autoTags || [] }
+      { tags: foundryDocument.system.autoTags || [] },
     );
     item.insertAdjacentHTML("beforeend", tagsHtml);
   }
@@ -41,13 +39,11 @@ export const RenderItemDirectory = async (object) => {
   const content = object.collection;
 
   for (const item of render) {
-    const foundryDocument = content.find(
-      (e) => e.id === item.dataset.entryId
-    );
+    const foundryDocument = content.find((e) => e.id === item.dataset.entryId);
 
     const tagsHtml = await foundry.applications.handlebars.renderTemplate(
       `${OSE.systemPath()}/templates/actors/partials/item-auto-tags-partial.html`,
-      { tags: foundryDocument.system.autoTags || [] }
+      { tags: foundryDocument.system.autoTags || [] },
     );
     item.insertAdjacentHTML("beforeend", tagsHtml);
   }

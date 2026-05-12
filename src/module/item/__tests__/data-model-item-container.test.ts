@@ -2,7 +2,7 @@
  * @file Contains tests for Container Item Data Model.
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import OseDataModelContainer from "../data-model-container";
 
 export const key = "ose.item.datamodel.container";
@@ -57,9 +57,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       expect(container.tags.length).equal(1);
       expect(container.autoTags[0].label).equal(CONFIG.OSE.tags.blunt);
       expect(container.autoTags[0].icon).equal("fa-hammer-crash");
-      expect(container.autoTags[0].image).equal(
-        `${CONFIG.OSE.assetsPath}/blunt.png`
-      );
+      expect(container.autoTags[0].image).equal(`${CONFIG.OSE.assetsPath}/blunt.png`);
     });
   });
 };

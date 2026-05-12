@@ -5,12 +5,12 @@ import OSE from "../config";
 
 export default class OseCharacterModifiers extends FormApplication {
   static get defaultOptions() {
-    const options = super.defaultOptions;
-    options.classes = ["ose", "dialog", "modifiers"];
-    options.id = "sheet-modifiers";
-    options.template = `${OSE.systemPath()}/templates/actors/dialogs/modifiers-dialog.html`;
-    options.width = 240;
-    return options;
+    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
+      classes: ["ose", "dialog", "modifiers"],
+      id: "sheet-modifiers",
+      template: `${OSE.systemPath()}/templates/actors/dialogs/modifiers-dialog.html`,
+      width: 240,
+    });
   }
 
   /* -------------------------------------------- */

@@ -2,7 +2,7 @@
  * @file Contains tests for treasure helpers
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../e2e";
+import type { QuenchMethods } from "../../e2e";
 import { rollSpecificNumber, trashChat, waitForInput } from "../../e2e/testUtils";
 import { functionsForTesting } from "../helpers-treasure";
 
@@ -26,11 +26,10 @@ const createMockTreasureTable = async () => {
 };
 
 const cleanUpTables = async () => {
-  const tables = game.tables?.filter(
-    (t) =>
-      t.name === `Mock Table ${key}` || t.name === `Mock Treasure Table ${key}`
-  );
-  tables?.forEach((t) => t.delete());
+  const tables = game.tables?.filter((t) => t.name === `Mock Table ${key}` || t.name === `Mock Treasure Table ${key}`);
+  for (const t of tables ?? []) {
+    await t.delete();
+  }
 };
 
 export default ({ describe, it, expect, after }: QuenchMethods) => {

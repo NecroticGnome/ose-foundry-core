@@ -2,7 +2,7 @@
  * @file Contains tests for Character Sheet.
  */
 // eslint-disable-next-line import/no-cycle
-import { QuenchMethods } from "../../../e2e";
+import type { QuenchMethods } from "../../../e2e";
 import {
   cleanUpActorsByKey,
   closeDialogs,
@@ -16,7 +16,7 @@ import {
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
-import OseActorSheetCharacter from "../character-sheet";
+import type OseActorSheetCharacter from "../character-sheet";
 
 export const key = "ose.actor.sheet.character";
 export const options = { displayName: "OSE: Actor: Sheet: Character" };
@@ -37,9 +37,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       expect(sheet.options.classes).contain("actor");
       expect(sheet.options.classes).contain("character");
 
-      expect(sheet.options.template).contain(
-        "/templates/actors/character-sheet.html"
-      );
+      expect(sheet.options.template).contain("/templates/actors/character-sheet.html");
       expect(sheet.options.width).equal(450);
       expect(sheet.options.height).equal(530);
       expect(sheet.options.resizable).is.true;
@@ -104,11 +102,9 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         $(`.creator div[data-score="${score}"] a.score-roll`).trigger("click");
         await waitForInput();
 
-        const scoreValue = document.querySelector(
-          `.creator div[data-score="${score}"] input.score-value`
-        );
+        const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
         const { value } = scoreValue;
-        expect(parseInt(value, 10) > 0).equal(true);
+        expect(Number.parseInt(value, 10) > 0).equal(true);
       });
 
       for (const window of windows) {
@@ -131,15 +127,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         $(`.creator div[data-score="${score}"] a.score-roll`).trigger("click");
         await waitForInput();
 
-        const scoreValue = document.querySelector(
-          `.creator div[data-score="${score}"] input.score-value`
-        );
+        const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
         const { value } = scoreValue;
-        expect(parseInt(value, 10) > 0).equal(true);
-        scores[score] = parseInt(value, 10);
+        expect(Number.parseInt(value, 10) > 0).equal(true);
+        scores[score] = Number.parseInt(value, 10);
       }
 
-      $(`.creator footer button`).trigger("submit");
+      $(".creator footer button").trigger("submit");
       await waitForInput();
 
       expect(actor?.system.scores.str.value).equal(scores.str);

@@ -2,7 +2,7 @@
  * @file Contains tests for handlebars helpers
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../e2e";
+import type { QuenchMethods } from "../../e2e";
 
 export const key = "ose.helpers.handlebars";
 export const options = {
@@ -126,9 +126,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
         const tags = Object.keys(CONFIG.OSE.tags);
         tags.forEach((tag) => {
           it(`for ${tag} tag`, async () => {
-            expect(Handlebars.helpers.getTagIcon(CONFIG.OSE.tags[tag])).equal(
-              CONFIG.OSE.tag_images[tag]
-            );
+            expect(Handlebars.helpers.getTagIcon(CONFIG.OSE.tags[tag])).equal(CONFIG.OSE.tag_images[tag]);
           });
         });
       });
@@ -176,9 +174,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       });
 
       it("is functional", () => {
-        expect(Handlebars.helpers.path("/test")).equal(
-          `${CONFIG.OSE.systemPath()}/test`
-        );
+        expect(Handlebars.helpers.path("/test")).equal(`${CONFIG.OSE.systemPath()}/test`);
       });
     });
 
@@ -189,9 +185,7 @@ export default ({ describe, it, expect }: QuenchMethods) => {
       });
 
       it("is functional", () => {
-        expect(Handlebars.helpers.asset("/test")).equal(
-          `${CONFIG.OSE.assetsPath}/test`
-        );
+        expect(Handlebars.helpers.asset("/test")).equal(`${CONFIG.OSE.assetsPath}/test`);
       });
     });
   });

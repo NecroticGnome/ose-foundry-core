@@ -1,16 +1,12 @@
 import { OSE } from "../config";
-import { OSECombat } from "./combat";
 import { OSECombatant } from "./combatant";
 
-
-export default class OSECombatTracker extends foundry.applications.sidebar.tabs
-  .CombatTracker {
+export default class OSECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
   /** @inheritDoc */
   static DEFAULT_OPTIONS = {
     ...foundry.applications.sidebar.tabs.CombatTracker.DEFAULT_OPTIONS,
     actions: {
-      ...foundry.applications.sidebar.tabs.CombatTracker.DEFAULT_OPTIONS
-        .actions,
+      ...foundry.applications.sidebar.tabs.CombatTracker.DEFAULT_OPTIONS.actions,
       casting: OSECombatTracker.#onCombatantControl,
       retreat: OSECombatTracker.#onCombatantControl,
     },
@@ -21,8 +17,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
     await super._prepareTrackerContext(context, options);
     context.turns?.forEach((turn) => {
       const combatant = game.combat.combatants.get(turn.id);
-      turn.isSlowed =
-        turn.initiative === `${OSECombatant.INITIATIVE_VALUE_SLOWED}`;
+      turn.isSlowed = turn.initiative === `${OSECombatant.INITIATIVE_VALUE_SLOWED}`;
       turn.isCasting = !!combatant.getFlag(game.system.id, "prepareSpell");
       turn.isRetreating = !!combatant.getFlag(game.system.id, "moveInCombat");
       turn.isOwnedByUser = !!combatant.actor?.isOwner;
@@ -33,6 +28,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
 
   /** @inheritDoc */
   static #onCombatantControl(...args) {
+    // biome-ignore lint/complexity/noThisInStatic: v2 Applications have `this` bound to the instance
     return this._onCombatantControl(...args);
   }
 
@@ -98,9 +94,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
         icon: '<i class="fas fa-star-of-life"></i>',
         callback: (li: HTMLElement) => {
           const { combatantId } = li.dataset;
-          const turnToActivate = this.viewed.turns.findIndex(
-            (t: OSECombatant) => t.id === combatantId
-          );
+          const turnToActivate = this.viewed.turns.findIndex((t: OSECombatant) => t.id === combatantId);
           this.viewed.activateCombatant(turnToActivate);
         },
       },
@@ -114,28 +108,16 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
    * @param {HTMLElement} html - The combat tracker being rendered.
    */
   async renderGroups(html: HTMLElement) {
-    if (
-      !this.viewed ||
-      game.settings.get(game.system.id, "initiative") !== "group"
-    ) {
+    if (!this.viewed || game.settings.get(game.system.id, "initiative") !== "group") {
       return;
     }
 
-    const headerButtonContainer = html.querySelector(
-      ".combat-tracker-header .control-buttons"
-    );
+    const headerButtonContainer = html.querySelector(".combat-tracker-header .control-buttons");
     if (headerButtonContainer) {
       // Replace the buttons with the OSE versions
       const reRollButton = document.createElement("button");
       reRollButton.type = "button";
-      reRollButton.classList.add(
-        "inline-control",
-        "combat-control",
-        "combat-button",
-        "icon",
-        "fa-solid",
-        "fa-dice"
-      );
+      reRollButton.classList.add("inline-control", "combat-control", "combat-button", "icon", "fa-solid", "fa-dice");
       reRollButton.dataset.action = "smartRerollInitiative";
       reRollButton.dataset.tooltip = game.i18n.localize("OSE.Reroll");
       reRollButton.ariaLabel = game.i18n.localize("OSE.Reroll");
@@ -148,35 +130,24 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
         "combat-button",
         "icon",
         "fa-solid",
-        "fa-flag"
+        "fa-flag",
       );
       setCombatantGroupsButton.dataset.action = "setCombatantGroups";
-      setCombatantGroupsButton.dataset.tooltip = game.i18n.localize(
-        "OSE.combat.SetCombatantGroups"
-      );
-      setCombatantGroupsButton.ariaLabel = game.i18n.localize(
-        "OSE.combat.SetCombatantGroups"
-      );
+      setCombatantGroupsButton.dataset.tooltip = game.i18n.localize("OSE.combat.SetCombatantGroups");
+      setCombatantGroupsButton.ariaLabel = game.i18n.localize("OSE.combat.SetCombatantGroups");
 
-      headerButtonContainer.replaceChildren(
-        reRollButton,
-        setCombatantGroupsButton
-      );
+      headerButtonContainer.replaceChildren(reRollButton, setCombatantGroupsButton);
     }
 
     const list = html.querySelector(".directory-list, .combat-tracker");
-    for (const combatantGroup of this.viewed?.groups?.values()) {
+    for (const combatantGroup of this.viewed?.groups?.values() ?? []) {
       if (!combatantGroup.members?.size) {
         continue;
       }
 
       const children =
         list?.querySelectorAll(
-          [
-            ...combatantGroup.members.map(
-              (c: OSECombatant) => `[data-combatant-id="${c?.id}"]`
-            ),
-          ].join(", ")
+          [...combatantGroup.members.map((c: OSECombatant) => `[data-combatant-id="${c?.id}"]`)].join(", "),
         ) || [];
       if (children.length === 0) {
         continue;
@@ -212,12 +183,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
       diceIcon.className = "fas fa-dice-d6";
       nameStrong.append(diceIcon);
 
-      nameStrong.append(
-        " ",
-        game.i18n.localize(
-          label === "slow" ? "OSE.items.Slow" : `OSE.colors.${label}`
-        )
-      );
+      nameStrong.append(" ", game.i18n.localize(label === "slow" ? "OSE.items.Slow" : `OSE.colors.${label}`));
 
       tokenName.append(nameStrong);
       groupHeader.append(tokenName);
@@ -233,12 +199,9 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs
       groupContainer.append(groupHeader);
       groupContainer.append(wrapper);
       groupContainer.dataset.groupKey = label;
-      groupContainer.dataset.initiative =
-        label === "slow" ? "-1" : combatantGroup.initiative;
+      groupContainer.dataset.initiative = label === "slow" ? "-1" : combatantGroup.initiative;
       children[0].before(groupContainer);
-      groupContainer
-        .querySelector(".group-children")
-        ?.replaceChildren(...children);
+      groupContainer.querySelector(".group-children")?.replaceChildren(...children);
     }
   }
 }

@@ -2,7 +2,7 @@
  * @file A class representing the character's ability to move, depending on encumbrance state
  */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 import OseDataModelCharacterEncumbrance from "./data-model-character-encumbrance";
 
 export interface CharacterMove {
@@ -41,7 +41,7 @@ export default class OseDataModelCharacterMove implements CharacterMove {
   constructor(
     encumbrance: OseDataModelCharacterEncumbrance = new OseDataModelCharacterEncumbrance(),
     shouldCalculateMovement = true,
-    base = OseDataModelCharacterMove.baseMoveRate
+    base = OseDataModelCharacterMove.baseMoveRate,
   ) {
     // Props necessary for any encumbrance variant
     this.#moveBase = base;
@@ -64,8 +64,7 @@ export default class OseDataModelCharacterMove implements CharacterMove {
 
   get base() {
     // Manual entry for movement
-    if (!this.#autocalculate || this.#encumbranceVariant === "disabled")
-      return this.#moveBase;
+    if (!this.#autocalculate || this.#encumbranceVariant === "disabled") return this.#moveBase;
     // Automatic calculation for movement
     return this.#derivedSpeed();
   }

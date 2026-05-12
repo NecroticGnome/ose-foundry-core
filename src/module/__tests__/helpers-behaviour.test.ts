@@ -2,7 +2,7 @@
  * @file Contains tests for behaviour helpers
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
-import { QuenchMethods } from "../../e2e";
+import type { QuenchMethods } from "../../e2e";
 import skipRollDialogCheck from "../helpers-behaviour";
 
 export const key = "ose.helpers.behaviour";
@@ -12,10 +12,7 @@ export const options = {
 
 export default ({ describe, it, before, after, assert }: QuenchMethods) => {
   describe("skipRollDialogCheck(event)", () => {
-    const originalSetting = game.settings.get(
-      game.system.id,
-      "invertedCtrlBehavior"
-    );
+    const originalSetting = game.settings.get(game.system.id, "invertedCtrlBehavior");
 
     describe("invertedCtrlBehavior is set to false", () => {
       before(async () => {
@@ -23,10 +20,7 @@ export default ({ describe, it, before, after, assert }: QuenchMethods) => {
       });
 
       it("Setting is false", async () => {
-        const setting = await game.settings.get(
-          game.system.id,
-          "invertedCtrlBehavior"
-        );
+        const setting = await game.settings.get(game.system.id, "invertedCtrlBehavior");
         assert(!setting);
       });
 
@@ -57,10 +51,7 @@ export default ({ describe, it, before, after, assert }: QuenchMethods) => {
       });
 
       it("Setting is false", async () => {
-        const setting = await game.settings.get(
-          game.system.id,
-          "invertedCtrlBehavior"
-        );
+        const setting = await game.settings.get(game.system.id, "invertedCtrlBehavior");
         assert(setting);
       });
 
@@ -86,11 +77,7 @@ export default ({ describe, it, before, after, assert }: QuenchMethods) => {
     });
 
     after(async () => {
-      await game.settings.set(
-        game.system.id,
-        "invertedCtrlBehavior",
-        originalSetting
-      );
+      await game.settings.set(game.system.id, "invertedCtrlBehavior", originalSetting);
     });
   });
 };
