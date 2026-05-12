@@ -247,8 +247,8 @@
             <li class="attribute saving-throw">
                 <h4 class="attribute-name box-title" title="{{ localize 'OSE.saves.magic.long' }}">
                     {{ localize "OSE.saves.magic.long"}}</h4>
-                <div class="attribute-value flat" title="{{localize 'OSE.scores.wis.long'}}({{system.scores.wis.mod}})">
-                    {{mod system.scores.wis.mod}}
+                <div class="attribute-value flat" title="{{localize 'OSE.scores.wis.long'}}({{system.scores.wis.mod}})+{{system.details.magic.bonus}}">
+                    {{add system.scores.wis.mod system.details.magic.bonus}}
                 </div>
             </li>
         </ul>

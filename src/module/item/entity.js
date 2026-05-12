@@ -422,7 +422,7 @@ export default class OseItem extends Item {
     // Basic chat message data
     const chatData = {
       user: game.user.id,
-      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+      style: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: html,
       speaker: {
         actor: this.actor?.id,

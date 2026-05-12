@@ -101,6 +101,9 @@
           "next": 2000,
           "value": 0,
           "bonus": 0
+        },
+        "magic": {
+          "bonus": 0
         }
       },
       "exploration": {
