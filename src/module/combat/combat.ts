@@ -2,6 +2,7 @@
  * @file System-level modifications to the way combat works
  */
 import { OSE } from "../config";
+import { getRollMode } from "../helpers-message-mode";
 import OSECombatGroupSelector from "./combat-set-groups";
 
 export const actionGroups = {
@@ -96,7 +97,7 @@ export class OSECombat extends foundry.documents.Combat {
       await roll.evaluate();
       updates.push({ _id: group.id, initiative: roll.total });
 
-      const rollMode = game.settings.get("core", "rollMode");
+      const rollMode = getRollMode();
 
       // Construct chat message data
       const messageData = {
@@ -182,7 +183,7 @@ export class OSECombat extends foundry.documents.Combat {
       // Further processing when rounds other than round 0 end (start combat).
       switch (this.#rerollBehavior) {
         case "reset":
-          await this.resetAll();
+          await this.resetAll({ updateTurn: false });
           break;
 
         case "reroll":

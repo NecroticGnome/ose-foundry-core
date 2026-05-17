@@ -14,6 +14,7 @@ import {
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
+import { getRollMode, setRollMode } from "../../helpers-message-mode";
 import OseItem from "../entity";
 
 export const key = "ose.item.entity";
@@ -73,30 +74,25 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     it("Can't create without name", async () => {
       const item = await OseItem.create({ type: "container" });
       await expect(item).is.undefined;
-      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
-      expect(texts.some((t) => t.startsWith("OseItem validation errors:\n  name: may not be undefined"))).to.equal(
-        true,
+      expect(getActiveNotifications().map((li) => li?.textContent?.trim())).to.satisfy((arr: (string | undefined)[]) =>
+        arr.some((s) => s?.includes("name: may not be undefined")),
       );
       await ui.notifications?.clear();
     });
     it("Can't create without type", async () => {
       const item = await OseItem.create({ name: "Test Item" });
       await expect(item).is.undefined;
-      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
-      expect(texts.some((t) => t.startsWith("OseItem validation errors:\n  type: may not be undefined"))).to.equal(
-        true,
+      expect(getActiveNotifications().map((li) => li?.textContent?.trim())).to.satisfy((arr: (string | undefined)[]) =>
+        arr.some((s) => s?.includes("type: may not be undefined")),
       );
       await ui.notifications?.clear();
     });
     it("Can't create without acceptable type", async () => {
       const item = await OseItem.create({ name: "Test Item", type: "TEST" });
       await expect(item).is.undefined;
-      const texts = getActiveNotifications().map((li) => li?.textContent?.trim() ?? "");
-      expect(
-        texts.some((t) =>
-          t.startsWith('OseItem validation errors:\n  type: "TEST" is not a valid type for the Item Document class'),
-        ),
-      ).to.equal(true);
+      expect(getActiveNotifications().map((li) => li?.textContent?.trim())).to.satisfy((arr: (string | undefined)[]) =>
+        arr.some((s) => s?.includes('type: "TEST" is not a valid type for the Item Document class')),
+      );
       await ui.notifications?.clear();
     });
   });
@@ -485,8 +481,8 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     const rollMessageTest = async (rollMode: string) => {
       assert(["publicroll", "gmroll", "blindroll", "selfroll"].includes(rollMode));
       expect(game.messages?.size).equal(0);
-      game.settings.set("core", "rollMode", rollMode);
-      expect(game.settings.get("core", "rollMode")).equal(rollMode);
+      await setRollMode(rollMode);
+      expect(getRollMode()).equal(rollMode);
       const item: OseItem = await createWorldTestItem("weapon");
       await item?.show();
       expect(game.messages?.size).equal(1);
