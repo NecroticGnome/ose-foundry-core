@@ -409,10 +409,10 @@
       }
       .item-controls {
         font-size: var(--font-size-12);
-        flex-basis: max(60px, 3.8rem);
-        flex-grow: 0;
+        flex: 0 0 max(60px, 3.8rem);
         text-align: right;
         margin-right: 4px;
+        white-space: nowrap;
         .item-unequipped {
           color: rgba(0, 0, 0, 0.2);
         }
@@ -427,7 +427,7 @@
           line-height: 1rem;
         }
         .item-controls {
-          flex-basis: 2.7rem;
+          flex: 0 0 2.7rem;
         }
       }
       #context-menu {
