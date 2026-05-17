@@ -12,6 +12,7 @@ import {
   createMockCompendium,
   createWorldTestItem,
   itemTypes,
+  waitForElement,
   waitForInput, // eslint-disable-next-line prettier/prettier
 } from "../../../../e2e/testUtils";
 import type OseItem from "../../../item/entity";
@@ -80,9 +81,8 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
 
       const [item] = await createActorTestItem(actor, "weapon");
       expect(item).not.undefined;
-      await waitForInput();
 
-      const itemElement = document.querySelector(`.sheet .inventory li.item[data-item-id="${item?.id}"]`);
+      const itemElement = await waitForElement(`.sheet .inventory li.item[data-item-id="${item?.id}"]`);
       expect(itemElement).not.null;
 
       const event = executeDrag(itemElement);
@@ -163,13 +163,11 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
 
       // Render UI elements
       actor?.sheet?.render(true);
-      await waitForInput();
 
-      // Set the DOM elements
-      items.source.itemElement = document.querySelector(
+      items.source.itemElement = await waitForElement(
         `.sheet .inventory li.item[data-item-id="${items.source?.item?.id}"]`,
       );
-      items.target.itemElement = document.querySelector(
+      items.target.itemElement = await waitForElement(
         `.sheet .inventory li.item[data-item-id="${items.target?.item?.id}"]`,
       );
 
@@ -192,9 +190,7 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
       await waitForInput();
 
       // Verify that the target container is still present
-      const finalElement = document.querySelector(
-        `.sheet .inventory li.item[data-item-id="${items.target?.item?.id}"]`,
-      );
+      const finalElement = await waitForElement(`.sheet .inventory li.item[data-item-id="${items.target?.item?.id}"]`);
       expect(finalElement).not.null;
     });
 
@@ -230,14 +226,13 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
           // Render UI elements
           documents.actor?.sheet?.render(true);
           documents.compendium?.render(true);
-          await waitForInput();
-          document
-            .querySelector(`#OseActorSheetCharacter-Actor-${documents.actor.id} nav.sheet-tabs a[data-tab="inventory"]`)
-            ?.click();
-          await waitForInput();
 
-          // Record Target DOM
-          items.target.itemElement = document.querySelector(
+          const inventoryTab = await waitForElement<HTMLElement>(
+            `#OseActorSheetCharacter-Actor-${documents.actor.id} nav.sheet-tabs a[data-tab="inventory"]`,
+          );
+          inventoryTab?.click();
+
+          items.target.itemElement = await waitForElement(
             `#OseActorSheetCharacter-Actor-${documents.actor.id} .inventory li.item[data-item-id="${items.target.item?.id}"]`,
           );
         });
@@ -248,17 +243,13 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
           // Create item in actor sheet
           [items.source.item] = await createActorTestItem(documents.actor, itemType);
 
-          // Wait for UI to keep up
-          await waitForInput();
-
-          // Create DOM element
-          items.source.itemElement = document.querySelector(
+          items.source.itemElement = await waitForElement(
             `#OseActorSheetCharacter-Actor-${documents.actor.id} .inventory li.item[data-item-id="${items.source.item?.id}"]`,
           );
 
           if (!items.target.itemElement?.isConnected) {
-            // Reallocate the target item element
-            items.target.itemElement = document.querySelector(
+            // Reallocate the target item element after the re-render.
+            items.target.itemElement = await waitForElement(
               `#OseActorSheetCharacter-Actor-${documents.actor.id} .inventory li.item[data-item-id="${items.target.item?.id}"]`,
             );
           }
@@ -281,11 +272,7 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
           // Create item in sidebar
           items.source.item = (await createWorldTestItem(itemType)) as OseItem;
 
-          // Wait for UI to keep up
-          await waitForInput();
-
-          // Create DOM element
-          items.source.itemElement = document.querySelector(`#items li.item[data-entry-id="${items.source.item?.id}"]`);
+          items.source.itemElement = await waitForElement(`#items li.item[data-entry-id="${items.source.item?.id}"]`);
 
           // Perform pre-flight checks
           const sourceItemName = `New World Test ${itemType.capitalize()}`;
@@ -309,11 +296,7 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
           const worldItem = (await createWorldTestItem(itemType)) as OseItem;
           items.source.item = await documents.compendium?.importDocument(worldItem);
 
-          // Wait for UI to keep up
-          await waitForInput();
-
-          // Create DOM element
-          items.source.itemElement = document.querySelector(
+          items.source.itemElement = await waitForElement(
             `.compendium-directory li.item[data-entry-id="${items.source.item?.id}"]`,
           );
 

@@ -2,6 +2,7 @@
  * @file Helpful methods for dealing with OSE-specific dice logic
  */
 import OSE from "./config";
+import { getRollMode, getRollModes } from "./helpers-message-mode";
 
 const OseDice = {
   async sendRoll({
@@ -36,7 +37,7 @@ const OseDice = {
     await roll.evaluate({ allowStrings: true });
 
     // Convert the roll to a chat message and return the roll
-    let rollMode = game.settings.get("core", "rollMode");
+    let rollMode = getRollMode();
     rollMode = form ? form.rollMode.value : rollMode;
 
     // Force blind roll (ability formulas)
@@ -291,7 +292,7 @@ const OseDice = {
     await dmgRoll.evaluate();
 
     // Convert the roll to a chat message and return the roll
-    let rollMode = game.settings.get("core", "rollMode");
+    let rollMode = getRollMode();
     rollMode = form ? form.rollMode.value : rollMode;
 
     // Force blind roll (ability formulas)
@@ -354,8 +355,8 @@ const OseDice = {
     const dialogData = {
       formula: parts.join(" "),
       data,
-      rollMode: game.settings.get("core", "rollMode"),
-      rollModes: CONFIG.Dice.rollModes,
+      rollMode: getRollMode(),
+      rollModes: getRollModes(),
     };
 
     const rollData = {
@@ -420,7 +421,7 @@ const OseDice = {
     // Create Dialog window
     return new Promise((resolve) => {
       new foundry.applications.api.DialogV2({
-        window: { title },
+        window: { title: title || "" },
         content: html,
         buttons,
         default: "ok",
@@ -446,8 +447,8 @@ const OseDice = {
     const dialogData = {
       formula: parts.join(" "),
       data,
-      rollMode: data.roll.blindroll ? "blindroll" : game.settings.get("core", "rollMode"),
-      rollModes: CONFIG.Dice.rollModes,
+      rollMode: data.roll.blindroll ? "blindroll" : getRollMode(),
+      rollModes: getRollModes(),
     };
     const rollData = {
       parts,
@@ -493,7 +494,7 @@ const OseDice = {
     // Create Dialog window
     return new Promise((resolve) => {
       new foundry.applications.api.DialogV2({
-        window: { title },
+        window: { title: title || "" },
         content: html,
         buttons,
         submit: () => {

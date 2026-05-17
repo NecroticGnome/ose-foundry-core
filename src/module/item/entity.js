@@ -3,6 +3,7 @@
  */
 import OSE from "../config";
 import OseDice from "../helpers-dice";
+import { getRollMode } from "../helpers-message-mode";
 
 /**
  * Override and extend the basic :class:`Item` implementation
@@ -432,7 +433,7 @@ export default class OseItem extends Item {
     };
 
     // Toggle default roll mode
-    const rollMode = game.settings.get("core", "rollMode");
+    const rollMode = getRollMode();
     if (["gmroll", "blindroll"].includes(rollMode)) chatData.whisper = ChatMessage.getWhisperRecipients("GM");
     if (rollMode === "selfroll") chatData.whisper = [game.user.id];
     if (rollMode === "blindroll") chatData.blind = true;

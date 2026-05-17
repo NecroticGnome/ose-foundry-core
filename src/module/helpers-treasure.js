@@ -2,6 +2,7 @@
  * @file Helper functions related to treasure table rolls
  */
 import { OSE } from "./config";
+import { getRollMode } from "./helpers-message-mode";
 
 // eslint-disable-next-line import/prefer-default-export
 export const augmentTable = (table, html) => {
@@ -138,7 +139,7 @@ export async function rollTreasure(table, options = {}) {
     // sound: "systems/ose/assets/coins.mp3"
   };
 
-  const rollMode = game.settings.get("core", "rollMode");
+  const rollMode = getRollMode();
   if (["gmroll", "blindroll"].includes(rollMode)) chatData.whisper = ChatMessage.getWhisperRecipients("GM");
   if (rollMode === "selfroll") chatData.whisper = [game.user._id];
   if (rollMode === "blindroll") chatData.blind = true;

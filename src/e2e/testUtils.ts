@@ -18,10 +18,30 @@ export const trashChat = (): undefined | Promise<Document[]> => {
 
 /**
  * Delays execution so the UI can catch up.
- *
  * @returns {Promise} The delay.
  */
 export const waitForInput = () => delay(inputDelay);
+
+/**
+ * Poll the DOM until a selector matches an element, or `timeout` elapses.
+ *
+ * Returns the matched element, or `null` if the timeout elapses first.
+ * @param selector - A CSS selector to look up via `document.querySelector`.
+ * @param opts.timeout - Max wait in ms. Default 2000.
+ * @param opts.interval - Poll interval in ms. Default 50.
+ */
+export const waitForElement = async <T extends Element = HTMLElement>(
+  selector: string,
+  { timeout = 2000, interval = 50 }: { timeout?: number; interval?: number } = {},
+): Promise<T | null> => {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const el = document.querySelector(selector) as T | null;
+    if (el) return el;
+    await delay(interval);
+  }
+  return null;
+};
 
 export const openWindows = (className: string) =>
   Object.values(ui.windows).filter((o) => o.options.classes.includes(className));
@@ -53,7 +73,6 @@ export const closeSheets = async () => {
 /**
  * Gets the active notifications from the UI. Needed because Foundry no longer
  * allows accessing the Notification class values directly.
- *
  * @returns {HTMLElement[]} An array of active notification elements.
  */
 export const getActiveNotifications = (): HTMLElement[] =>
@@ -62,7 +81,6 @@ export const getActiveNotifications = (): HTMLElement[] =>
 /**
  * Checks if an object is a likely to be a Notification since Foundry
  * no longer allows accessing the Notification class values directly.
- *
  * @param obj
  */
 export const objectIsNotification = (obj: unknown): obj is Notification =>
@@ -74,7 +92,6 @@ export const objectIsNotification = (obj: unknown): obj is Notification =>
  * Returns the random number required to roll a specific number on a die.
  * This function is used to replace the `CONFIG.Dice.randomUniform` function as
  * it is then fed into the `randomFace` function of a DiceTerm.
- *
  * @param {number} requiredResult - The specific number you want to roll (e.g. 3 for rolling a 3 on a d6).
  * @param {number} diceFaces - The number of faces on the dice. (e.g. 6 for a d6)
  */
