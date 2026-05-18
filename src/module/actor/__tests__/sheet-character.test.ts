@@ -11,6 +11,7 @@ import {
   createMockActorKey,
   delay,
   openDialogs,
+  openV2AppsByClass,
   openV2Dialogs,
   openWindows,
   trashChat,
@@ -289,13 +290,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       $(`.sheet .profile a[data-action="modifiers"]`).trigger("click");
       await delay(200);
 
-      const dialogs = openDialogs();
+      const dialogs = openV2AppsByClass("modifiers");
       expect(dialogs.length).equal(1);
     });
 
     after(async () => {
       await cleanUpActorsByKey(key);
-      await closeDialogs();
+      await closeV2Dialogs();
       await delay(400);
     });
   });

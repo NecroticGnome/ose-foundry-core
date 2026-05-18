@@ -5,6 +5,10 @@
   }
 }
 
+.sheet-tweaks .form-group > input[type="text"] {
+  flex: 0 0 100px;
+}
+
 .unlist {
   list-style: none;
   padding: 0;

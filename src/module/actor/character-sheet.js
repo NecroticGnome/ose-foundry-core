@@ -158,10 +158,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   _onShowModifiers(event) {
     event.preventDefault();
-    new OseCharacterModifiers(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterModifiers.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**

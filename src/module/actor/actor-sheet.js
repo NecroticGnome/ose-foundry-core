@@ -546,10 +546,12 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   // eslint-disable-next-line no-underscore-dangle
   _onConfigureActor(event) {
     event.preventDefault();
-    new OseEntityTweaks(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseEntityTweaks.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
