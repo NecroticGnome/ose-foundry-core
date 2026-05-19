@@ -48,8 +48,10 @@ export const openWindows = (className: string) =>
 
 export const openDialogs = () => Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
 
-export const openV2Dialogs = () =>
-  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes("dialog"));
+export const openV2AppsByClass = (className: string) =>
+  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes(className));
+
+export const openV2Dialogs = () => openV2AppsByClass("dialog");
 
 export const closeDialogs = async () => {
   for (const o of openDialogs()) {
