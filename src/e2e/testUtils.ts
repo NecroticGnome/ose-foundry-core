@@ -22,6 +22,13 @@ export const trashChat = (): undefined | Promise<Document[]> => {
  */
 export const waitForInput = () => delay(inputDelay);
 
+export const waitFor = async (predicate: () => boolean, { timeout = 2000, interval = 50 } = {}) => {
+  const start = Date.now();
+  while (!predicate() && Date.now() - start < timeout) {
+    await delay(interval);
+  }
+};
+
 /**
  * Poll the DOM until a selector matches an element, or `timeout` elapses.
  *
