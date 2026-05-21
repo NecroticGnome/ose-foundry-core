@@ -12,6 +12,7 @@ import {
   getActiveNotifications,
   openV2Dialogs,
   trashChat,
+  waitFor,
   waitForInput,
 } from "../../../e2e/testUtils";
 import { getRollMode, setRollMode } from "../../helpers-message-mode";
@@ -28,7 +29,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
   const { defaultIcons } = OseItem;
 
   after(async () => {
-    cleanUpWorldItems();
+    await cleanUpWorldItems();
   });
 
   describe("defaultIcons()", () => {
@@ -48,6 +49,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
       expect(item?.img).equals(defaultIcons[type]);
       const itemName = item?.name;
       await item?.delete();
+      await waitFor(() => !game.items?.find((o) => o.name === itemName));
       expect(game.items?.find((o) => o.name === itemName)).is.undefined;
     };
 

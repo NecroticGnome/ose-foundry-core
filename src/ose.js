@@ -111,7 +111,7 @@ Hooks.once("init", async () => {
     label: "OSE.SheetClassMonster",
   });
 
-  foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+  foundry.documents.collections.Items.unregisterSheet("core", foundry.applications.sheets.ItemSheetV2);
   foundry.documents.collections.Items.registerSheet(game.system.id, OseItemSheet, {
     makeDefault: true,
     label: "OSE.SheetClassItem",

@@ -67,10 +67,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   }
 
   generateScores() {
-    new OseCharacterCreator(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterCreator.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
@@ -158,10 +160,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   _onShowModifiers(event) {
     event.preventDefault();
-    new OseCharacterModifiers(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterModifiers.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
@@ -195,10 +199,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   async _onShowGpCost(event) {
     event.preventDefault();
     const cartData = await this._prepareShoppingCartData();
-    new OseCharacterGpCost(this.actor, cartData, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterGpCost.open(this.actor, cartData, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**

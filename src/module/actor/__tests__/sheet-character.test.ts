@@ -5,14 +5,12 @@
 import type { QuenchMethods } from "../../../e2e";
 import {
   cleanUpActorsByKey,
-  closeDialogs,
   closeSheets,
   closeV2Dialogs,
   createMockActorKey,
   delay,
-  openDialogs,
+  openV2AppsByClass,
   openV2Dialogs,
-  openWindows,
   trashChat,
   waitForInput,
 } from "../../../e2e/testUtils";
@@ -80,7 +78,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       sheet.generateScores();
       await waitForInput();
 
-      const windows = openWindows("creator");
+      const windows = openV2AppsByClass("creator");
       expect(windows.length).equal(1);
 
       for (const window of windows) {
@@ -95,11 +93,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       sheet.generateScores();
       await delay(400);
 
-      const windows = openWindows("creator");
+      const windows = openV2AppsByClass("creator");
       expect(windows.length).equal(1);
 
       Object.keys(scores).forEach(async (score) => {
-        $(`.creator div[data-score="${score}"] a.score-roll`).trigger("click");
+        document
+          .querySelector(`.creator div[data-score="${score}"] a[data-action="rollScore"]`)
+          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
         const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
@@ -120,11 +120,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       sheet.generateScores();
       await delay(400);
 
-      const windows = openWindows("creator");
+      const windows = openV2AppsByClass("creator");
       expect(windows.length).equal(1);
 
       for (const score of Object.keys(scores)) {
-        $(`.creator div[data-score="${score}"] a.score-roll`).trigger("click");
+        document
+          .querySelector(`.creator div[data-score="${score}"] a[data-action="rollScore"]`)
+          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
         const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
@@ -133,7 +135,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         scores[score] = Number.parseInt(value, 10);
       }
 
-      $(".creator footer button").trigger("submit");
+      document.querySelector(".creator")?.requestSubmit?.();
       await waitForInput();
 
       expect(actor?.system.scores.str.value).equal(scores.str);
@@ -289,13 +291,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       $(`.sheet .profile a[data-action="modifiers"]`).trigger("click");
       await delay(200);
 
-      const dialogs = openDialogs();
+      const dialogs = openV2AppsByClass("modifiers");
       expect(dialogs.length).equal(1);
     });
 
     after(async () => {
       await cleanUpActorsByKey(key);
-      await closeDialogs();
+      await closeV2Dialogs();
       await delay(400);
     });
   });
@@ -321,13 +323,13 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       $(`.sheet .profile a[data-action="gp-cost"]`).trigger("click");
       await delay(200);
 
-      const dialogs = openDialogs();
+      const dialogs = openV2AppsByClass("gp-cost");
       expect(dialogs.length).equal(1);
     });
 
     after(async () => {
       await cleanUpActorsByKey(key);
-      await closeDialogs();
+      await closeV2Dialogs();
       await delay(400);
     });
   });

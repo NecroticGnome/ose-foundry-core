@@ -15,9 +15,11 @@ import {
   createWorldTestItem,
   delay,
   itemTypes,
+  openV2AppsByClass,
   openV2Dialogs,
   openWindows,
   trashChat,
+  waitForElement,
   waitForInput,
 } from "../../../e2e/testUtils";
 import type OseItem from "../../item/entity";
@@ -1203,16 +1205,14 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
         document
           .querySelector(`#OseActorSheet${actorType.capitalize()}-Actor-${actor?.id} .configure-actor`)
           ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        await waitForInput();
+        await waitForElement("#entity-tweaks");
 
-        const windows = openWindows("sheet-tweaks");
-        const w = windows.filter((win) => win.object?.name === `Test Actor ${key} ${actorType}`);
-        expect(w.length).equal(1);
-        const windowElement = w?.[0]?.element?.[0];
+        const dialogs = openV2AppsByClass("sheet-tweaks").filter((d) => d.document === actor);
+        expect(dialogs.length).equal(1);
+        const windowElement = dialogs[0].element;
         expect(windowElement).not.undefined;
-        expect(windowElement.querySelector("h4.window-title").innerHTML).to.include(`Test Actor ${key} ${actorType}`);
-        // eslint-disable-next-line no-restricted-syntax
-        await w?.[0]?.close();
+        expect(windowElement.querySelector(".window-title").innerHTML).to.include(`Test Actor ${key} ${actorType}`);
+        await dialogs[0].close();
         await actor?.delete();
       });
     }

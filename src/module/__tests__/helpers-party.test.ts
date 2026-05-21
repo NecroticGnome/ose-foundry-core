@@ -3,7 +3,13 @@
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../e2e";
-import { cleanUpActorsByKey, closeDialogs, createMockActorKey, openDialogs, waitForInput } from "../../e2e/testUtils";
+import {
+  cleanUpActorsByKey,
+  createMockActorKey,
+  openV2AppsByClass,
+  waitForElement,
+  waitForInput,
+} from "../../e2e/testUtils";
 import { update } from "../helpers-party";
 import OsePartySheet from "../party/party-sheet";
 
@@ -30,7 +36,7 @@ export default ({ describe, it, expect, after }: QuenchMethods) => {
     it("Doesn't render a partysheet when not in party", async () => {
       const actor = await createMockActor("character");
       update(actor);
-      expect(openDialogs().length).equal(0);
+      expect(openV2AppsByClass("party-sheet").length).equal(0);
       await actor?.delete();
     });
 
@@ -39,13 +45,13 @@ export default ({ describe, it, expect, after }: QuenchMethods) => {
       await actor?.setFlag(game.system.id, "party", true);
       update(actor);
       await waitForInput();
-      await OsePartySheet?.partySheet?.render(true);
-      await waitForInput();
-      const partyMember = document.querySelector(".party-members .actor")?.getAttribute("data-actor-id");
-      expect(partyMember).equal(actor?.id);
-      expect(openDialogs().length).equal(1);
-      await closeDialogs();
-      actor?.delete();
+      await OsePartySheet?.partySheet?.render({ force: true });
+      await waitForElement(`.party-members .actor[data-actor-id="${actor?.id}"]`);
+      const dialogs = openV2AppsByClass("party-sheet");
+      expect(dialogs.length).equal(1);
+      await dialogs[0].close();
+      await actor?.setFlag(game.system.id, "party", false);
+      await actor?.delete();
     });
   });
 };

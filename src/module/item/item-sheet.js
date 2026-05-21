@@ -1,90 +1,86 @@
 /**
- * @file The system-level sheet for items of any type
+ * @file The system-level sheet for items of any type.
  */
-import OSE from "../config";
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ItemSheetV2 } = foundry.applications.sheets;
+const TextEditor = foundry.applications.ux.TextEditor.implementation;
 
-/**
- * Extend the basic ItemSheet with some very simple modifications
- */
-export default class OseItemSheet extends foundry.appv1.sheets.ItemSheet {
-  /**
-   * Extend and override the default options used by the Simple Item Sheet
-   *
-   * @returns {object}
-   */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(foundry.appv1.sheets.ItemSheet.defaultOptions, {
-      classes: ["ose", "sheet", "item"],
-      width: 520,
-      height: 390,
-      resizable: true,
-      tabs: [
-        {
-          navSelector: ".tabs",
-          contentSelector: ".sheet-body",
-          initial: "description",
-        },
-      ],
-    });
-  }
+export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
+  static DEFAULT_OPTIONS = {
+    classes: ["ose", "sheet", "item"],
+    tag: "form",
+    form: { submitOnChange: true, closeOnSubmit: false },
+    position: { width: 560, height: 480 },
+    window: { resizable: true },
+    actions: {
+      tagDelete: OseItemSheet._onTagDelete,
+      meleeToggle: OseItemSheet._onMeleeToggle,
+      missileToggle: OseItemSheet._onMissileToggle,
+    },
+  };
 
-  /* -------------------------------------------- */
+  static PARTS = {
+    main: { template: "systems/__SYSTEM_ID__/dist/templates/items/item-sheet.html" },
+  };
 
-  /** @override */
-  get template() {
-    const path = `${OSE.systemPath()}/templates/items`;
-    return `${path}/${this.item.type}-sheet.html`;
-  }
-
-  /**
-   * Prepare data for rendering the Item sheet
-   * The prepared data object contains both the actor data as well as additional sheet options
-   *
-   * @returns {object} Data for the Handlebars template
-   */
-  async getData() {
-    const { data } = super.getData();
-    data.editable = this.document.sheet.isEditable;
-    data.config = {
-      ...CONFIG.OSE,
-      encumbrance: game.settings.get(game.system.id, "encumbranceOption"),
+  _configureRenderParts(options) {
+    const parts = super._configureRenderParts(options);
+    parts.main = {
+      ...parts.main,
+      template: `systems/__SYSTEM_ID__/dist/templates/items/${this.item.type}-sheet.html`,
     };
-    data.enriched = {
-      description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        this.item.system?.description || "",
-        { async: true },
-      ),
-    };
-    return data;
+    return parts;
   }
 
-  /* -------------------------------------------- */
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+    const item = this.item;
+    return Object.assign(context, {
+      cssClass: this.options.classes.join(" "),
+      name: item.name,
+      img: item.img,
+      type: item.type,
+      system: item.system,
+      owner: item.isOwner,
+      config: {
+        ...CONFIG.OSE,
+        encumbrance: game.settings.get(game.system.id, "encumbranceOption"),
+      },
+      enriched: {
+        description: await TextEditor.enrichHTML(item.system?.description ?? "", {
+          relativeTo: item,
+          secrets: game.user.isGM,
+        }),
+      },
+    });
+  }
 
-  /**
-   * Activate event listeners using the prepared sheet HTML
-   *
-   * @param {JQuery} html - The prepared HTML object ready to be rendered into the DOM
-   */
-  activateListeners(html) {
-    html.find('input[data-action="add-tag"]').keypress((ev) => {
-      if (ev.which === 13) {
-        const value = $(ev.currentTarget).val();
-        const values = value.split(",");
-        this.object.pushManualTag(values);
-      }
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const tagInput = this.element.querySelector('input[data-action="add-tag"]');
+    if (!tagInput) return;
+    tagInput.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter") return;
+      ev.preventDefault();
+      const value = ev.currentTarget.value;
+      if (!value) return;
+      this.item.pushManualTag(value.split(","));
+      ev.currentTarget.value = "";
     });
-    html.find(".tag-delete").click((ev) => {
-      const value = ev.currentTarget.parentElement.dataset.tag;
-      this.object.popManualTag(value);
-    });
-    html.find("a.melee-toggle").click(() => {
-      this.object.update({ "system.melee": !this.object.system.melee });
-    });
+  }
 
-    html.find("a.missile-toggle").click(() => {
-      this.object.update({ "system.missile": !this.object.system.missile });
-    });
+  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
+  static _onTagDelete(_event, target) {
+    return this.item.popManualTag(target.closest("[data-tag]")?.dataset.tag);
+  }
 
-    super.activateListeners(html);
+  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
+  static _onMeleeToggle() {
+    return this.item.update({ "system.melee": !this.item.system.melee });
+  }
+
+  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
+  static _onMissileToggle() {
+    return this.item.update({ "system.missile": !this.item.system.missile });
   }
 }
