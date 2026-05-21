@@ -81,17 +81,12 @@ export default class OseDataModelCharacterSpells implements CharacterSpells {
   // eslint-disable-next-line class-methods-use-this
   #usedAndMaxSlots(
     list: Slots,
-    item: Item | string,
-    _idx: number,
+    _item: Item | string,
+    idx: number,
     usedSlots: { [n: number]: number },
     maxSlots: { [n: number]: { max: number } },
   ) {
-    if (item === "enabled") return list;
-    // `item` is the spell-level key from Object.keys(maxSlots), so it is
-    // always a string at runtime here. Use that as the level rather than
-    // the reduce-array index (which is the iteration position, not the
-    // level number).
-    const lv = Number(item);
+    const lv = idx;
     const max = maxSlots[lv]?.max || 0;
     const used = usedSlots[lv] ?? 0;
 

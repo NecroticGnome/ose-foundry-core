@@ -61,6 +61,41 @@ export default ({ describe, it, expect }: QuenchMethods) => {
         expect(spellData.slots[1].max).to.equal(1);
       });
     });
+
+    describe("Keys slots by numeric level", () => {
+      it("for a single-level caster", () => {
+        const spellData = new OseDataModelCharacterSpells({ 1: { max: 2 } }, []);
+        expect(Object.keys(spellData.slots)).to.not.contain("NaN");
+        expect(spellData.slots[1]).to.not.be.undefined;
+        expect(spellData.slots[1].max).to.equal(2);
+      });
+
+      it("across multiple levels", () => {
+        const spellData = new OseDataModelCharacterSpells(
+          { 1: { max: 3 }, 2: { max: 2 }, 3: { max: 1 } },
+          [],
+        );
+        expect(Object.keys(spellData.slots)).to.not.contain("NaN");
+        for (const lvl of [1, 2, 3]) {
+          expect(spellData.slots[lvl]).to.not.be.undefined;
+        }
+        expect(spellData.slots[1].max).to.equal(3);
+        expect(spellData.slots[2].max).to.equal(2);
+        expect(spellData.slots[3].max).to.equal(1);
+      });
+
+      it("including spell level 0 (cantrips)", () => {
+        const spellData = new OseDataModelCharacterSpells(
+          { 0: { max: 4 }, 1: { max: 2 } },
+          [],
+        );
+        expect(Object.keys(spellData.slots)).to.not.contain("NaN");
+        expect(spellData.slots[0]).to.not.be.undefined;
+        expect(spellData.slots[1]).to.not.be.undefined;
+        expect(spellData.slots[0].max).to.equal(4);
+        expect(spellData.slots[1].max).to.equal(2);
+      });
+    });
   });
   // Sanity check: can we cast spells?
   describe("Checking for spellcasting", () => {
