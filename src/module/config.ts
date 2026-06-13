@@ -9,16 +9,39 @@ import OseDataModelCharacterEncumbranceItemBased from "./actor/data-model-classe
 
 import { CLASSIC_FANTASY_CLASSES } from "./classes/classic-fantasy-classes";
 
+/**
+ * The shape of the system's global configuration object, `OSE` (exposed at
+ * runtime as `CONFIG.OSE`). Most string values are localization keys to be
+ * passed through `game.i18n`, not display text. Several derived unions below
+ * (e.g. {@link Save}, {@link Attribute}) are keyed off this shape.
+ */
 export type OseConfig = typeof OSE;
 
+/** An ability-score key: `str`, `int`, `wis`, `dex`, `con`, or `cha`. */
 export type Attribute = keyof OseConfig["scores"];
+
+/** A dungeon-exploration skill key (e.g. listen at doors, open doors, find secret doors). */
 export type ExplorationSkill = keyof OseConfig["exploration_skills"];
+
+/** How a roll is compared against its target: exact result, at or above, or at or below. */
 export type RollType = keyof OseConfig["roll_type"];
+
+/** A saving-throw category key: `death`, `wand`, `paralysis`, `breath`, or `spell`. */
 export type Save = keyof OseConfig["saves_long"];
+
+/** An armour category key: `unarmored`, `light`, `heavy`, or `shield`. */
 export type Armor = keyof OseConfig["armor"];
+
+/** A UI colour key used by the system's theming. */
 export type Color = keyof OseConfig["colors"];
+
+/** A weapon/item quality tag key (e.g. `melee`, `missile`, `slow`, `twohanded`). */
 export type InventoryItemTag = keyof OseConfig["tags"];
+
+/** An encumbrance-scheme key: `basic`, `detailed`, `complete`, `disabled`, or `itembased`. */
 export type EncumbranceOption = keyof OseConfig["encumbranceOptions"];
+
+/** Which token(s) damage is applied to: the `selected`, the `targeted`, or the `originalTarget`. */
 export type ApplyDamageOption = keyof OseConfig["apply_damage_options"];
 
 export const OSE = {
@@ -34,13 +57,19 @@ export const OSE = {
   get assetsPath(): string {
     return `${this.systemRoot}/assets`;
   },
+  /**
+   * The encumbrance scheme currently selected in world settings, resolved to
+   * its data-model class. Falls back to the disabled scheme if unset.
+   */
   get encumbrance() {
-    const variant = game.settings.get(game.system.id, "encumbranceOption");
+    const variant = game.settings.get(game.system.id, "encumbranceOption") as keyof typeof OSE.encumbranceOptions;
     return this.encumbranceOptions[variant] || this.encumbranceOptions.disabled;
   },
+  /** Character class definitions, grouped by rules setting (e.g. classic fantasy). */
   classes: {
     classic: CLASSIC_FANTASY_CLASSES,
   },
+  /** The available encumbrance schemes, keyed by setting value to their data-model class. */
   encumbranceOptions: {
     basic: OseDataModelCharacterEncumbranceBasic,
     detailed: OseDataModelCharacterEncumbranceDetailed,
@@ -48,6 +77,7 @@ export const OSE = {
     disabled: OseDataModelCharacterEncumbranceDisabled,
     itembased: OseDataModelCharacterEncumbranceItemBased,
   },
+  /** Full ability-score names, as localization keys, keyed by ability. */
   scores: {
     str: "OSE.scores.str.long",
     int: "OSE.scores.int.long",
@@ -56,6 +86,7 @@ export const OSE = {
     con: "OSE.scores.con.long",
     cha: "OSE.scores.cha.long",
   },
+  /** Abbreviated ability-score names, as localization keys, keyed by ability. */
   scores_short: {
     str: "OSE.scores.str.short",
     int: "OSE.scores.int.short",
@@ -64,23 +95,27 @@ export const OSE = {
     con: "OSE.scores.con.short",
     cha: "OSE.scores.cha.short",
   },
+  /** Full dungeon-exploration skill names, as localization keys, keyed by skill. */
   exploration_skills: {
     ld: "OSE.exploration.ld.long",
     od: "OSE.exploration.od.long",
     sd: "OSE.exploration.sd.long",
     fs: "OSE.exploration.ft.long",
   },
+  /** Abbreviated dungeon-exploration skill names, as localization keys, keyed by skill. */
   exploration_skills_short: {
     ld: "OSE.exploration.ld.abrev",
     od: "OSE.exploration.od.abrev",
     sd: "OSE.exploration.sd.abrev",
     fs: "OSE.exploration.ft.abrev",
   },
+  /** Comparison operators shown for a roll's target: equal, at-or-above, at-or-below. */
   roll_type: {
     result: "=",
     above: "≥",
     below: "≤",
   },
+  /** Abbreviated saving-throw names, as localization keys, keyed by save category. */
   saves_short: {
     death: "OSE.saves.death.short",
     wand: "OSE.saves.wand.short",
@@ -88,6 +123,7 @@ export const OSE = {
     breath: "OSE.saves.breath.short",
     spell: "OSE.saves.spell.short",
   },
+  /** Full saving-throw names, as localization keys, keyed by save category. */
   saves_long: {
     death: "OSE.saves.death.long",
     wand: "OSE.saves.wand.long",
@@ -95,17 +131,20 @@ export const OSE = {
     breath: "OSE.saves.breath.long",
     spell: "OSE.saves.spell.long",
   },
+  /** Armour category names, as localization keys, keyed by category. */
   armor: {
     unarmored: "OSE.armor.unarmored",
     light: "OSE.armor.light",
     heavy: "OSE.armor.heavy",
     shield: "OSE.armor.shield",
   },
+  /** Targeting modes for applying damage, keyed by mode. */
   apply_damage_options: {
     selected: "selected",
     targeted: "targeted",
     originalTarget: "originalTarget",
   },
+  /** Named UI colours, as localization keys, keyed by colour. */
   colors: {
     green: "OSE.colors.green",
     red: "OSE.colors.red",
@@ -115,6 +154,7 @@ export const OSE = {
     orange: "OSE.colors.orange",
     white: "OSE.colors.white",
   },
+  /** The languages a character may know, as display names. */
   languages: [
     "Common",
     "Lawful",
@@ -140,6 +180,7 @@ export const OSE = {
     "Orcish",
     "Pixie",
   ],
+  /** Weapon/item quality tag labels, as localization keys, keyed by tag. */
   tags: {
     melee: "OSE.items.Melee",
     missile: "OSE.items.Missile",
@@ -151,6 +192,7 @@ export const OSE = {
     reload: "OSE.items.Reload",
     charge: "OSE.items.Charge",
   },
+  /** Display metadata (label, image, icon) for each item tag, derived on access. */
   auto_tags: {
     get melee() {
       return {
@@ -216,6 +258,7 @@ export const OSE = {
       };
     },
   },
+  /** Icon/image path for each item tag, derived on access. */
   tag_images: {
     get melee() {
       return `${CONFIG.OSE.assetsPath}/melee.png`;
@@ -245,6 +288,10 @@ export const OSE = {
       return `${CONFIG.OSE.assetsPath}/charge.png`;
     },
   },
+  /**
+   * Monster saving-throw target numbers, keyed by the minimum Hit Dice for the
+   * row, then by save category (`d`/`w`/`p`/`b`/`s`).
+   */
   monster_saves: {
     0: {
       d: 14,
@@ -310,6 +357,7 @@ export const OSE = {
       s: 2,
     },
   },
+  /** Monster THAC0 (attack value), keyed by the minimum Hit Dice for the row. */
   monster_thac0: {
     0: 20,
     1: 19,

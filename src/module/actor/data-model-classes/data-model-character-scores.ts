@@ -1,8 +1,12 @@
 /**
  * @file A class representing a Character's ability scores.
  */
+/** A raw ability score as supplied, before its modifier is derived. */
 type IncomingScore = {
+  /** The ability score itself (typically 3–18). */
   value: number;
+
+  /** Flat bonus applied to the score, separate from the derived modifier. */
   bonus: number;
 };
 
@@ -16,15 +20,57 @@ type Scores = {
 };
 type OptionalScores = Partial<Scores>;
 
-type BaseScore = IncomingScore & { mod: number };
+/** An ability score together with its derived modifier. */
+type BaseScore = IncomingScore & {
+  /** Derived ability modifier (−3 to +3), looked up from `value`. */
+  mod: number;
+};
 
+/**
+ * A character's six ability scores. Each ability carries its raw value, bonus,
+ * and derived modifier; some abilities also expose extra values computed from
+ * that score (open-doors chance, literacy/languages, initiative, and the
+ * Charisma-driven retainer stats).
+ */
 export interface CharacterScores {
-  str: BaseScore & { od: number };
-  int: BaseScore & { literacy: string; spoken: string };
+  /** Strength, plus the character's open-doors chance. */
+  str: BaseScore & {
+    /** Chance (in 6) to force open a stuck door, derived from Strength. */
+    od: number;
+  };
+
+  /** Intelligence, plus derived literacy and spoken-language information. */
+  int: BaseScore & {
+    /** Localization key describing the character's literacy level. */
+    literacy: string;
+
+    /** Localization key describing how many languages the character speaks. */
+    spoken: string;
+  };
+
+  /** Wisdom. */
   wis: BaseScore;
-  dex: BaseScore & { init: number };
+
+  /** Dexterity, plus its contribution to initiative. */
+  dex: BaseScore & {
+    /** Initiative modifier derived from Dexterity. */
+    init: number;
+  };
+
+  /** Constitution. */
   con: BaseScore;
-  cha: BaseScore & { loyalty: number; retain: number; npc: number };
+
+  /** Charisma, plus its retainer-related values. */
+  cha: BaseScore & {
+    /** Loyalty rating of the character's retainers, derived from Charisma. */
+    loyalty: number;
+
+    /** Maximum number of retainers the character can employ, derived from Charisma. */
+    retain: number;
+
+    /** Modifier to NPC reaction rolls, derived from Charisma. */
+    npc: number;
+  };
 }
 
 /**

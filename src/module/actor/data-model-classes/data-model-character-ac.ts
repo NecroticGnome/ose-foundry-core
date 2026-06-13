@@ -2,11 +2,25 @@
  * @file A class to handle the nested AC/AAC props on OseDataModelCharacter.
  */
 
-interface CharacterAC {
-  base: number;
-  naked: number;
-  shield: number;
+/**
+ * A character's armour class, broken into its component parts. Which numbering
+ * convention `base` follows depends on whether ascending or descending AC is in
+ * use for the world.
+ */
+export interface CharacterAC {
+  /** Starting AC before armour, shield, or modifiers are applied. */
+  readonly base: number;
+
+  /** AC with no armour or shield equipped. */
+  readonly naked: number;
+
+  /** Bonus contributed by an equipped shield, if any. */
+  readonly shield: number;
+
+  /** Effective armour class, combining armour, shield, and modifiers. */
   value: number;
+
+  /** Miscellaneous flat modifier applied to AC. */
   mod: number;
 }
 
