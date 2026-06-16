@@ -1,0 +1,212 @@
+name: Quench Test Suite
+
+# Runs the OSE Quench test batches headlessly against a real Foundry server via
+# Playwright. Needs repo secrets FOUNDRY_USERNAME / FOUNDRY_PASSWORD — see
+# tools/quench-ci/README.md.
+
+on:
+  push:
+    branches: [main]
+  # pull_request_target (not pull_request) so the job can read the license
+  # secrets, which GitHub never exposes to fork-PR workflows. The Checkout step
+  # then pulls the PR head — i.e. runs untrusted code with secrets present — so
+  # the `if` below gates it: same-repo PRs auto-run; fork PRs only after a
+  # maintainer applies the `safe-to-test` label.
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: "Quench batch filter (e.g. ose.actor.**)"
+        required: false
+        default: "**"
+
+# One license = one server: serialize, drop superseded runs.
+concurrency:
+  group: quench-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quench:
+    if: >-
+      github.event_name != 'pull_request_target' ||
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(github.event.pull_request.labels.*.name, 'safe-to-test')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FOUNDRY_VERSION: "13"
+      FOUNDRY_PORT: 30000
+      WORLD_ID: quench-ci
+      DATA_DIR: ${{ github.workspace }}/.foundry-ci
+      QUENCH_FILTER: ${{ github.event.inputs.filter || '**' }}
+
+    steps:
+      - name: Fail early if Foundry credentials are missing
+        env:
+          FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
+          FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
+        run: |
+          if [ -z "$FOUNDRY_USERNAME" ] || [ -z "$FOUNDRY_PASSWORD" ]; then
+            echo "::error::FOUNDRY_USERNAME and FOUNDRY_PASSWORD secrets are required." \
+                 "Add them under Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # PR head, not the base ref pull_request_target defaults to (gated by the job `if`).
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Pull Foundry image and resolve version
+        run: |
+          docker pull "felddy/foundryvtt:${FOUNDRY_VERSION}"
+          # felddy labels the image with the exact build it installs — stabilizes the cache key.
+          RESOLVED=$(docker image inspect "felddy/foundryvtt:${FOUNDRY_VERSION}" \
+            --format '{{ index .Config.Labels "com.foundryvtt.version" }}' || true)
+          [ -z "$RESOLVED" ] && RESOLVED="$FOUNDRY_VERSION"
+          echo "FOUNDRY_RESOLVED=$RESOLVED" >> "$GITHUB_ENV"
+          echo "Resolved Foundry build: $RESOLVED"
+
+      # Caching the Foundry zip (felddy's CONTAINER_CACHE) is the biggest win: warm boot ~5-10s.
+      - name: Cache Foundry distribution
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DATA_DIR }}/container_cache
+          key: foundry-dist-${{ env.FOUNDRY_RESOLVED }}
+          restore-keys: |
+            foundry-dist-
+
+      - name: Build the OSE system
+        run: |
+          npm ci
+          npm run build
+
+      - name: Assemble Foundry data directory (system + Quench + world fixture)
+        run: |
+          mkdir -p "${DATA_DIR}"
+          tools/quench-ci/setup-data-dir.sh "${DATA_DIR}" "${GITHUB_WORKSPACE}"
+          # felddy runs as uid:gid 1000:1000; without this its /data write test fails and it
+          # exits immediately (felddy/foundryvtt-docker#1197).
+          sudo chown -R 1000:1000 "${DATA_DIR}"
+
+      # Start the container first so it boots while the runner deps install below.
+      - name: Start Foundry container
+        env:
+          FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
+          FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
+        run: |
+          docker run -d --name foundry \
+            -p "${FOUNDRY_PORT}:30000" \
+            -v "${DATA_DIR}:/data" \
+            -e FOUNDRY_USERNAME="${FOUNDRY_USERNAME}" \
+            -e FOUNDRY_PASSWORD="${FOUNDRY_PASSWORD}" \
+            -e CONTAINER_CACHE=/data/container_cache \
+            -e FOUNDRY_MINIFY_STATIC_FILES=true \
+            -e FOUNDRY_TELEMETRY=false \
+            -e "FOUNDRY_WORLD=${WORLD_ID}" \
+            "felddy/foundryvtt:${FOUNDRY_VERSION}"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('tools/quench-ci/package.json') }}
+
+      - name: Install Quench runner dependencies
+        working-directory: tools/quench-ci
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npx playwright install chromium --with-deps
+
+      - name: Wait for Foundry to be healthy
+        run: |
+          echo "Waiting for the Foundry container to become healthy..."
+          for i in $(seq 1 60); do
+            status=$(docker inspect -f '{{ .State.Health.Status }}' foundry 2>/dev/null || echo missing)
+            state=$(docker inspect -f '{{ .State.Status }}' foundry 2>/dev/null || echo missing)
+            echo "  [$((i*5))s] health=$status state=$state"
+            if [ "$status" = "healthy" ]; then echo "Container healthy."; exit 0; fi
+            if [ "$state" = "exited" ]; then
+              echo "::error::Foundry container exited before becoming healthy."
+              docker logs foundry || true
+              exit 1
+            fi
+            sleep 5
+          done
+          echo "::error::Foundry container did not become healthy in time."
+          docker logs foundry || true
+          exit 1
+
+      # First-boot activation (see activate-world.mjs / README): accept the EULA (generates the
+      # host-bound license signature, which can't be pre-committed), then restart so felddy's
+      # FOUNDRY_WORLD auto-launches the world server-side. Clear the stale lock felddy leaves behind.
+      - name: Accept EULA
+        working-directory: tools/quench-ci
+        run: |
+          node activate-world.mjs --phase eula \
+            --url "http://localhost:${FOUNDRY_PORT}" \
+            --wait 240
+
+      - name: Restart Foundry to auto-launch the world
+        run: |
+          docker stop -t 30 foundry
+          sudo rm -rf "${DATA_DIR}/Config/options.json.lock"
+          docker start foundry
+          echo "Waiting for the restarted container to become healthy..."
+          for i in $(seq 1 36); do
+            status=$(docker inspect -f '{{ .State.Health.Status }}' foundry 2>/dev/null || echo missing)
+            state=$(docker inspect -f '{{ .State.Status }}' foundry 2>/dev/null || echo missing)
+            echo "  [$((i*5))s] health=$status state=$state"
+            if [ "$status" = "healthy" ]; then echo "Container healthy."; exit 0; fi
+            if [ "$state" = "exited" ]; then
+              echo "::error::Foundry container exited during restart."
+              docker logs --since 5m foundry || true
+              exit 1
+            fi
+            sleep 5
+          done
+          echo "::error::Foundry container did not become healthy after restart."
+          docker logs --since 5m foundry || true
+          exit 1
+
+      - name: Wait for world activation
+        working-directory: tools/quench-ci
+        run: |
+          node activate-world.mjs --phase await \
+            --url "http://localhost:${FOUNDRY_PORT}" \
+            --wait 240
+
+      - name: Run Quench suite
+        working-directory: tools/quench-ci
+        run: |
+          node run-quench.mjs \
+            --url "http://localhost:${FOUNDRY_PORT}" \
+            --user Gamemaster \
+            --enable-module quench \
+            --filter "${QUENCH_FILTER}" \
+            --repo "${GITHUB_WORKSPACE}" \
+            --out "${GITHUB_WORKSPACE}/quench-report.json" \
+            --server-wait 240 \
+            --timeout 1500 \
+            --mocha-timeout 15000
+
+      - name: Upload Quench report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quench-report
+          path: quench-report.json
+          if-no-files-found: warn
+
+      - name: Dump Foundry logs on failure
+        if: failure()
+        run: docker logs foundry || true

@@ -1,0 +1,12 @@
+{
+  "id": "quench-ci",
+  "title": "Quench CI World",
+  "description": "Minimal world used only to load the OSE system and run the Quench test suite in CI. Tests create their own fixtures; this world ships no content.",
+  "system": "ose",
+  "coreVersion": "13.345",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "systemVersion": "999.0.0-dev"
+}
