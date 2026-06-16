@@ -11,6 +11,7 @@ import {
   createMockScene,
   trashChat,
   waitForInput,
+  waitUntil,
 } from "../../../e2e/testUtils";
 import type OseActor from "../../actor/entity";
 import { OSECombat } from "../combat";
@@ -42,6 +43,9 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
   let neutralRetainer2: OseActor | Document | null = null;
   let hostileRetainer1: OseActor | Document | null = null;
   let hostileRetainer2: OseActor | Document | null = null;
+  // The hasPlayerOwner assertions need a non-GM user. Headless/CI worlds may
+  // not have one, so we create one for the batch and remove it afterwards.
+  let createdTestUser: User | null = null;
 
   const createCombatant = async (actor: OseActor) => {
     const token = await actor.getTokenDocument();
@@ -61,6 +65,9 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     controlAllTokens();
     const tokens = canvas.tokens.controlled.map((t) => t.document);
     await TokenDocument.implementation.createCombatants(tokens);
+    // Combatant (and group) creation involves follow-up async updates;
+    // wait until they have all landed before tests assert on them.
+    await waitUntil(() => game.combat?.combatants?.size === tokens.length);
   };
 
   const getCombatTrackerElement = () => document.querySelector("#combat ol.combat-tracker");
@@ -72,14 +79,24 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     await waitForInput();
   };
 
-  before(async () => {
+  before(async function () {
+    // Creating a scene + ~20 actors headless routinely exceeds mocha's default
+    // 2000ms hook timeout, which aborted the entire batch before any test ran.
+    this.timeout(60_000);
     await trashChat();
     await cleanupCombat();
     const scene = await createMockScene();
     await scene?.activate();
     await waitForInput();
 
-    const nonGMUser = game.users?.find((u) => !u.isGM);
+    let nonGMUser = game.users?.find((u) => !u.isGM);
+    if (!nonGMUser) {
+      createdTestUser = (await User.create({
+        name: `Test Player ${key}`,
+        role: CONST.USER_ROLES.PLAYER,
+      })) as User;
+      nonGMUser = createdTestUser ?? undefined;
+    }
 
     // Create mock actors for testing
     pc1 = await createMockActorKey(
@@ -288,10 +305,15 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     await waitForInput();
   });
 
-  after(async () => {
+  after(async function () {
+    // Deleting ~20 actors + scene headless also exceeds the default 2000ms.
+    this.timeout(60_000);
     await cleanupCombat();
     await cleanUpActorsByKey(key);
     await cleanUpScenes();
+    if (createdTestUser && game.users?.get(createdTestUser.id)) {
+      await createdTestUser.delete();
+    }
   });
 
   describe("Static properties", () => {
@@ -339,7 +361,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("mockActors", async () => {
+  describe("mockActors", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     it("should have created valid actors", async () => {
       expect(pc1?.type).to.equal("character");
       expect(pc1?.hasPlayerOwner, "test can only pass if a non-GM user exists on this world").to.be.true;
@@ -478,7 +503,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("groupCombat(reroll)", async () => {
+  describe("groupCombat(reroll)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -492,11 +520,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -506,7 +539,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should render groups", async () => {
       await addAllTokensToCombat();
-      await waitForInput();
+      // Group assignment and the tracker re-render are async follow-ups of
+      // combatant creation; poll instead of relying on a fixed delay.
+      await waitUntil(() => game.combat?.groups?.size === 3);
+      await waitUntil(() => getCombatTrackerElement()?.children?.length === 3);
 
       expect(game.combat).to.not.be.null;
       expect(game.combat?.combatants?.size).to.equal(20);
@@ -530,6 +566,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       );
       expect(smartRerollInitiativeButton).to.not.be.null;
       smartRerollInitiativeButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      // The click handler rolls each group's initiative asynchronously; wait
+      // until all rolls and their chat messages have landed, then let the
+      // tracker re-render before asserting on DOM state.
+      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.messages.size).to.equal(3);
       for (const group of game.combat.groups.contents.map((g) => g.name)) {
@@ -580,11 +620,14 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await cleanupCombat();
       await waitForInput();
       await addAllTokensToCombat();
-      await waitForInput();
+      await waitUntil(() => game.combat?.groups?.size === 3);
 
       expect(game.messages.size).to.equal(0);
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.true;
       await game.combat.startCombat();
+      // startCombat triggers async initiative rolls for unrolled groups; wait
+      // for all rolls/messages to land before asserting.
+      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
@@ -621,13 +664,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -636,6 +682,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should reroll initiative for all groups on new round", async () => {
       await game?.combat?.nextRound();
+      // nextRound rerolls each group's initiative asynchronously.
+      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -647,7 +695,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("groupCombat(reset)", async () => {
+  describe("groupCombat(reset)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -661,11 +712,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -689,13 +745,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -704,11 +763,14 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should reset initiative for all groups on new round", async () => {
       await game?.combat?.smartRerollInitiative();
-      await waitForInput();
+      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
       expect(game.messages.size).to.equal(3);
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
       await game?.combat?.nextRound();
+      // With "reset" behavior, nextRound asynchronously nulls all group
+      // initiative values — wait until that has fully applied.
+      await waitUntil(() => !game.combat?.groups?.some((g) => g.initiative !== null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -721,7 +783,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("groupCombat(keep)", async () => {
+  describe("groupCombat(keep)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -735,11 +800,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -749,9 +819,12 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should roll initiative for all groups on combat start", async () => {
       await addAllTokensToCombat();
-      await waitForInput();
+      await waitUntil(() => game.combat?.groups?.size === 3);
 
       await game.combat.startCombat();
+      // startCombat rolls initiative for all groups asynchronously; wait for
+      // every roll/message to land so later tests see a settled state.
+      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
@@ -763,13 +836,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -784,6 +860,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       }
 
       await game?.combat?.nextRound();
+      await waitUntil(() => game.combat?.round === 2);
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -796,7 +873,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("individualCombat(reroll)", async () => {
+  describe("individualCombat(reroll)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -810,11 +890,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -840,6 +925,11 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const rollAllButton = document.querySelector(".combat-tracker-header .combat-control[data-action='rollAll']");
       expect(rollAllButton).to.not.be.null;
       rollAllButton?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      // The click handler rolls 20 initiatives asynchronously; wait until all
+      // rolls and chat messages have landed before asserting.
+      await waitUntil(
+        () => game.messages.size === 20 && !game.combat?.combatants?.some((c) => c.initiative === null),
+      );
       await waitForInput();
       expect(game.messages.size).to.equal(20);
       for (const combatant of game.combat.combatants.contents.map((g) => g.name)) {
@@ -873,13 +963,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -888,6 +981,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should reroll initiative for all combatants on new round", async () => {
       await game?.combat?.nextRound();
+      // nextRound rerolls 20 initiatives asynchronously.
+      await waitUntil(
+        () => game.messages.size === 20 && !game.combat?.combatants?.some((c) => c.initiative === null),
+      );
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -899,7 +996,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("individualCombat(reset)", async () => {
+  describe("individualCombat(reset)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -913,11 +1013,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -941,13 +1046,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -956,13 +1064,18 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should reset initiative for all combatants on new round", async () => {
       await game?.combat?.smartRerollInitiative();
-      await waitForInput();
+      await waitUntil(
+        () => game.messages.size === 20 && !game.combat?.combatants?.some((c) => c.initiative === null),
+      );
       expect(game.messages.size).to.equal(20);
       for (const group of game.combat?.groups ?? []) {
         expect(group?.initiative).to.not.be.null;
       }
 
       await game?.combat?.nextRound();
+      // With "reset" behavior, nextRound asynchronously nulls all combatant
+      // initiative values — wait until that has fully applied.
+      await waitUntil(() => !game.combat?.combatants?.some((c) => c.initiative !== null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -975,7 +1088,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
   });
 
-  describe("individualCombat(keep)", async () => {
+  describe("individualCombat(keep)", function () {
+    // Suite-wide headroom: 20-token combat operations regularly exceed
+    // mocha's default 2000ms when running headless.
+    this.timeout(60_000);
     let previousInitiativeSetting: string;
     let previousCombatRerollBehavior: string;
 
@@ -989,11 +1105,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await trashChat();
     });
 
-    after(async () => {
+    after(async function () {
+      // Generous timeout: deleting a 20-combatant encounter headless can
+      // exceed mocha's default 2000ms.
+      this.timeout(30_000);
       await cleanupCombat();
       await game.settings.set(game.system.id, "initiative", previousInitiativeSetting);
       await game.settings.set(game.system.id, "rerollInitiative", previousCombatRerollBehavior);
-      await cleanUpActorsByKey(key);
+      // NOTE: the shared test actors are deliberately NOT deleted here — later
+      // suites in this batch re-use their tokens. The batch-level `after`
+      // cleans them up.
       await waitForInput();
     });
 
@@ -1006,6 +1127,11 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await waitForInput();
 
       await game.combat.startCombat();
+      // startCombat rolls 20 initiatives asynchronously; wait for all
+      // rolls/messages to land so later tests see a settled state.
+      await waitUntil(
+        () => game.messages.size === 20 && !game.combat?.combatants?.some((c) => c.initiative === null),
+      );
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
@@ -1017,13 +1143,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should mark combatants as active", async () => {
+      // The tracker re-renders asynchronously after combat updates; poll for
+      // the expected DOM state instead of asserting immediately.
+      await waitUntil(() => getCombatantElements()?.[0]?.classList.contains("active") === true);
       let combatants = getCombatantElements();
       expect(combatants).to.not.be.null;
       expect(combatants?.length).to.equal(20);
       expect(combatants?.[0]?.classList.contains("active")).to.be.true;
 
       await game.combat?.nextTurn();
-      await waitForInput();
+      await waitUntil(() => getCombatantElements()?.[1]?.classList.contains("active") === true);
       expect(game.combat?.turn).to.equal(1);
       combatants = getCombatantElements();
       expect(combatants?.[0]?.classList.contains("active")).to.be.false;
@@ -1038,6 +1167,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       }
 
       await game?.combat?.nextRound();
+      await waitUntil(() => game.combat?.round === 2);
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);

@@ -19,6 +19,7 @@ import {
   objectIsNotification,
   openV2Dialogs,
   waitForInput,
+  waitUntil,
 } from "../../e2e/testUtils";
 import { createOseMacro, rollItemMacro } from "../helpers-macros";
 
@@ -37,7 +38,9 @@ export default ({ describe, it, expect, before, after, afterEach }: QuenchMethod
     await ui.notifications?.clear();
   });
 
-  afterEach(async () => {
+  afterEach(async function () {
+    // Five sequential cleanup steps can exceed mocha's 2000ms headless.
+    this.timeout(15_000);
     await closeV2Dialogs();
     await cleanUpMacros();
     await cleanUpActors();
@@ -121,7 +124,10 @@ export default ({ describe, it, expect, before, after, afterEach }: QuenchMethod
     });
   });
 
-  describe("rollItemMacro(itemName)", () => {
+  describe("rollItemMacro(itemName)", function () {
+    // Each test creates an actor, scene and items before rolling — headless
+    // this regularly exceeds mocha's default 2000ms.
+    this.timeout(15_000);
     it("No scene creates warning", async () => {
       const type = "weapon";
       const actor = await createMockActor("character");
@@ -161,7 +167,8 @@ export default ({ describe, it, expect, before, after, afterEach }: QuenchMethod
       expect(ChatMessage.getSpeaker().scene).is.not.null;
       expect(ChatMessage.getSpeaker().actor).is.not.null;
       await rollItemMacro(`New Actor Test ${type.capitalize()}`);
-      await waitForInput();
+      // The roll dialog renders asynchronously; poll instead of fixed delay.
+      await waitUntil(() => openV2Dialogs().length === 1);
       expect(openV2Dialogs().length).equal(1);
       await closeV2Dialogs();
       await actor?.delete();
@@ -177,16 +184,19 @@ export default ({ describe, it, expect, before, after, afterEach }: QuenchMethod
       await createActorTestItem(actor, type);
       await game.user?.update({ character: actor?.id });
       await rollItemMacro(`New Actor Test ${type.capitalize()}`);
-      await waitForInput();
+      // Both the warning notification and the roll dialog appear
+      // asynchronously; poll for them instead of using fixed delays.
+      const expectedWarning = game.i18n.format("OSE.warn.moreThanOneItemWithName", {
+        actorName: actor?.name,
+        itemName: `New Actor Test ${type.capitalize()}`,
+      });
+      await waitUntil(() =>
+        getActiveNotifications().some((li) => li?.textContent?.trim() === expectedWarning),
+      );
       expect(getActiveNotifications().map((li) => li?.textContent?.trim()))
         .to.be.an("array")
-        .that.includes(
-          game.i18n.format("OSE.warn.moreThanOneItemWithName", {
-            actorName: actor?.name,
-            itemName: `New Actor Test ${type.capitalize()}`,
-          }),
-        );
-      await waitForInput();
+        .that.includes(expectedWarning);
+      await waitUntil(() => openV2Dialogs().length === 1);
       expect(openV2Dialogs().length).equal(1);
       await closeV2Dialogs();
       await actor?.delete();

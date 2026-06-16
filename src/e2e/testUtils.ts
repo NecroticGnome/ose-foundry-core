@@ -43,6 +43,29 @@ export const waitForElement = async <T extends Element = HTMLElement>(
   return null;
 };
 
+/**
+ * Poll until `predicate` returns truthy, or `timeout` elapses.
+ *
+ * Use this instead of fixed delays when waiting on async side effects
+ * (chat message creation, document updates, UI re-renders) so tests are
+ * deterministic rather than timing-dependent.
+ * @param predicate - Condition to wait for.
+ * @param opts.timeout - Max wait in ms. Default 10000.
+ * @param opts.interval - Poll interval in ms. Default 50.
+ * @returns The final value of the predicate (truthy if condition was met).
+ */
+export const waitUntil = async (
+  predicate: () => boolean,
+  { timeout = 10_000, interval = 50 }: { timeout?: number; interval?: number } = {},
+): Promise<boolean> => {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (predicate()) return true;
+    await delay(interval);
+  }
+  return Boolean(predicate());
+};
+
 export const openWindows = (className: string) =>
   Object.values(ui.windows).filter((o) => o.options.classes.includes(className));
 
@@ -163,7 +186,9 @@ export const cleanUpMacros = async () => {
 
 export const cleanUpActorsByKey = async (key: string) => {
   for (const a of game.actors?.filter((a) => a.name === `Test Actor ${key}`) ?? []) {
-    await a.delete();
+    // Guard: re-fetch by id so a concurrent/earlier deletion can't throw
+    // 'Actor "<id>" does not exist!' when cleanup runs more than once.
+    if (game.actors?.get(a.id)) await a.delete();
   }
 };
 

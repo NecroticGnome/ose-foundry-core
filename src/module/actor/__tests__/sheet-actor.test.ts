@@ -19,6 +19,7 @@ import {
   openWindows,
   trashChat,
   waitForInput,
+  waitUntil,
 } from "../../../e2e/testUtils";
 import type OseItem from "../../item/entity";
 import OseActorSheet from "../actor-sheet";
@@ -53,7 +54,7 @@ type DragNDropDocuments = {
 /* --------------------------------------------- */
 const getActor = async () => game.actors?.getName(`Test Actor ${key}`);
 
-export default ({ describe, it, expect, after, afterEach, before }: QuenchMethods) => {
+export default ({ describe, it, expect, after, afterEach, before, beforeEach }: QuenchMethods) => {
   // Saving settings being modified by tests
   const originalCtrlSetting = game.settings.get(game.system.id, "invertedCtrlBehavior");
 
@@ -157,7 +158,11 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const actor = (await createMockActorKey("character", {}, key)) as OseActor;
       await actor.update({ system: { spells: { enabled: true } } });
       actor?.sheet?.render(true);
-      await delay(220);
+      // Wait for the sheet (and the inventory list) to actually render —
+      // fixed delays are too short on slow CI runners.
+      await waitUntil(
+        () => openWindows("sheet").length === 1 && !!document.querySelector(".tab[data-tab='inventory'] .item-list"),
+      );
     });
 
     it("clicking the category name hides the item cateogry", async () => {
@@ -166,6 +171,9 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const categoryElement = document.querySelector(".tab[data-tab='inventory'] .item-list");
       expect(categoryElement?.style.display).equal("");
       await clickCategory();
+      // The collapse animation applies display:none when it finishes; poll
+      // for the final state instead of assuming a fixed animation duration.
+      await waitUntil(() => categoryElement?.style.display === "none");
       expect(categoryElement?.style.display).equal("none");
     });
 
@@ -175,6 +183,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const categoryElement = document.querySelector(".tab[data-tab='inventory'] .item-list");
       expect(categoryElement?.style.display).equal("none");
       await clickCategory();
+      await waitUntil(() => categoryElement?.style.display === "");
       expect(categoryElement?.style.display).equal("");
     });
 
@@ -202,6 +211,12 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const container = actor?.items.getName("New Actor Test Container");
       await weapon?.update({ system: { containerId: container?.id } });
       actor?.sheet?.render(true);
+      // Wait for the sheet and the container's contained-items list to render.
+      await waitUntil(
+        () =>
+          openWindows("sheet").length === 1 &&
+          !!document.querySelector(".tab[data-tab='inventory'] .container .contained-items"),
+      );
     });
 
     it("clicking container caret will hide the content", async () => {
@@ -217,6 +232,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(containerElement?.style.display).equal("");
 
       await clickContainerCaret();
+      // Poll for the collapse animation's final state (slow on CI runners).
+      await waitUntil(() => containerElement?.style.display === "none");
       expect(containerElement?.style.display).equal("none");
     });
 
@@ -233,6 +250,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
       expect(containerElement?.style.display).equal("none");
       await clickContainerCaret();
+      await waitUntil(() => containerElement?.style.display === "");
       expect(containerElement?.style.display).equal("");
     });
 
@@ -1068,11 +1086,19 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
   describe("_chooseItemType(choices)", () => {
     const defaultChoices = ["weapon", "armor", "shield", "gear"];
 
+    // A slow dialog from an earlier suite can still be open (or appear late)
+    // on CI runners — start each test from a known dialog-free state.
+    beforeEach(async () => {
+      await closeV2Dialogs();
+      await waitUntil(() => openV2Dialogs().length === 0);
+    });
+
     it("can create standard dialog", async () => {
       const actor = await createMockActorKey("monster", {}, key);
       // eslint-disable-next-line no-underscore-dangle
       actor?.sheet?._chooseItemType();
-      await waitForInput();
+      // The dialog renders asynchronously; poll instead of a fixed delay.
+      await waitUntil(() => openV2Dialogs().length === 1);
 
       const dialogs = openV2Dialogs();
       expect(dialogs.length).equal(1);
@@ -1088,7 +1114,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const actor = (await createMockActorKey("monster", {}, key)) as OseActor;
       // eslint-disable-next-line no-underscore-dangle
       actor?.sheet?._chooseItemType(customChoices);
-      await waitForInput();
+      await waitUntil(() => openV2Dialogs().length === 1);
 
       const dialogs = openV2Dialogs();
       expect(dialogs.length).equal(1);
