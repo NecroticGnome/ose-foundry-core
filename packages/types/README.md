@@ -70,4 +70,11 @@ when the actor data models migrate
 
 Bump `version` in `packages/types/package.json`, then from the repo root run
 `npm run release:types` — it rebuilds `index.d.ts` and publishes the package to
-npm (requires npm auth with publish rights to the `@ose-foundry-core` scope).
+npm.
+
+Publishing needs an npm account with publish rights to the `@ose-foundry-core`
+scope (the scope/org must already exist on npm). Run `npm login` first, then the
+release script.
+
+The package sets `publishConfig.access: public`, so the first publish creates
+the scoped package as public — no extra flags needed.
