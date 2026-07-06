@@ -1,5 +1,0 @@
-# Local runner deps and generated reports
-node_modules/
-package-lock.json
-reports/
-*.report.json
