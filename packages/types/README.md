@@ -65,3 +65,9 @@ when the actor data models migrate
 `index.d.ts` is **generated** — do not edit it. It is produced from  
 `src/types/` in the system repo via `npm run build:types` (a declaration-only  
 `tsc` pass bundled with `rollup-plugin-dts`).
+
+## Releasing
+
+Bump `version` in `packages/types/package.json`, then from the repo root run
+`npm run release:types` — it rebuilds `index.d.ts` and publishes the package to
+npm (requires npm auth with publish rights to the `@ose-foundry-core` scope).

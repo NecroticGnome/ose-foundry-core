@@ -10,6 +10,7 @@
     "build:js": "rollup -c",
     "build:css": "sass src/ose.scss dist/ose.css --style=compressed --source-map",
     "build:types": "tsc -p tsconfig.types.json && rollup -c rollup.types.config.js",
+    "release:types": "npm run build:types && npm publish ./packages/types",
     "watch": "npm-run-all --parallel watch:*",
     "watch:js": "rollup -c --watch",
     "watch:css": "sass --watch src/ose.scss dist/ose.css --source-map",
