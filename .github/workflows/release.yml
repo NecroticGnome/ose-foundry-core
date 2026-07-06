@@ -7,11 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # The secrets context isn't available in step `if:` expressions, so
-      # surface NPM_TOKEN presence here to let the publish steps no-op
-      # gracefully until the secret is configured.
-      NPM_TOKEN_PRESENT: ${{ secrets.NPM_TOKEN != '' }}
     steps:
       # Standard required steps for a Node.js package
       - name: Checkout repository to add to workspace
@@ -69,32 +64,3 @@ jobs:
           artifacts: "./system.json, ./system.zip"
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
-
-      # --- Publish the @ose-foundry-core/types companion package ---
-      # Requires an NPM_TOKEN repo secret with publish rights to the
-      # @ose-foundry-core npm scope (the scope/org must already exist).
-      # All four steps are skipped (not failed) while the secret is absent.
-      - name: Setup Node.js for npm publish
-        if: env.NPM_TOKEN_PRESENT == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Stamp types package version
-        if: env.NPM_TOKEN_PRESENT == 'true'
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: "packages/types/package.json"
-        env:
-          version: ${{ github.event.release.tag_name }}
-
-      - name: Build type declarations
-        if: env.NPM_TOKEN_PRESENT == 'true'
-        run: npm run build:types
-
-      - name: Publish @ose-foundry-core/types
-        if: env.NPM_TOKEN_PRESENT == 'true'
-        run: npm publish ./packages/types --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
