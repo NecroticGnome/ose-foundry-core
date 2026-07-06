@@ -10,6 +10,19 @@ import OseItem from "../item/entity";
  */
 const removeFalsyElements = (arr) => arr.filter((b) => b);
 
+/**
+ * Builds the roll parts for a character's Hit Dice roll. Characters gain at
+ * least 1 HP per Hit Die regardless of CON, so the total is floored at the die
+ * count (the leading digit of `hd`, e.g. "3" in "3d8").
+ *
+ * @param {object} params
+ * @param {string} params.hd - hit dice formula, e.g. "3d8"
+ * @param {number} params.conMod - CON modifier
+ * @param {number} params.level - character level
+ * @returns {string[]} single-element roll parts array
+ */
+export const hitDiceParts = ({ hd, conMod, level }) => [`max(${hd} + ${conMod * level}, ${hd[0]})`];
+
 export default class OseActor extends Actor {
   static migrateData(source) {
     // Fixing missing img
@@ -351,9 +364,11 @@ export default class OseActor extends Actor {
     if (actorType === "character") {
       // A character always gains at least 1 hit point per Hit Die,
       // regardless of CON modifier.
-      rollParts = [
-        `max(${actorData.hp.hd} + ${actorData.scores.con.mod * actorData.details.level}, ${actorData.hp.hd[0]})`,
-      ];
+      rollParts = hitDiceParts({
+        hd: actorData.hp.hd,
+        conMod: actorData.scores.con.mod,
+        level: actorData.details.level,
+      });
     }
 
     const data = {
