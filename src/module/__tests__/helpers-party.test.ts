@@ -41,8 +41,12 @@ export default ({ describe, it, expect, after }: QuenchMethods) => {
       await waitForInput();
       await OsePartySheet?.partySheet?.render(true);
       await waitForInput();
-      const partyMember = document.querySelector(".party-members .actor")?.getAttribute("data-actor-id");
-      expect(partyMember).equal(actor?.id);
+      // The world may already hold other party members, so assert our actor is
+      // among the rendered members rather than assuming it's the only/first one.
+      const memberIds = Array.from(document.querySelectorAll(".party-members .actor")).map((el) =>
+        el.getAttribute("data-actor-id"),
+      );
+      expect(memberIds).to.include(actor?.id);
       expect(openDialogs().length).equal(1);
       await closeDialogs();
       actor?.delete();
