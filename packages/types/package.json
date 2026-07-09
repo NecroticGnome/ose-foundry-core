@@ -1,0 +1,39 @@
+{
+  "name": "@ose-foundry-core/types",
+  "version": "0.0.0",
+  "description": "TypeScript type definitions for the Old-School Essentials (OSE) Foundry VTT system — actor/item data shapes, config unions, and character helper-class interfaces.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts"
+    }
+  },
+  "files": [
+    "index.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NecroticGnome/ose-foundry-core.git",
+    "directory": "packages/types"
+  },
+  "homepage": "https://github.com/NecroticGnome/ose-foundry-core/tree/main/packages/types#readme",
+  "bugs": "https://github.com/NecroticGnome/ose-foundry-core/issues",
+  "keywords": [
+    "foundry-vtt",
+    "foundryvtt",
+    "ose",
+    "old-school-essentials",
+    "types",
+    "typescript"
+  ],
+  "peerDependencies": {
+    "@league-of-foundry-developers/foundry-vtt-types": "13.346.0-beta.20251209192131"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

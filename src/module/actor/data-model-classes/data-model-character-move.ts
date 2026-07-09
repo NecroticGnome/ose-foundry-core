@@ -1,14 +1,22 @@
 /**
  * @file A class representing the character's ability to move, depending on encumbrance state
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import OseDataModelCharacterEncumbrance from "./data-model-character-encumbrance";
 
+/**
+ * A character's movement rates, derived from their base speed and current
+ * encumbrance. When auto-calculation is enabled, `base` is computed from the
+ * encumbrance variant; otherwise it is the manually entered rate.
+ */
 export interface CharacterMove {
+  /** Base (exploration) movement rate, in feet per turn. Defaults to 120. */
   base: number;
-  encounter: number;
-  overland: number;
+
+  /** Encounter (combat) movement rate, in feet per round — derived as `base / 3`. */
+  readonly encounter: number;
+
+  /** Overland (travel) movement rate, in miles per day — derived as `base / 5`. */
+  readonly overland: number;
 }
 
 /**

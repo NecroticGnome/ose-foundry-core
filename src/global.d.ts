@@ -17,6 +17,12 @@ declare global {
     OSE: OseConfig;
   }
 
+  // Foundry extends Math with clamp() (see foundry client primitives/math),
+  // but the League v13 types don't re-export it via the main entry.
+  interface Math {
+    clamp(value: number, min: number, max: number): number;
+  }
+
   interface Game {
     ose: {
       rollItemMacro: (itemName: string) => Promise<void>;
