@@ -1,6 +1,6 @@
 {
   "name": "@ose-foundry-core/types",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "TypeScript type definitions for the Old-School Essentials (OSE) Foundry VTT system — actor/item data shapes, config unions, and character helper-class interfaces.",
   "license": "GPL-3.0-or-later",
   "type": "module",

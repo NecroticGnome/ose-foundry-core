@@ -1,7 +1,7 @@
 # @ose-foundry-core/types
 
 TypeScript types for the [Old-School Essentials
-(OSE)](https://github.com/tasandberg/ose-foundry-core) Foundry VTT system.
+(OSE)](https://github.com/NecroticGnome/ose-foundry-core) Foundry VTT system.
 
 This package is intentionally minimal in its initial release. It re-exports
 **only the types that are already explicitly declared in OSE's TypeScript
