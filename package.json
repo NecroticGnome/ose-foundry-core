@@ -5,7 +5,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "clean": "rm -rf dist .types-build",
+    "clean": "node ./tools/clean.js dist .types-build",
     "build": "npm run clean && npm run build:js && npm run build:css",
     "build:js": "rollup -c",
     "build:css": "sass src/ose.scss dist/ose.css --style=compressed --source-map",
