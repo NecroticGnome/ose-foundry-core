@@ -159,8 +159,10 @@
       }
     }
     .exploration {
+      flex-wrap: wrap;
       .attribute {
         margin: 4px;
+        flex: 1 0 calc(33.333% - 8px);
         .attribute-name {
           text-align: left;
           flex: 1 0 60px;

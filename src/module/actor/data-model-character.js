@@ -79,10 +79,12 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
         wand: new SchemaField({ value: new NumberField({ integer: true }) }),
       }),
       exploration: new SchemaField({
-        ft: new NumberField({ integer: true, positive: true }),
-        ld: new NumberField({ integer: true, positive: true }),
-        od: new NumberField({ integer: true, positive: true }),
-        sd: new NumberField({ integer: true, positive: true }),
+        ft: new NumberField({ integer: true, positive: true, initial: 1 }),
+        ld: new NumberField({ integer: true, positive: true, initial: 1 }),
+        od: new NumberField({ integer: true, positive: true, initial: 2 }),
+        sd: new NumberField({ integer: true, positive: true, initial: 1 }),
+        fg: new NumberField({ integer: true, positive: true, initial: 1 }),
+        hn: new NumberField({ integer: true, positive: true, initial: 1 }),
       }),
       retainer: new SchemaField({
         enabled: new BooleanField(),

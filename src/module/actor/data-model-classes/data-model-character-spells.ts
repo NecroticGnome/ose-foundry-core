@@ -1,13 +1,19 @@
 /**
  * @file A class representing a creature's spellcasting abilities
  */
+/** Slot usage for a single spell level. */
 type Slot = {
+  /** Number of slots already expended at this spell level. */
   used: number;
+
+  /** Total slots available at this spell level. */
   max: number;
 };
 
+/** Spell slots, keyed by spell level. */
 type Slots = Record<number, Slot>;
 
+/** Spells grouped by spell level. */
 type Spells = Record<number, Item[]>;
 
 const reducedSpells = (list: Spells, item: Item) => {
@@ -19,10 +25,19 @@ const reducedSpells = (list: Spells, item: Item) => {
   };
 };
 
+/**
+ * A character's spellcasting state — whether they cast at all, the spells they
+ * have grouped by level, and how many slots they have used per level.
+ */
 export interface CharacterSpells {
+  /** Whether the character can cast spells. */
   enabled: boolean;
-  spellList: Spells;
-  slots: Slots;
+
+  /** The character's spells, grouped by spell level. */
+  readonly spellList: Spells;
+
+  /** Slot usage per spell level. */
+  readonly slots: Slots;
 }
 
 export default class OseDataModelCharacterSpells implements CharacterSpells {

@@ -1,72 +1,20 @@
 <ul class="attributes exploration flexrow">
-  <li class="attribute flexrow" data-exploration="ld">
-    <h4
-      class="attribute-name box-title"
-      title="({{localize 'OSE.exploration.ld.abrev'}}) {{localize 'OSE.exploration.ld.long'}}"
-    >
-      <a>{{ localize "OSE.exploration.ld.short" }}</a>
+  {{#each explorationSkills}}
+  <li class="attribute flexrow" data-exploration="{{key}}">
+    <h4 class="attribute-name box-title" title="({{abbreviation}}) {{long}}">
+      <a>{{short}}</a>
     </h4>
     <div class="attribute-value">
       <input
-        name="system.exploration.ld"
+        name="system.exploration.{{key}}"
         type="text"
-        value="{{system.exploration.ld}}"
-        data-dtype="Number"
-        placeholder="0"
-      />
-    </div>
-  </li>
-  <li class="attribute flexrow" data-exploration="od">
-    <h4
-      class="attribute-name box-title"
-      title="({{localize 'OSE.exploration.od.abrev'}}) {{localize 'OSE.exploration.od.long'}}"
-    >
-      <a>{{ localize "OSE.exploration.od.short" }}</a>
-    </h4>
-    <div class="attribute-value">
-      <input
-        name="system.exploration.od"
-        type="text"
-        value="{{system.exploration.od}}"
+        value="{{value}}"
         placeholder="0"
         data-dtype="Number"
       />
     </div>
   </li>
-  <li class="attribute flexrow" data-exploration="sd">
-    <h4
-      class="attribute-name box-title"
-      title="({{localize 'OSE.exploration.sd.abrev'}}) {{localize 'OSE.exploration.sd.long'}}"
-    >
-      <a>{{ localize "OSE.exploration.sd.short" }}</a>
-    </h4>
-    <div class="attribute-value">
-      <input
-        name="system.exploration.sd"
-        type="text"
-        value="{{system.exploration.sd}}"
-        placeholder="0"
-        data-dtype="Number"
-      />
-    </div>
-  </li>
-  <li class="attribute flexrow" data-exploration="ft">
-    <h4
-      class="attribute-name box-title"
-      title="({{localize 'OSE.exploration.ft.abrev'}}) {{localize 'OSE.exploration.ft.long'}}"
-    >
-      <a>{{ localize "OSE.exploration.ft.short" }}</a>
-    </h4>
-    <div class="attribute-value">
-      <input
-        name="system.exploration.ft"
-        type="text"
-        value="{{system.exploration.ft}}"
-        placeholder="0"
-        data-dtype="Number"
-      />
-    </div>
-  </li>
+  {{/each}}
 </ul>
 <div class="inventory abilities">
   <div class="item-category-title flexrow">

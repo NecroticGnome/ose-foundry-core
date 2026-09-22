@@ -1,7 +1,7 @@
 /**
  * @file OSE Classic Fantasy class definitions
  */
-import type { ClassicClassName, OseClass } from "./types";
+import type { ClassicClassName, OseClass } from "../../types/classes";
 
 export const CLASSIC_FANTASY_SOURCE = "Classic Fantasy";
 

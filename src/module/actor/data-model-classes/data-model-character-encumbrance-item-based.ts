@@ -77,13 +77,13 @@ export default class OseDataModelCharacterEncumbranceItemBased
 
   #packedWeight;
 
-  #weightMod;
+  #weightMod = 0;
 
   // eslint-disable-next-line sonarjs/cognitive-complexity, @typescript-eslint/no-unused-vars
-  constructor(max = 16, items: OseItem[] = [], options = {}) {
+  constructor(max = 16, items: Item[] = [], options: { scores?: { str?: { mod?: number } } } = {}) {
     super(OseDataModelCharacterEncumbranceItemBased.type, max);
     if (game.settings.get(game.system.id, "encumbranceItemStrengthMod")) {
-      this.#weightMod = options.scores?.str?.mod > 0 ? options.scores.str.mod : 0;
+      this.#weightMod = Math.max(0, options.scores?.str?.mod ?? 0);
     } else {
       this.#weightMod = 0;
     }
@@ -97,7 +97,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
     this.#equippedMax = isDefaultMax ? 9 : max;
     this.#packedWeight =
       Math.ceil(
-        items.reduce((acc, item: OseItem) => {
+        items.reduce((acc, item: Item) => {
           if (item.type === "item" && item.system.isCoinsOrGems) {
             // Coins and gems are handled below
             return acc;
@@ -113,7 +113,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
         }, 0),
       ) +
       Math.ceil(
-        items.reduce((acc, item: OseItem) => {
+        items.reduce((acc, item: Item) => {
           if (item.type === "item" && item.system.isCoinsOrGems) {
             // Up to 100 coins or gems count as 1 item.
             return acc + item.system.quantity.value / 100;
@@ -143,6 +143,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
   }
 
   static defineSchema() {
+    // @ts-expect-error League v13 client/data/fields shadows common (only declares ShaderField)
     const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
     return new SchemaField({

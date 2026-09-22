@@ -1,0 +1,19 @@
+{
+  // Declaration-only build for @ose-foundry-core/types.
+  //
+  // Extends the base tsconfig (inheriting `types: ["foundry-vtt-types"]`).
+  // rootDir is `src` so the barrel's relative imports into src/module emit
+  // cleanly; rollup-plugin-dts tree-shakes from .types-build/types/index.d.ts
+  // into the single bundled packages/types/index.d.ts.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "noEmitOnError": false,
+    "rootDir": "src",
+    "outDir": ".types-build"
+  },
+  "include": ["src/types/**/*.ts", "src/global.d.ts"]
+}

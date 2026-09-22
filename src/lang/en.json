@@ -301,6 +301,12 @@
   "OSE.exploration.ft.long": "Find Room Trap",
   "OSE.exploration.ft.short": "Find Trap",
   "OSE.exploration.ft.abrev": "FT",
+  "OSE.exploration.fg.long": "Forage for Food",
+  "OSE.exploration.fg.short": "Forage",
+  "OSE.exploration.fg.abrev": "FG",
+  "OSE.exploration.hn.long": "Hunt for Food",
+  "OSE.exploration.hn.short": "Hunt",
+  "OSE.exploration.hn.abrev": "HN",
 
   "OSE.messages.GetExperience": "{name} gained {value} experience points!",
   "OSE.messages.AttackSuccess": "<b>Hits AC {result}!</b> ({bonus})",

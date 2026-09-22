@@ -400,7 +400,7 @@ const OseDice = {
         action: "Poison",
         label: game.i18n.localize("OSE.saves.poison.short"),
         icon: "fas fa-skull",
-        callback: (event, button) => {
+        callback: (_event, button) => {
           rolled = true;
           rollData.form = button.form;
           rollData.parts.push(`${rollData.data.roll.poison}`);

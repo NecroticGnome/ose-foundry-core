@@ -6,6 +6,7 @@ import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
 import OseCharacterModifiers from "../dialog/character-modifiers";
 import OseActorSheet from "./actor-sheet";
+import { prepareExplorationSkills } from "./exploration-skills";
 
 export default class OseActorSheetCharacter extends OseActorSheet {
   /**
@@ -84,6 +85,8 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
     // Prepare owned items
     this._prepareItems(data);
+
+    data.explorationSkills = prepareExplorationSkills(this.actor.system.exploration);
 
     data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.object.system.details.biography,

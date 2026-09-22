@@ -1,7 +1,11 @@
-const fs = require("fs-extra");
-const path = require("path");
-const yargs = require("yargs");
-const { hideBin } = require("yargs/helpers");
+// Using this instead of require() since require() doesn't exist in ES modules
+import path from "node:path"
+import { fileURLToPath } from "node:url";
+import fs from "fs-extra";
+import yargs from "yargs";
+import { hideBin} from "yargs/helpers";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @typedef {{dataPath: Array<string>; symLinkName: string;}} FoundryConfig
