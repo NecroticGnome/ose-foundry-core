@@ -71,7 +71,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
     data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.object.system.details.biography,
-      { async: true },
+      { secrets: game.user?.isGM },
     );
 
     // Monsters don't show an encumbrance bar

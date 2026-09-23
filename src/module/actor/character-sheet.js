@@ -88,11 +88,11 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
     data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.object.system.details.biography,
-      { async: true },
+      { secrets: game.user?.isGM },
     );
     data.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.object.system.details.notes,
-      { async: true },
+      { secrets: game.user?.isGM },
     );
 
     return data;
