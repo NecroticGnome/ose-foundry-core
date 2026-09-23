@@ -49,7 +49,7 @@ export default class OseItem extends Item {
     // Rich text description
     this.system.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.system.description,
-      { async: true },
+      { secrets: game.user?.isGM },
     );
   }
 
