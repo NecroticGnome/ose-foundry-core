@@ -7,11 +7,11 @@
   Old-School Essentials – Foundry VTT Edition
 </h1>
 <p align="center">
-  <!-- BEGIN TEXT REQUIRED BY LICENSE -->Requires <strong><em>Old-School Essentials</em></strong> Classic Fantasy or Advanced Fantasy.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at <a href="https://necroticgnome.com">Necrotic Gnome's website</a>. Buy <a href="https://www.drivethrurpg.com/browse/pub/5606/Necrotic-Gnome?filters=0_0_0_100073_0&affiliate_id=516538">Old-School Essentials: Advanced Fantasy and more</a> for Foundry VTT.
+  <!-- BEGIN TEXT REQUIRED BY LICENSE -->Requires <strong><em>Old-School Essentials</em></strong> Classic Fantasy or Advanced Fantasy.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at <a href="https://necroticgnome.com">Necrotic Gnome's website</a>. Buy <a href="https://www.foundryvtt.store/products/ose-advancedfantasytome">Old-School Essentials: Premium Game</a> and <a href="https://www.foundryvtt.store/creators/necroticgnome">more Necrotic Gnome content</a> for Foundry VTT.
 </p>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-37-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fose&colorB=4aa94a)](https://forge-vtt.com/bazaar#package=ose)
 [![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fose%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/ose/)
@@ -40,17 +40,13 @@ https://github.com/NecroticGnome/ose-foundry-content/releases/latest/download/mo
 
 ## Your Support
 
-If you use this system and want to show your appreciation, here's a couple free things you can do.
+If you use this system and want to show your appreciation, here are a few things you can do.
 
 - If you're a GitHub user, please give us a GitHub star.
 - If you're a Foundry Hub user, please [endorse us or write a comment](https://www.foundryvtt-hub.com/package/ose/) (happy feedback and constructive feedback both appreciated).
 - If you speak a non-English language fluently, please contribute some of your time on an open source translation. [Join the ose project on Crowdin](https://crowdin.com/project/ose).
 - If you know some JavaScript or you're a CSS whiz, please consider [contributing code](/CONTRIBUTING.md).
-
-### Here's a couple paid things you can do.
-
-- Your purchases of [Official Necrotic Gnome Foundry VTT premium content](https://www.drivethrurpg.com/browse/pub/5606/Necrotic-Gnome?filters=0_0_0_100073_0&affiliate_id=516538) support the Old-School Essentials ecosystem. Follow the [Necrotic Gnome blog or subscribe to their newsletter](https://necroticgnome.com/blogs/newsletter-archive) for more news about upcoming Foundry VTT releases.
-- If you'd like to support some of the contributors of this game system, we keep a list of tipping/patronage links in the [THANKS.md](/THANKS.md) file.
+- If you'd like to support the wider Old-School Essentials ecosystem, your purchases of [official Necrotic Gnome Foundry VTT content](https://www.foundryvtt.store/creators/necroticgnome) help. Follow the [Necrotic Gnome blog or subscribe to their newsletter](https://necroticgnome.com/blogs/news) for news about upcoming Foundry VTT releases.
 
 ## Troubleshooting and Requesting User Support
 
@@ -89,9 +85,9 @@ See [LICENSE.GPL](/LICENSE.GPL) file.
 
 Weapon quality icons, and the Treasure chest are from [Rexxard](https://assetstore.unity.com/packages/2d/gui/icons/flat-skills-icons-82713).
 
-## Contributors ✨
+## Contributors
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/en/reference/emoji-key/)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -99,34 +95,51 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sneat"><img src="https://avatars.githubusercontent.com/u/293277?v=4?s=100" width="100px;" alt="Blair"/><br /><sub><b>Blair</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=sneat" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=sneat" title="Documentation">📖</a> <a href="#maintenance-sneat" title="Maintenance">🚧</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Asneat" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://ronda.dev"><img src="https://avatars.githubusercontent.com/u/1410433?v=4?s=100" width="100px;" alt="Anthony Ronda"/><br /><sub><b>Anthony Ronda</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=anthonyronda" title="Code">💻</a> <a href="#maintenance-anthonyronda" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mesfoliesludiques"><img src="https://avatars.githubusercontent.com/u/43685820?v=4?s=100" width="100px;" alt="U~man"/><br /><sub><b>U~man</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=mesfoliesludiques" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=mesfoliesludiques" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.dragonshorn.info"><img src="https://avatars.githubusercontent.com/u/802214?v=4?s=100" width="100px;" alt="Antoni Sobkowicz"/><br /><sub><b>Antoni Sobkowicz</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Rughalt" title="Code">💻</a> <a href="#infra-Rughalt" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://tasandberg.github.io"><img src="https://avatars.githubusercontent.com/u/6488787?v=4?s=100" width="100px;" alt="Tim Sandberg"/><br /><sub><b>Tim Sandberg</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=tasandberg" title="Code">💻</a> <a href="#infra-tasandberg" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=tasandberg" title="Tests">⚠️</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Atasandberg" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/justinfreitas"><img src="https://avatars.githubusercontent.com/u/7852499?v=4?s=100" width="100px;" alt="Justin Freitas"/><br /><sub><b>Justin Freitas</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=JustinFreitas" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=JustinFreitas" title="Documentation">📖</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3AJustinFreitas" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Tremah"><img src="https://avatars.githubusercontent.com/u/34700917?v=4?s=100" width="100px;" alt="Patrick Schäfer"/><br /><sub><b>Patrick Schäfer</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Tremah" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NekohimeMusou"><img src="https://avatars.githubusercontent.com/u/37454858?v=4?s=100" width="100px;" alt="Nekohime"/><br /><sub><b>Nekohime</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=NekohimeMusou" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Lavaman369"><img src="https://avatars.githubusercontent.com/u/47902737?v=4?s=100" width="100px;" alt="Lavaman369"/><br /><sub><b>Lavaman369</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Lavaman369" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.jeff-horton.uk"><img src="https://avatars.githubusercontent.com/u/2327261?v=4?s=100" width="100px;" alt="Jeff Horton"/><br /><sub><b>Jeff Horton</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=kamioftea" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.apostolapostolov.com"><img src="https://avatars.githubusercontent.com/u/4083812?v=4?s=100" width="100px;" alt="Apostol Apostolov"/><br /><sub><b>Apostol Apostolov</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=apoapostolov" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mdanielak"><img src="https://avatars.githubusercontent.com/u/6941778?v=4?s=100" width="100px;" alt="mdanielak"/><br /><sub><b>mdanielak</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=mdanielak" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://toniruiz.es"><img src="https://avatars.githubusercontent.com/u/16167848?v=4?s=100" width="100px;" alt="Toni Ruiz"/><br /><sub><b>Toni Ruiz</b></sub></a><br /><a href="#translation-Favashi" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Godforsaken84"><img src="https://avatars.githubusercontent.com/u/100036544?v=4?s=100" width="100px;" alt="Godforsaken84"/><br /><sub><b>Godforsaken84</b></sub></a><br /><a href="#design-Godforsaken84" title="Design">🎨</a></td>
+    </tr>
+    <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/freohr"><img src="https://avatars.githubusercontent.com/u/3462951?v=4?s=100" width="100px;" alt="Stephen FAURE"/><br /><sub><b>Stephen FAURE</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=freohr" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Afreohr" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/engleback"><img src="https://avatars.githubusercontent.com/u/35422051?v=4?s=100" width="100px;" alt="Ian Engleback"/><br /><sub><b>Ian Engleback</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=engleback" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/RabidOwlbear"><img src="https://avatars.githubusercontent.com/u/71675732?v=4?s=100" width="100px;" alt="Grim"/><br /><sub><b>Grim</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=RabidOwlbear" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/WallaceMcGregor"><img src="https://avatars.githubusercontent.com/u/17795541?v=4?s=100" width="100px;" alt="WallaceMcGregor"/><br /><sub><b>WallaceMcGregor</b></sub></a><br /><a href="#translation-WallaceMcGregor" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/IGALEGOI"><img src="https://avatars.githubusercontent.com/u/97805442?v=4?s=100" width="100px;" alt="IGALEGOI"/><br /><sub><b>IGALEGOI</b></sub></a><br /><a href="#translation-IGALEGOI" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sanviler"><img src="https://avatars.githubusercontent.com/u/96877404?v=4?s=100" width="100px;" alt="Lorenzo Castelletta"/><br /><sub><b>Lorenzo Castelletta</b></sub></a><br /><a href="#translation-sanviler" title="Translation">🌍</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/HerrSquash"><img src="https://avatars.githubusercontent.com/u/97633309?v=4?s=100" width="100px;" alt="herrsquash"/><br /><sub><b>herrsquash</b></sub></a><br /><a href="#translation-herrsquash" title="Translation">🌍</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/HerrSquash"><img src="https://avatars.githubusercontent.com/u/97633309?v=4?s=100" width="100px;" alt="herrsquash"/><br /><sub><b>herrsquash</b></sub></a><br /><a href="#translation-herrsquash" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://linktr.ee/teuri"><img src="https://avatars.githubusercontent.com/u/64547748?v=4?s=100" width="100px;" alt="Igor Teuri"/><br /><sub><b>Igor Teuri</b></sub></a><br /><a href="#translation-igorteuri" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/hogwrassler"><img src="https://avatars.githubusercontent.com/u/110945935?v=4?s=100" width="100px;" alt="hogwrassler"/><br /><sub><b>hogwrassler</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=hogwrassler" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://timsnyder.codes"><img src="https://avatars.githubusercontent.com/u/1731267?v=4?s=100" width="100px;" alt="Tim"/><br /><sub><b>Tim</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=wyrmisis" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Awyrmisis" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/maschill92"><img src="https://avatars.githubusercontent.com/u/4692066?v=4?s=100" width="100px;" alt="Michael Schilling"/><br /><sub><b>Michael Schilling</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=maschill92" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://adamoresten.com"><img src="https://avatars.githubusercontent.com/u/12858387?v=4?s=100" width="100px;" alt="Adam Oresten"/><br /><sub><b>Adam Oresten</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Haxxer" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bakbakbakbakbak"><img src="https://avatars.githubusercontent.com/u/105067023?v=4?s=100" width="100px;" alt="bakbakbakbakbak"/><br /><sub><b>bakbakbakbakbak</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=bakbakbakbakbak" title="Code">💻</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Abakbakbakbakbak" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/adn770"><img src="https://avatars.githubusercontent.com/u/113786?v=4?s=100" width="100px;" alt="Josep Torra"/><br /><sub><b>Josep Torra</b></sub></a><br /><a href="#translation-adn770" title="Translation">🌍</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/adn770"><img src="https://avatars.githubusercontent.com/u/113786?v=4?s=100" width="100px;" alt="Josep Torra"/><br /><sub><b>Josep Torra</b></sub></a><br /><a href="#translation-adn770" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/amir-arad"><img src="https://avatars.githubusercontent.com/u/6019373?v=4?s=100" width="100px;" alt="Amir Arad"/><br /><sub><b>Amir Arad</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=amir-arad" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/justinthejaguar"><img src="https://avatars.githubusercontent.com/u/38022481?v=4?s=100" width="100px;" alt="justinthejaguar"/><br /><sub><b>justinthejaguar</b></sub></a><br /><a href="#question-justinthejaguar" title="Answering Questions">💬</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.carlellis.co.uk"><img src="https://avatars.githubusercontent.com/u/288811?v=4?s=100" width="100px;" alt="Carl Ellis"/><br /><sub><b>Carl Ellis</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3Acarl-ellis" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Stew-rt"><img src="https://avatars.githubusercontent.com/u/40280034?v=4?s=100" width="100px;" alt="Stewart Webb"/><br /><sub><b>Stewart Webb</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Stew-rt" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ronner231"><img src="https://avatars.githubusercontent.com/u/136009984?v=4?s=100" width="100px;" alt="Ronner"/><br /><sub><b>Ronner</b></sub></a><br /><a href="#translation-Ronner231" title="Translation">🌍</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZzNoah"><img src="https://avatars.githubusercontent.com/u/34055623?v=4?s=100" width="100px;" alt="ZzNoah"/><br /><sub><b>ZzNoah</b></sub></a><br /><a href="#translation-ZzNoah" title="Translation">🌍</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Henrik-Bonsmann"><img src="https://avatars.githubusercontent.com/u/112704394?v=4?s=100" width="100px;" alt="Henrik Bonsmann"/><br /><sub><b>Henrik Bonsmann</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3AHenrik-Bonsmann" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Henrik-Bonsmann" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Henrik-Bonsmann"><img src="https://avatars.githubusercontent.com/u/112704394?v=4?s=100" width="100px;" alt="Henrik Bonsmann"/><br /><sub><b>Henrik Bonsmann</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/pulls?q=is%3Apr+reviewed-by%3AHenrik-Bonsmann" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=Henrik-Bonsmann" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/apewall"><img src="https://avatars.githubusercontent.com/u/1915182?v=4?s=100" width="100px;" alt="Apewall"/><br /><sub><b>Apewall</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=apewall" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/arcos"><img src="https://avatars.githubusercontent.com/u/143747?v=4?s=100" width="100px;" alt="Andrea Costantini"/><br /><sub><b>Andrea Costantini</b></sub></a><br /><a href="https://github.com/NecroticGnome/ose-foundry-core/commits?author=arcos" title="Code">💻</a></td>
     </tr>
@@ -137,7 +150,3 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
-Links to drivethrurpg.com are affiliate links, and are currently supporting efforts to maintain the open source project. If you buy something after clicking one of these links, drivethrurpg.com may give the maintainers of this software a few cents of your purchase.
