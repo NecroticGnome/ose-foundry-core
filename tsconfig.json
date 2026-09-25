@@ -36,5 +36,5 @@
       "@setup/*": ["./foundry/setup/*"]
     }
   },
-  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts"]
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"]
 }

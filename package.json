@@ -19,9 +19,9 @@
     "test:watch": "vitest",
     "link": "node ./tools/symlink.js",
     "unlink": "node ./tools/symlink.js -c",
-    "lint": "biome check src",
-    "format": "biome format --write src",
-    "fix": "biome check --write src"
+    "lint": "biome check src test",
+    "format": "biome format --write src test",
+    "fix": "biome check --write src test"
   },
   "author": "",
   "license": "",
