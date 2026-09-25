@@ -31,6 +31,7 @@ export type {
   EncumbranceOption,
   ExplorationSkill,
   InventoryItemTag,
+  InventoryItemTagValue,
   OseConfig,
   RollType,
   Save,
