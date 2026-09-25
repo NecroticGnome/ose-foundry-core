@@ -16,8 +16,8 @@ export default class OseDataModelContainer
   declare equipped: boolean;
   declare cost: number;
   declare containerId: string;
-  declare quantity: { value: number; max: number };
-  declare weight: number;
+  declare quantity: { value: number | null; max: number | null };
+  declare weight: number | null;
   declare itemslots: number;
 
   static defineSchema() {
@@ -48,7 +48,10 @@ export default class OseDataModelContainer
   get totalWeight(): number {
     if (!this.contents) return 0;
 
-    return this.contents.reduce((acc, { system: { weight, quantity } }) => acc + weight * (quantity?.value || 1), 0);
+    return this.contents.reduce(
+      (acc, { system: { weight, quantity } }) => acc + Number(weight) * (quantity?.value || 1),
+      0,
+    );
   }
 
   get manualTags(): ItemTag[] | null {

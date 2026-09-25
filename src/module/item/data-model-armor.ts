@@ -16,8 +16,8 @@ export default class OseDataModelArmor extends foundry.abstract.TypeDataModel<an
   declare equipped: boolean;
   declare cost: number;
   declare containerId: string;
-  declare quantity: { value: number; max: number };
-  declare weight: number;
+  declare quantity: { value: number | null; max: number | null };
+  declare weight: number | null;
   declare itemslots: number;
 
   static defineSchema() {

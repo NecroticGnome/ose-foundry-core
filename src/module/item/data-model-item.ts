@@ -14,8 +14,8 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel<any
   declare equipped: boolean;
   declare cost: number;
   declare containerId: string;
-  declare quantity: { value: number; max: number };
-  declare weight: number;
+  declare quantity: { value: number | null; max: number | null };
+  declare weight: number | null;
   declare itemslots: number;
 
   static defineSchema() {
@@ -37,15 +37,15 @@ export default class OseDataModelItem extends foundry.abstract.TypeDataModel<any
   }
 
   get cumulativeWeight() {
-    return this.weight * this.quantity.value;
+    return (this.weight ?? 0) * (this.quantity.value ?? 0);
   }
 
   get cumulativeCost() {
-    return this.cost * this.quantity.value;
+    return this.cost * (this.quantity.value ?? 0);
   }
 
   get cumulativeItemslots() {
-    return Math.ceil(this.itemslots * this.quantity.value);
+    return Math.ceil(this.itemslots * (this.quantity.value ?? 0));
   }
 
   static migrateData(source: LegacyItemSource) {

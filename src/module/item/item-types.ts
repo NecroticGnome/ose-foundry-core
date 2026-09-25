@@ -47,8 +47,8 @@ export interface PhysicalItemData {
   equipped: boolean;
   cost: number;
   containerId: string;
-  quantity: { value: number; max: number };
-  weight: number;
+  quantity: { value: number | null; max: number | null };
+  weight: number | null;
   itemslots: number;
 
   readonly manualTags: ItemTag[] | null;
@@ -101,8 +101,8 @@ export interface WeaponItemData extends PhysicalItemData {
 export interface CarriedItem {
   system: {
     containerId: string;
-    weight: number;
-    quantity?: { value: number };
+    weight: number | null;
+    quantity?: { value: number | null };
   };
 }
 
