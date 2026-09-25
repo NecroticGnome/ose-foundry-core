@@ -33,7 +33,7 @@ export default class OseDataModelCharacterEncumbranceComplete
     super(OseDataModelCharacterEncumbranceComplete.type, max);
     this.#weight = items.reduce((acc, { type, system: { quantity, weight } }: Item) => {
       if (type === "item") return acc + (quantity.value ?? 0) * (weight ?? 0);
-      if (["weapon", "armor", "container"].includes(type)) return acc + weight;
+      if (["weapon", "armor", "container"].includes(type)) return acc + (weight ?? 0);
       return acc;
     }, 0);
   }
