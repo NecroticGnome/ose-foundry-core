@@ -1,15 +1,15 @@
-<form class="{{cssClass}}" autocomplete="off">
+<div class="item-sheet-content">
   <header class="sheet-header">
-    <img class="profile-img" src="{{img}}" data-edit="img" title="{{name}}" />
+    <img class="profile-img" src="{{img}}" data-edit="img" data-tooltip="{{name}}" />
     <div class="header-col">
       <h1 class="charname">
         <input name="name" type="text" value="{{name}}" placeholder="Name" />
       </h1>
       <ol class="tag-list">
         {{#each @root.system.tags as |tag|}}
-        <li class="tag" title="{{tag.title}}" data-tag="{{tag.value}}">
+        <li class="tag" data-tooltip="{{tag.title}}" data-tag="{{tag.value}}">
           <span>{{tag.value}}</span>
-          <a class="tag-delete"><i class="fas fa-times"></i></a>
+          <a class="tag-delete" data-action="tagDelete"><i class="fas fa-times"></i></a>
         </li>
         {{/each}}
       </ol>
@@ -23,13 +23,13 @@
             <input
               type="text"
               data-action="add-tag"
-              title="{{localize 'OSE.items.typeTag'}}"
+              data-tooltip="OSE.items.typeTag"
               placeholder="{{localize 'OSE.items.enterTag'}}"
             />
           </div>
         </div>
-        <div class="form-group">
-          <label>{{localize 'OSE.items.Quantity'}}</label>
+        <label class="form-group qty">
+          <span class="form-label">{{localize 'OSE.items.Quantity'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -43,9 +43,9 @@
               data-dtype="Number"
             />
           </div>
-        </div>
-        <div class="form-group">
-          <label>{{localize 'OSE.items.Treasure'}}</label>
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.items.Treasure'}}</span>
           <div class="form-fields">
             <input
               type="checkbox"
@@ -56,9 +56,9 @@
               data-dtype="Boolean"
             />
           </div>
-        </div>
-        <div class="form-group">
-          <label>{{localize 'OSE.items.Cost'}}</label>
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.items.Cost'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -67,10 +67,10 @@
               data-dtype="Number"
             />
           </div>
-        </div>
+        </label>
         {{#unless (eq @root.config.encumbrance 'itembased')}}
-        <div class="form-group">
-          <label>{{localize 'OSE.items.Weight'}}</label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.items.Weight'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -79,12 +79,12 @@
               data-dtype="Number"
             />
           </div>
-        </div>
+        </label>
         {{else}}
-        <div class="form-group">
-          <label data-tooltip aria-label="{{localize 'OSE.items.ItemBasedEncumbranceLong'}}">
+        <label class="form-group">
+          <span class="form-label" data-tooltip="OSE.items.ItemBasedEncumbranceLong" aria-label="{{localize 'OSE.items.ItemBasedEncumbranceLong'}}">
             {{localize 'OSE.items.ItemBasedEncumbrance'}}
-          </label>
+          </span>
           <div class="form-fields">
             <input
               type="text"
@@ -93,19 +93,16 @@
               data-dtype="Number"
             />
           </div>
-        </div>
+        </label>
         {{/unless}}
       </div>
-      <div class="description weapon-editor">
-        {{editor enriched.description
-          target="system.description"
-          button=true
-          owner=owner
-          editable=editable
-          async=true
-          engine="prosemirror"
-        }}
+      <div class="description">
+        {{#if editable}}
+        <prose-mirror name="system.description" toggled="true" button="true" value="{{system.description}}">{{{enriched.description}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enriched.description}}}</div>
+        {{/if}}
       </div>
     </div>
   </section>
-</form>
+</div>

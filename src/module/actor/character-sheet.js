@@ -5,6 +5,7 @@ import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
 import OseCharacterModifiers from "../dialog/character-modifiers";
+import { toggleItemEquipped } from "../sheet/inventory-actions";
 import OseActorSheet from "./actor-sheet";
 import { prepareExplorationSkills } from "./exploration-skills";
 
@@ -68,10 +69,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   }
 
   generateScores() {
-    new OseCharacterCreator(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterCreator.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
@@ -161,10 +164,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   _onShowModifiers(event) {
     event.preventDefault();
-    new OseCharacterModifiers(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterModifiers.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
@@ -198,10 +203,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   async _onShowGpCost(event) {
     event.preventDefault();
     const cartData = await this._prepareShoppingCartData();
-    new OseCharacterGpCost(this.actor, cartData, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterGpCost.open(this.actor, cartData, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
@@ -261,11 +268,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     html.find(".item-toggle").click(async (ev) => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.items.get(li.data("itemId"));
-      await item.update({
-        system: {
-          equipped: !item.system.equipped,
-        },
-      });
+      await toggleItemEquipped(item);
     });
 
     html.find("a[data-action='generate-scores']").click((ev) => {

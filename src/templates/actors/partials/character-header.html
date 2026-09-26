@@ -1,19 +1,19 @@
 <div class="profile">
-  <img class="profile-img" src="{{img}}" data-edit="img" title="{{name}}" />
+  <img class="profile-img" src="{{img}}" data-edit="img" data-tooltip="{{name}}" />
   {{#if isOwnerOrObserver}}
     <div class="modifiers-btn">
       {{#unless isNew}}
-      <a data-action="modifiers" title="{{localize 'OSE.Modifiers'}}"
+      <a data-action="modifiers" data-tooltip="OSE.Modifiers"
         ><i class="fas fa-book"></i
       ></a>
-      <a data-action="gp-cost" title="{{localize 'OSE.dialog.shoppingCart'}}"
+      <a data-action="gp-cost" data-tooltip="OSE.dialog.shoppingCart"
         ><i class="fas fa-coins"></i
       ></a>
       {{else}}
       <a
         class="blinking"
         data-action="generate-scores"
-        title="{{localize 'OSE.dialog.generateScores'}}"
+        data-tooltip="OSE.dialog.generateScores"
         ><i class="fa fa-dice"></i
       ></a>
       {{/unless}}

@@ -1,46 +1,46 @@
 /**
- * @file An application used for setting up roll modifiers
+ * @file An application used for setting up roll modifiers.
  */
-import OSE from "../config";
+const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
-export default class OseCharacterModifiers extends FormApplication {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
-      classes: ["ose", "dialog", "modifiers"],
-      id: "sheet-modifiers",
-      template: `${OSE.systemPath()}/templates/actors/dialogs/modifiers-dialog.html`,
-      width: 240,
-    });
+export default class OseCharacterModifiers extends HandlebarsApplicationMixin(ApplicationV2) {
+  constructor(document, options = {}) {
+    super(options);
+    this.document = document;
   }
 
-  /* -------------------------------------------- */
+  /** Bring an open dialog forward (closing if it's for a different actor) before creating a new one. */
+  static open(document, options = {}) {
+    const existing = foundry.applications.instances.get("sheet-modifiers");
+    if (existing?.document === document) {
+      existing.bringToFront();
+      return existing;
+    }
+    existing?.close();
+    const sheet = new OseCharacterModifiers(document, options);
+    sheet.render({ force: true });
+    return sheet;
+  }
 
-  /**
-   * Add the Entity name into the window title
-   *
-   * @returns {string} - The app title
-   */
+  static DEFAULT_OPTIONS = {
+    id: "sheet-modifiers",
+    classes: ["ose", "dialog", "modifiers"],
+    tag: "div",
+    position: { width: 240, height: "auto" },
+    window: { resizable: false },
+  };
+
+  static PARTS = {
+    main: { template: "systems/__SYSTEM_ID__/dist/templates/actors/dialogs/modifiers-dialog.html" },
+  };
+
   get title() {
-    return `${this.object.name}: Modifiers`;
+    return `${this.document.name}: ${game.i18n.localize("OSE.Modifiers")}`;
   }
 
-  /* -------------------------------------------- */
-
-  /**
-   * Construct and return the data object used to render the HTML template for this form application.
-   *
-   * @returns {object} - The template data
-   */
-  getData() {
-    const data = foundry.utils.deepClone(this.object);
-    data.user = game.user;
-    return data;
-  }
-
-  /* -------------------------------------------- */
-
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  async _prepareContext() {
+    const context = this.document.toObject();
+    context.user = game.user;
+    return context;
   }
 }

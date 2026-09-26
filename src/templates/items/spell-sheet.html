@@ -1,6 +1,6 @@
-<form class="{{cssClass}}" autocomplete="off">
+<div class="item-sheet-content">
   <header class="sheet-header">
-    <img class="profile-img" src="{{img}}" data-edit="img" title="{{name}}" />
+    <img class="profile-img" src="{{img}}" data-edit="img" data-tooltip="{{name}}" />
     <div class="header-col">
       <h1 class="charname">
         <input name="name" type="text" value="{{name}}" placeholder="Name" />
@@ -9,9 +9,9 @@
   </header>
   <section class="sheet-body">
     <div class="flexrow">
-      <div class="stats narrow">
-        <div class="form-group">
-          <label>{{localize 'OSE.spells.Level'}}</label>
+      <div class="stats">
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.spells.Level'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -20,9 +20,9 @@
               data-dtype="Number"
             />
           </div>
-        </div>
-        <div class="form-group block-input">
-          <label>{{localize 'OSE.spells.Class'}}</label>
+        </label>
+        <label class="form-group block-input">
+          <span class="form-label">{{localize 'OSE.spells.Class'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -31,9 +31,9 @@
               data-dtype="String"
             />
           </div>
-        </div>
-        <div class="form-group block-input">
-          <label>{{localize 'OSE.spells.Duration'}}</label>
+        </label>
+        <label class="form-group block-input">
+          <span class="form-label">{{localize 'OSE.spells.Duration'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -42,9 +42,9 @@
               data-dtype="String"
             />
           </div>
-        </div>
-        <div class="form-group block-input">
-          <label>{{localize 'OSE.spells.Range'}}</label>
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.spells.Range'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -53,18 +53,18 @@
               data-dtype="String"
             />
           </div>
-        </div>
-        <div class="form-group">
-          <label>{{localize 'OSE.spells.Save'}}</label>
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.spells.Save'}}</span>
           <div class="form-fields">
             <select name="system.save">
               <option value=""></option>
               {{selectOptions config.saves_short selected=system.save}}
             </select>
           </div>
-        </div>
-        <div class="form-group block-input">
-          <label>{{localize 'OSE.items.Roll'}}</label>
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.items.Roll'}}</span>
           <div class="form-fields">
             <input
               type="text"
@@ -73,18 +73,15 @@
               data-dtype="String"
             />
           </div>
-        </div>
+        </label>
       </div>
       <div class="description">
-        {{editor enriched.description
-          target="system.description"
-          button=true
-          owner=owner
-          editable=editable
-          async=true
-          engine="prosemirror"
-        }}
+        {{#if editable}}
+        <prose-mirror name="system.description" toggled="true" button="true" value="{{system.description}}">{{{enriched.description}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enriched.description}}}</div>
+        {{/if}}
       </div>
     </div>
   </section>
-</form>
+</div>
