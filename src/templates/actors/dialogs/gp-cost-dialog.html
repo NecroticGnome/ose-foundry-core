@@ -5,7 +5,7 @@
       <li class="item-entry item" data-item-id="{{item.id}}">
         <div class="item-header flexrow">
           <div class="item-image" style="background-image: url({{item.img}})"></div>
-          <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+          <h4 class="item-name" data-tooltip="{{item.name}}">{{item.name~}}</h4>
           <div class="field-short">
             {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
             {{item.system.cost}}
@@ -19,7 +19,7 @@
       <li class="item-entry item" data-item-id="{{item.id}}">
         <div class="item-header flexrow">
           <div class="item-image" style="background-image: url({{item.img}})"></div>
-          <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+          <h4 class="item-name" data-tooltip="{{item.name}}">{{item.name~}}</h4>
           <div class="field-short">
             {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
             {{item.system.cost}}
@@ -33,7 +33,7 @@
       <li class="item-entry item" data-item-id="{{bag.id}}">
         <div class="item-header flexrow">
           <div class="item-image" style="background-image: url({{bag.img}})"></div>
-          <h4 class="item-name" title="{{bag.name}}">{{bag.name~}}</h4>
+          <h4 class="item-name" data-tooltip="{{bag.name}}">{{bag.name~}}</h4>
           <div class="field-short">
             {{#if bag.system.quantity.max}}{{bag.system.quantity.value}} x {{/if}}
             {{bag.system.cost}}
@@ -45,7 +45,7 @@
         <li class="item-entry item" data-item-id="{{item.id}}">
           <div class="item-header flexrow">
             <div class="item-image" style="background-image: url({{item.img}})"></div>
-            <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+            <h4 class="item-name" data-tooltip="{{item.name}}">{{item.name~}}</h4>
             <div class="field-short">
               {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
               {{item.system.cost}}
@@ -61,7 +61,7 @@
       <li class="item-entry item" data-item-id="{{item.id}}">
         <div class="item-header flexrow">
           <div class="item-image" style="background-image: url({{item.img}})"></div>
-          <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+          <h4 class="item-name" data-tooltip="{{item.name}}">{{item.name~}}</h4>
           <div class="field-short">
             {{#if item.system.quantity.max}}{{item.system.quantity.value}} x {{/if}}
             {{item.system.cost}}

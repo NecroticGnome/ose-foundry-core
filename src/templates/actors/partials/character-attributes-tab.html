@@ -3,7 +3,7 @@
     <div class="attribute-group">
         <ul class="attributes">
             <li class="attribute ability-score" data-score="str">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.str.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.str.long">
                     <a>{{ localize "OSE.scores.str.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -12,7 +12,7 @@
                 </div>
             </li>
             <li class="attribute ability-score" data-score="int">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.int.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.int.long">
                     <a>{{ localize "OSE.scores.int.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -21,7 +21,7 @@
                 </div>
             </li>
             <li class="attribute ability-score" data-score="wis">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.wis.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.wis.long">
                     <a>{{ localize "OSE.scores.wis.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -30,7 +30,7 @@
                 </div>
             </li>
             <li class="attribute ability-score" data-score="dex">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.dex.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.dex.long">
                     <a>{{ localize "OSE.scores.dex.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -39,7 +39,7 @@
                 </div>
             </li>
             <li class="attribute ability-score" data-score="con">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.con.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.con.long">
                     <a>{{ localize "OSE.scores.con.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -48,7 +48,7 @@
                 </div>
             </li>
             <li class="attribute ability-score" data-score="cha">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.scores.cha.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.scores.cha.long">
                     <a>{{ localize "OSE.scores.cha.short" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -58,7 +58,7 @@
             </li>
             {{#if system.retainer.enabled}}
             <li class="attribute ability-score" data-stat="lr">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.Loyalty' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.Loyalty">
                     <a>{{ localize "OSE.LoyaltyShort" }}</a>
                 </h4>
                 <div class="attribute-value">
@@ -74,26 +74,26 @@
         <div class="flexrow">
             <div class="health">
                 <input class="health-value health-top" name="system.hp.value" type="text" value="{{system.hp.value}}"
-                    data-dtype="Number" placeholder="0" title="{{localize 'OSE.Health'}}" />
+                    data-dtype="Number" placeholder="0" data-tooltip="OSE.Health" />
                 <input class="health-value health-bottom" name="system.hp.max" type="text" value="{{system.hp.max}}"
-                    data-dtype="Number" placeholder="0" title="{{localize 'OSE.HealthMax'}}" />
+                    data-dtype="Number" placeholder="0" data-tooltip="OSE.HealthMax" />
                 <div class="health-empty" style="height:{{counter false system.hp.value system.hp.max}}%"></div>
                 <div class="health-full" style="height:{{counter true system.hp.value system.hp.max}}%"></div>
             </div>
             <div class="health armor-class">
                 {{#if @root.system.usesAscendingAC}}
-                <div class="health-value health-top" title="{{localize 'OSE.ArmorClass'}}">{{system.aac.value}}</div>
-                <div class="health-value health-bottom" title="{{localize 'OSE.ArmorClassNaked'}}">
+                <div class="health-value health-top" data-tooltip="OSE.ArmorClass">{{system.aac.value}}</div>
+                <div class="health-value health-bottom" data-tooltip="OSE.ArmorClassNaked">
                     {{system.aac.naked}}</div>
                 {{#if system.aac.shield}}<div class="shield"
-                    title="{{localize 'OSE.items.hasShield'}} ({{system.aac.shield}})"><i class="fas fa-shield-alt"></i>
+                    data-tooltip="{{localize 'OSE.items.hasShield'}} ({{system.aac.shield}})"><i class="fas fa-shield-alt"></i>
                 </div>{{/if}}
                 {{else}}
-                <div class="health-value health-top" title="{{localize 'OSE.ArmorClass'}}">{{system.ac.value}}</div>
-                <div class="health-value health-bottom" title="{{localize 'OSE.ArmorClassNaked'}}">
+                <div class="health-value health-top" data-tooltip="OSE.ArmorClass">{{system.ac.value}}</div>
+                <div class="health-value health-bottom" data-tooltip="OSE.ArmorClassNaked">
                     {{system.ac.naked}}</div>
                 {{#if system.ac.shield}}<div class="shield"
-                    title="{{localize 'OSE.items.hasShield'}} ({{system.ac.shield}})"><i class="fas fa-shield-alt"></i>
+                    data-tooltip="{{localize 'OSE.items.hasShield'}} ({{system.ac.shield}})"><i class="fas fa-shield-alt"></i>
                 </div>{{/if}}
                 {{/if}}
             </div>
@@ -101,7 +101,7 @@
         <div class="flexrow">
             <ul class="attributes flexrow">
                 <li class="attribute hit-dice">
-                    <h4 class="attribute-name box-title" title="{{ localize 'OSE.HitDice' }}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.HitDice">
                         <a>{{ localize "OSE.HitDiceShort" }}</a>
                     </h4>
                     <div class="attribute-value">
@@ -111,10 +111,10 @@
                 </li>
                 {{#if config.initiative}}
                 <li class="attribute">
-                    <h4 class="attribute-name box-title" title="{{ localize 'OSE.Initiative' }}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.Initiative">
                         {{ localize "OSE.InitiativeShort" }}</h4>
                     <div class="attribute-value"
-                        title="{{localize 'OSE.scores.dex.long'}}({{system.scores.dex.init}}) + {{localize 'OSE.Modifier'}}({{system.initiative.mod}})">
+                        data-tooltip="{{localize 'OSE.scores.dex.long'}}({{system.scores.dex.init}}) + {{localize 'OSE.Modifier'}}({{system.initiative.mod}})">
                         {{system.init}}
                     </div>
                 </li>
@@ -124,19 +124,19 @@
         <div class="flexrow">
             <ul class="attributes flexrow">
                 <li class="attribute attribute-secondaries attack" data-attack="melee">
-                    <h4 class="attribute-name box-title" title="{{localize 'OSE.Melee'}}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.Melee">
                         <a>{{localize 'OSE.MeleeShort'}}</a>
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value"
-                            title="{{localize 'OSE.scores.str.long'}}({{system.scores.str.mod}}) + {{localize 'OSE.Modifier'}}({{system.thac0.mod.melee}})">
+                            data-tooltip="{{localize 'OSE.scores.str.long'}}({{system.scores.str.mod}}) + {{localize 'OSE.Modifier'}}({{system.thac0.mod.melee}})">
                             {{system.meleeMod}}
                         </div>
                     </div>
                 </li>
                 {{#if config.ascendingAC}}
                 <li class="attribute">
-                    <h4 class="attribute-name box-title" title="{{ localize 'OSE.AB' }}">{{ localize "OSE.ABShort"}}
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.AB">{{ localize "OSE.ABShort"}}
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value">
@@ -147,7 +147,7 @@
                 </li>
                 {{else}}
                 <li class="attribute">
-                    <h4 class="attribute-name box-title" title="{{ localize 'OSE.Thac0' }}">{{ localize "OSE.Thac0"}}
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.Thac0">{{ localize "OSE.Thac0"}}
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value">
@@ -158,12 +158,12 @@
                 </li>
                 {{/if}}
                 <li class="attribute attribute-secondaries attack" data-attack="missile">
-                    <h4 class="attribute-name box-title" title="{{localize 'OSE.Missile'}}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.Missile">
                         <a>{{localize 'OSE.MissileShort'}}</a>
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value"
-                            title="{{localize 'OSE.scores.dex.long'}}({{system.scores.dex.mod}}) + {{localize 'OSE.Modifier'}}({{system.thac0.mod.missile}})">
+                            data-tooltip="{{localize 'OSE.scores.dex.long'}}({{system.scores.dex.mod}}) + {{localize 'OSE.Modifier'}}({{system.thac0.mod.missile}})">
                             {{system.rangedMod}}
                         </div>
                     </div>
@@ -173,7 +173,7 @@
         <div class="flexrow">
             <ul class="attributes flexrow">
                 <li class="attribute attribute-secondaries">
-                    <h4 class="attribute-name box-title" title="{{localize 'OSE.movement.overland.long'}}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.movement.overland.long">
                         {{localize 'OSE.movement.overland.short'}}</h4>
                     <div class="flexrow">
                         <div class="attribute-value">
@@ -182,7 +182,7 @@
                     </div>
                 </li>
                 <li class="attribute">
-                    <h4 class="attribute-name box-title" title="{{ localize 'OSE.movement.exploration.long' }}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.movement.exploration.long">
                         {{ localize "OSE.movement.exploration.short" }}</h4>
                     <div class="attribute-value flexrow">
                         <input name="system.movement.base" type="text" value="{{@root.system.movement.base}}" placeholder="0"
@@ -190,7 +190,7 @@
                     </div>
                 </li>
                 <li class="attribute attribute-secondaries">
-                    <h4 class="attribute-name box-title" title="{{localize 'OSE.movement.encounter.long'}}">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.movement.encounter.long">
                         {{localize 'OSE.movement.encounter.short'}}</h4>
                     <div class="flexrow">
                         <div class="attribute-value">
@@ -245,9 +245,9 @@
                         placeholder="0" />
             </li>
             <li class="attribute saving-throw">
-                <h4 class="attribute-name box-title" title="{{ localize 'OSE.saves.magic.long' }}">
+                <h4 class="attribute-name box-title" data-tooltip="OSE.saves.magic.long">
                     {{ localize "OSE.saves.magic.long"}}</h4>
-                <div class="attribute-value flat" title="{{localize 'OSE.scores.wis.long'}}({{system.scores.wis.mod}})+{{system.details.magic.bonus}}">
+                <div class="attribute-value flat" data-tooltip="{{localize 'OSE.scores.wis.long'}}({{system.scores.wis.mod}})+{{system.details.magic.bonus}}">
                     {{add system.scores.wis.mod system.details.magic.bonus}}
                 </div>
             </li>

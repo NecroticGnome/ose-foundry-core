@@ -43,6 +43,12 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
   });
 
   describe("create()", () => {
+    // Free the notification slots first: the "Can't create…" tests assert on the
+    // visible list, which permanent notifications from earlier batches can fill.
+    beforeEach(async () => {
+      await ui.notifications?.clear();
+    });
+
     const testItemCreate = async (type: string) => {
       const item = await createWorldTestItem(type);
       expect(item).is.not.undefined;

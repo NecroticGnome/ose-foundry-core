@@ -1,5 +1,5 @@
 <div class="profile">
-  <img class="profile-img" src="{{img}}" data-edit="img" title="{{name}}" />
+  <img class="profile-img" src="{{img}}" data-edit="img" data-tooltip="{{name}}" />
 </div>
 <section class="header-details flexrow">
   <h1 class="charname">
@@ -23,7 +23,7 @@
         </div>
         <div
           class="check reaction-check"
-          title="{{localize 'OSE.roll.reaction'}}"
+          data-tooltip="OSE.roll.reaction"
         >
           <a><i class="fas fa-dice"></i></a>
         </div>
@@ -39,7 +39,7 @@
         </div>
         <div
           class="check appearing-check"
-          title="{{localize 'OSE.roll.appearing'}}"
+          data-tooltip="OSE.roll.appearing"
         >
           <a><i class="fas fa-dice"></i></a>
         </div>
@@ -56,7 +56,7 @@
         )
         <div
           class="check appearing-check"
-          title="{{localize 'OSE.roll.appearing'}}"
+          data-tooltip="OSE.roll.appearing"
         >
           <a><i class="fas fa-dice"></i></a>
         </div>
@@ -71,7 +71,7 @@
           />
           <label>{{localize 'OSE.details.morale'}}</label>
         </div>
-        <div class="check morale-check" title="{{localize 'OSE.roll.morale'}}">
+        <div class="check morale-check" data-tooltip="OSE.roll.morale">
            <a><i class="fas fa-dice"></i></a>
         </div>
       </li>
@@ -92,12 +92,12 @@
           name="system.details.specialAbilities"
           value="{{system.details.specialAbilities}}"
         />
-        <label title="Special Abilities"
+        <label data-tooltip="Special Abilities"
           >{{localize 'OSE.details.special.abilities'}}</label>
       </li>
       <li
         class="treasure-table"
-        title="{{localize 'OSE.details.treasureTableHint'}}"
+        data-tooltip="OSE.details.treasureTableHint"
       >
         <div>{{{system.details.treasure.link}}}</div>
         <label>{{localize 'OSE.details.treasure'}}</label>

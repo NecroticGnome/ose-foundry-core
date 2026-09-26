@@ -5,6 +5,7 @@ import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
 import OseCharacterModifiers from "../dialog/character-modifiers";
+import { toggleItemEquipped } from "../sheet/inventory-actions";
 import OseActorSheet from "./actor-sheet";
 import { prepareExplorationSkills } from "./exploration-skills";
 
@@ -267,11 +268,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     html.find(".item-toggle").click(async (ev) => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.items.get(li.data("itemId"));
-      await item.update({
-        system: {
-          equipped: !item.system.equipped,
-        },
-      });
+      await toggleItemEquipped(item);
     });
 
     html.find("a[data-action='generate-scores']").click((ev) => {

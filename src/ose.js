@@ -31,6 +31,7 @@ import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
 import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
+import { bindInventoryContextMenu } from "./module/sheet/context-menu";
 
 import "./e2e";
 
@@ -193,85 +194,15 @@ Hooks.on("createCombatant", (combatant) => {
   combatant.assignGroup();
 });
 
+// TODO(appv2 stage 7): this hook fires only for V1 ActorSheet instances.
+// When OseActorSheet moves to ActorSheetV2 in stage 7, drop this hook and call
+// bindInventoryContextMenu from the V2 sheet's `_onRender` instead.
 /**
  * @param {Application} app - The actor sheet application
  * @param {HTMLElement|JQuery} html - Sheet root (v1 hooks may still pass jQuery)
  */
 Hooks.on("renderActorSheet", (app, html) => {
-  if (!app?.object?.isOwnerOrObserver) return;
-
-  // ContextMenu no longer accepts jQuery roots (deprecated since Foundry v13).
-  const root = html instanceof HTMLElement ? html : html?.[0];
-  if (!(root instanceof HTMLElement)) return;
-
-  new foundry.applications.ux.ContextMenu(
-    root,
-    ".item",
-    [
-      {
-        name: "OSE.Show",
-        icon: "<i class='fas fa-eye'></i>",
-        callback: (el) => {
-          const id = el.dataset?.itemId;
-          const item = app.actor?.items?.get(id);
-          if (item) {
-            item.show();
-          }
-        },
-      },
-      {
-        name: "OSE.items.Equip",
-        icon: "<i class='fas fa-hand'></i>",
-        condition: (el) => {
-          if (app.actor?.type !== "character" || !app.object?.sheet?.isEditable) {
-            return false;
-          }
-
-          const id = el.dataset?.itemId;
-          const item = app.actor?.items?.get(id);
-          return ["item", "armor", "weapon", "treasure", "container"].includes(item?.type);
-        },
-        callback: async (el) => {
-          const id = el.dataset?.itemId;
-          const item = app.actor?.items?.get(id);
-          if (item) {
-            await item.update({
-              system: {
-                equipped: !item.system.equipped,
-              },
-            });
-          }
-        },
-      },
-      {
-        name: "OSE.Edit",
-        icon: "<i class='fas fa-edit'></i>",
-        condition: () => !!app.object?.sheet?.isEditable,
-        callback: (el) => {
-          const id = el.dataset?.itemId;
-          const item = app.actor?.items?.get(id);
-          if (item) {
-            item.sheet.render(true);
-          }
-        },
-      },
-      {
-        name: "OSE.Delete",
-        icon: "<i class='fas fa-trash'></i>",
-        condition: () => !!app.object?.sheet?.isEditable,
-        callback: (el) => {
-          const id = el.dataset?.itemId;
-          const item = app.actor?.items?.get(id);
-          if (item) {
-            app._promptRemoveItemFromActor(item);
-          }
-        },
-      },
-    ],
-    {
-      jQuery: false,
-    },
-  );
+  bindInventoryContextMenu(app, html instanceof HTMLElement ? html : html?.[0]);
 });
 
 Hooks.on("renderCompendium", renderList.RenderCompendium);
