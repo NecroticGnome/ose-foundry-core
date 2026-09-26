@@ -31,9 +31,23 @@ export type {
   EncumbranceOption,
   ExplorationSkill,
   InventoryItemTag,
+  InventoryItemTagValue,
   OseConfig,
   RollType,
   Save,
 } from "../module/config";
-
+export type {
+  AbilityItemData,
+  ArmorItemData,
+  ArmorType,
+  CarriedItem,
+  ContainerItemData,
+  DisplayTag,
+  ItemTag,
+  MiscItemData,
+  NonPhysicalItemData,
+  PhysicalItemData,
+  SpellItemData,
+  WeaponItemData,
+} from "../module/item/item-types";
 export type { ClassicClassName, OseClass } from "./classes";

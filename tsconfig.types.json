@@ -12,6 +12,10 @@
     "emitDeclarationOnly": true,
     "declarationMap": false,
     "noEmitOnError": false,
+    // The declaration emit needs Node-style resolution: under the base
+    // config's "bundler" the real fvtt-types field classes resolve, and tsc
+    // cannot name their types portably in the emitted .d.ts (TS2742).
+    "moduleResolution": "node",
     "rootDir": "src",
     "outDir": ".types-build"
   },

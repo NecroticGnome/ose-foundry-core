@@ -15,11 +15,13 @@
     "watch:js": "rollup -c --watch",
     "watch:css": "sass --watch src/ose.scss dist/ose.css --source-map",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "link": "node ./tools/symlink.js",
     "unlink": "node ./tools/symlink.js -c",
-    "lint": "biome check src",
-    "format": "biome format --write src",
-    "fix": "biome check --write src"
+    "lint": "biome check src test",
+    "format": "biome format --write src test",
+    "fix": "biome check --write src test"
   },
   "author": "",
   "license": "",
@@ -37,6 +39,7 @@
     "sass": "^1.97.2",
     "tslib": "^2.4.0",
     "typescript": "^5.9.3",
+    "vitest": "^5.0.0",
     "yargs": "^17.3.1"
   }
 }

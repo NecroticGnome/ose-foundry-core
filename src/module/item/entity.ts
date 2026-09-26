@@ -4,13 +4,36 @@
 import OSE from "../config";
 import OseDice from "../helpers-dice";
 import { getRollMode } from "../helpers-message-mode";
+import type { ITEM_DATA_MODELS } from "./data-models";
+import type { DisplayTag, ItemTag } from "./item-types";
+
+/** The Item subtypes this system registers. */
+type OseItemType = keyof typeof ITEM_DATA_MODELS;
+
+/**
+ * The union of every registered item's system data.
+ *
+ * Methods below switch on `this.type` before reading subtype-specific fields,
+ * but TypeScript cannot narrow `this.system` from `this.type` — `this` is not a
+ * discriminated union — so those reads assert the shape the switch guarantees.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: the union is read field-by-field after a type switch
+type AnyItemSystem = Item["system"] & Record<string, any>;
+
+/**
+ * The owning Actor, as this file needs it. The actor entity is still JavaScript
+ * and its data models are not registered with fvtt-types, so members like
+ * `targetAttack` and `rollSave` are not yet visible on Foundry's `Actor`.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: until the actor entity is TypeScript
+type OwningActor = Actor & Record<string, any>;
 
 /**
  * Override and extend the basic :class:`Item` implementation
  */
 export default class OseItem extends Item {
   // Replacing default image */
-  static get defaultIcons() {
+  static get defaultIcons(): Record<OseItemType, string> {
     return {
       spell: `${OSE.assetsPath}/default/spell.png`,
       ability: `${OSE.assetsPath}/default/ability.png`,
@@ -21,20 +44,27 @@ export default class OseItem extends Item {
     };
   }
 
-  static async create(data, context = {}) {
+  // Narrowing these to Item.CreateData / CreateOperation breaks static-side
+  // compatibility with Item.create's generic overloads (TS2417).
+  // biome-ignore lint/suspicious/noExplicitAny: see above
+  static async create(data: any, context: any = {}) {
     if (data.img === undefined) {
-      data.img = OseItem.defaultIcons[data.type];
+      data.img = OseItem.defaultIcons[data.type as OseItemType];
     }
     return Item.create(data, context);
   }
 
-  static migrateData(source) {
+  static migrateData(source: {
+    img?: string;
+    type?: string;
+    system?: { itemslots?: number; tags?: ItemTag[]; type?: string };
+  }) {
     if (source?.img === "" && source.type) {
-      source.img = OseItem.defaultIcons[source.type];
+      source.img = OseItem.defaultIcons[source.type as OseItemType];
     }
     if (source?.system?.itemslots === undefined) {
-      if ((source?.system?.tags ?? []).some((tag) => tag.value === "Two-handed") && source?.type === "weapon")
-        source.system.itemslots = 2;
+      if ((source?.system?.tags ?? []).some((tag: ItemTag) => tag.value === "Two-handed") && source?.type === "weapon")
+        (source.system as { itemslots?: number }).itemslots = 2;
       if (source?.system?.type === "heavy" && source.type === "armor") source.system.itemslots = 2;
     }
 
@@ -45,33 +75,35 @@ export default class OseItem extends Item {
     super.prepareData();
   }
 
-  async prepareDerivedData() {
+  async prepareDerivedData(): Promise<void> {
     // Rich text description
-    this.system.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      this.system.description,
-      { async: true },
-    );
+    (this.system as AnyItemSystem).enrichedDescription =
+      // `async` was removed from EnrichmentOptions in v13; kept so the call is
+      // byte-identical to the JavaScript this replaces.
+      await foundry.applications.ux.TextEditor.implementation.enrichHTML((this.system as AnyItemSystem).description, {
+        async: true,
+      } as never);
   }
 
-  static chatListeners(html) {
+  static chatListeners(html: HTMLElement) {
     // Use event delegation for buttons
-    html.addEventListener("click", (event) => {
-      const button = event.target.closest(".card-buttons button");
+    html.addEventListener("click", (event: MouseEvent) => {
+      const button = (event.target as HTMLElement).closest(".card-buttons button");
       if (button) {
         OseItem._onChatCardAction(event);
       }
 
-      const itemName = event.target.closest(".item-name");
+      const itemName = (event.target as HTMLElement).closest(".item-name");
       if (itemName) {
         OseItem._onChatCardToggleContent(event);
       }
     });
   }
 
-  async getChatData(_htmlOptions) {
+  async getChatData(_htmlOptions?: unknown) {
     const itemType = this.type;
 
-    const itemData = this.system;
+    const itemData = this.system as AnyItemSystem;
 
     // Item properties
     const props = [];
@@ -93,15 +125,15 @@ export default class OseItem extends Item {
     return itemData;
   }
 
-  rollWeapon(options = {}) {
-    const isNPC = this.actor.type !== "character";
-    const _targets = 5;
+  rollWeapon(options: Record<string, unknown> = {}) {
+    const actor = this.actor as OwningActor;
+    const isNPC = (actor.type as string) !== "character";
     const itemData = this.system;
 
     let type = isNPC ? "attack" : "melee";
     const rollData = {
       item: this._source,
-      actor: this.actor,
+      actor: this.actor as OwningActor,
       roll: {
         save: itemData.save,
         target: null,
@@ -120,7 +152,7 @@ export default class OseItem extends Item {
             label: game.i18n.localize("OSE.Melee"),
             default: true,
             callback: () => {
-              this.actor.targetAttack(rollData, "melee", options);
+              actor.targetAttack(rollData, "melee", options);
             },
           },
           {
@@ -128,7 +160,7 @@ export default class OseItem extends Item {
             icon: "fas fa-bullseye",
             label: game.i18n.localize("OSE.Missile"),
             callback: () => {
-              this.actor.targetAttack(rollData, "missile", options);
+              actor.targetAttack(rollData, "missile", options);
             },
           },
         ],
@@ -138,11 +170,11 @@ export default class OseItem extends Item {
     if (itemData.missile && !isNPC) {
       type = "missile";
     }
-    this.actor.targetAttack(rollData, type, options);
+    actor.targetAttack(rollData, type, options);
     return true;
   }
 
-  async rollFormula(options = {}) {
+  async rollFormula(options: { event?: Event } = {}) {
     const itemData = this.system;
 
     if (!itemData.roll) {
@@ -154,8 +186,8 @@ export default class OseItem extends Item {
 
     const type = itemData.rollType;
 
-    const rollData = {
-      actor: this.actor,
+    const rollData: Record<string, unknown> = {
+      actor: this.actor as OwningActor,
       item: this._source,
       description: null,
       save: itemData.save,
@@ -177,10 +209,11 @@ export default class OseItem extends Item {
       parts: rollParts,
       data: rollData,
       skipDialog: true,
-      speaker: ChatMessage.getSpeaker({ actor: this }),
+      // biome-ignore lint/suspicious/noExplicitAny: getSpeaker expects an Actor; this passes the Item, as the original did
+      speaker: ChatMessage.getSpeaker({ actor: this as any }),
       flavor: game.i18n.format("OSE.roll.formula", { label }),
       title: game.i18n.format("OSE.roll.formula", { label }),
-    });
+    } as never);
   }
 
   async spendSpell() {
@@ -189,7 +222,7 @@ export default class OseItem extends Item {
     const itemData = this.system;
     await this.update({
       system: {
-        cast: itemData.cast - 1,
+        cast: (itemData.cast ?? 0) - 1,
       },
     });
 
@@ -200,29 +233,31 @@ export default class OseItem extends Item {
     }
   }
 
-  _getRollTag(data) {
+  _getRollTag(data: AnyItemSystem): DisplayTag | undefined {
     if (data.roll) {
       const roll = `${data.roll}${
-        data.rollTarget ? CONFIG.OSE.roll_type[data.rollType] : ""
+        data.rollTarget ? CONFIG.OSE.roll_type[data.rollType as keyof typeof CONFIG.OSE.roll_type] : ""
       }${data.rollTarget ? data.rollTarget : ""}`;
       return {
         label: `${game.i18n.localize("OSE.items.Roll")} ${roll}`,
       };
     }
+    return undefined;
   }
 
-  _getSaveTag(data) {
+  _getSaveTag(data: AnyItemSystem): DisplayTag | undefined {
     if (data.save) {
       return {
         label: CONFIG.OSE.saves_long[data.save],
         icon: "fa-skull",
       };
     }
+    return undefined;
   }
 
-  getAutoTagList() {
-    const tagList = [];
-    const data = this.system;
+  getAutoTagList(): DisplayTag[] {
+    const tagList: DisplayTag[] = [];
+    const data = this.system as AnyItemSystem;
     const itemType = this.type;
 
     switch (itemType) {
@@ -232,7 +267,7 @@ export default class OseItem extends Item {
       }
 
       case "weapon": {
-        tagList.push({ label: data.damage, icon: "fa-tint" });
+        tagList.push({ label: data.damage as string, icon: "fa-tint" });
         if (data.missile) {
           tagList.push({
             label: `${data.range.short}/${data.range.medium}/${data.range.long}`,
@@ -248,17 +283,17 @@ export default class OseItem extends Item {
       }
 
       case "armor": {
-        tagList.push({ label: CONFIG.OSE.armor[data.type], icon: "fa-tshirt" });
+        tagList.push({ label: CONFIG.OSE.armor[data.type as keyof typeof CONFIG.OSE.armor], icon: "fa-tshirt" });
         break;
       }
 
       case "spell": {
-        tagList.push({ label: data.class }, { label: data.range }, { label: data.duration });
+        tagList.push({ label: data.class }, { label: data.range as string }, { label: data.duration });
         break;
       }
 
       case "ability": {
-        const reqs = data.requirements.split(",");
+        const reqs = (data.requirements ?? "").split(",");
         for (const req of reqs) {
           tagList.push({ label: req });
         }
@@ -288,13 +323,13 @@ export default class OseItem extends Item {
    * @param {string[]} values - The values of the tags to add.
    * @returns {Promise<OseItem|undefined>>} - The updated Document instance, or undefined if not updated
    */
-  async pushManualTag(values) {
-    const data = this?.system;
-    let update = [];
+  async pushManualTag(values: string[]) {
+    const data = this?.system as AnyItemSystem;
+    let update: ItemTag[] = [];
     if (data.tags) {
       update = data.tags;
     }
-    const newData = {};
+    const newData: Record<string, unknown> = {};
     const regExp = /\(([^)]+)\)/;
     values.forEach((val) => {
       // Catch infos in brackets
@@ -302,7 +337,7 @@ export default class OseItem extends Item {
       let title = "";
       let trimmedVal = "";
       if (matches) {
-        title = matches[1];
+        title = matches[1] ?? "";
         trimmedVal = val.slice(0, Math.max(0, matches.index)).trim();
       } else {
         trimmedVal = val.trim();
@@ -335,7 +370,7 @@ export default class OseItem extends Item {
         });
       }
 
-      if (trimmedVal === "Two-handed" && this.type === "weapon") {
+      if (trimmedVal === "Two-handed" && (this.type as string) === "weapon") {
         newData.itemslots = 2;
       }
     });
@@ -349,21 +384,21 @@ export default class OseItem extends Item {
    * @param {string} value - The value of the tag to remove.
    * @returns {Promise<OseItem|undefined>} - The updated Document instance, or undefined if not updated
    */
-  popManualTag(value) {
-    const itemData = this.system;
+  popManualTag(value: string) {
+    const itemData = this.system as AnyItemSystem;
 
     const { tags } = itemData;
     if (!tags) return;
 
-    const update = tags.filter((el) => el.value.toLowerCase() !== value.toLowerCase());
+    const update = tags.filter((el: ItemTag) => el.value.toLowerCase() !== value.toLowerCase());
     const newData = {
       tags: update,
     };
     return this.update({ system: newData });
   }
 
-  roll(options = {}) {
-    const itemData = this.system;
+  roll(options: Record<string, unknown> = {}) {
+    const itemData = this.system as AnyItemSystem;
     switch (this.type) {
       case "weapon": {
         this.rollWeapon(options);
@@ -371,7 +406,7 @@ export default class OseItem extends Item {
       }
 
       case "spell": {
-        this.spendSpell(options);
+        this.spendSpell();
         break;
       }
 
@@ -387,7 +422,9 @@ export default class OseItem extends Item {
       case "item":
       case "armor": {
         this.show();
+        break;
       }
+      // No default
     }
   }
 
@@ -396,39 +433,40 @@ export default class OseItem extends Item {
    *
    * @returns {Promise}
    */
-  async show() {
+  async show(_options: Record<string, unknown> = {}) {
     const itemType = this.type;
     // Basic template rendering data
-    const token = this.actor?.token;
-    const templateData = {
-      actor: this.actor,
-      tokenId: token ? `${token.parent.id}.${token.id}` : null,
+    const token = (this.actor as OwningActor | null)?.token;
+    const templateData: Record<string, unknown> = {
+      actor: this.actor as OwningActor,
+      tokenId: token ? `${token.parent?.id}.${token.id}` : null,
       item: this._source,
-      itemId: this._source._id,
+      itemId: (this._source as { _id?: string })._id,
       data: await this.getChatData(),
-      labels: this.labels,
-      isHealing: this.isHealing,
-      hasDamage: this.hasDamage,
+      labels: (this as unknown as Record<string, unknown>).labels,
+      isHealing: (this as unknown as Record<string, unknown>).isHealing,
+      hasDamage: (this as unknown as Record<string, unknown>).hasDamage,
       isSpell: itemType === "spell",
-      hasSave: this.hasSave,
+      hasSave: (this as unknown as Record<string, unknown>).hasSave,
       config: CONFIG.OSE,
     };
-    templateData.rollFormula = new Roll(templateData.data.roll, templateData).formula;
-    templateData.data.properties = this.system.autoTags;
+    const chatItemData = templateData.data as AnyItemSystem;
+    templateData.rollFormula = new Roll(chatItemData.roll ?? "", templateData).formula;
+    chatItemData.properties = this.system.autoTags;
 
     // Render the chat card template
     const template = `${OSE.systemPath()}/templates/chat/item-card.html`;
     const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
     // Basic chat message data
-    const chatData = {
+    const chatData: Record<string, unknown> = {
       user: game.user.id,
       style: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: html,
       speaker: {
-        actor: this.actor?.id,
-        token: this.actor?.token,
-        alias: this.actor?.name,
+        actor: (this.actor as OwningActor | null)?.id,
+        token: (this.actor as OwningActor | null)?.token,
+        alias: (this.actor as OwningActor | null)?.name,
       },
     };
 
@@ -439,7 +477,7 @@ export default class OseItem extends Item {
     if (rollMode === "blindroll") chatData.blind = true;
 
     // Create the chat message
-    return ChatMessage.create(chatData);
+    return ChatMessage.create(chatData as never);
   }
 
   /**
@@ -448,11 +486,11 @@ export default class OseItem extends Item {
    * @param {Event} event - The originating click event
    * @private
    */
-  static _onChatCardToggleContent(event) {
+  static _onChatCardToggleContent(event: Event) {
     event.preventDefault();
-    const header = event.target.closest(".item-name");
-    const card = header.closest(".chat-card");
-    const content = card.querySelector(".card-content");
+    const header = (event.target as HTMLElement).closest(".item-name");
+    const card = header?.closest(".chat-card") as HTMLElement | null;
+    const content = card?.querySelector(".card-content") as HTMLElement;
     if (content.style.display === "none") {
       $(content).slideDown(200);
     } else {
@@ -460,38 +498,41 @@ export default class OseItem extends Item {
     }
   }
 
-  static async _onChatCardAction(event) {
+  static async _onChatCardAction(event: Event): Promise<unknown> {
     event.preventDefault();
 
     // Extract card data
-    const button = event.target.closest(".card-buttons button");
+    const button = (event.target as HTMLElement).closest(".card-buttons button") as HTMLButtonElement;
     button.disabled = true;
-    const card = button.closest(".chat-card");
-    const { messageId } = card.closest(".message").dataset;
-    const message = game.messages.get(messageId);
+    const card = button.closest(".chat-card") as HTMLElement;
+    const { messageId } = (card.closest(".message") as HTMLElement).dataset;
+    const message = game.messages.get(messageId as string);
     const { action } = button.dataset;
 
     // Validate permission to proceed with the roll
     const isTargetted = action === "save";
-    if (!(isTargetted || game.user.isGM || message.isAuthor)) return;
+    if (!(isTargetted || game.user.isGM || message?.isAuthor)) return;
 
     // Get the Actor from a synthetic Token
     const actor = OseItem._getChatCardActor(card);
     if (!actor) return;
 
     // Get the Item
-    const item = actor.items.get(card.dataset.itemId);
+    // Widened because the "damage" branch below calls item.rollDamage, which is
+    // defined on the Actor, not the Item — preserved from the JavaScript.
+    // biome-ignore lint/suspicious/noExplicitAny: see above
+    const item = actor.items.get(card.dataset.itemId as string) as (OseItem & Record<string, any>) | undefined;
     if (!item) {
       return ui.notifications.error(
         game.i18n.format("OSE.error.itemNoLongerExistsOnActor", {
           actorName: actor.name,
-          itemId: card.dataset.itemId,
+          itemId: card.dataset.itemId ?? "",
         }),
       );
     }
 
     // Get card targets
-    let targets = [];
+    let targets: OwningActor[] = [];
     if (isTargetted) {
       targets = OseItem._getChatCardTargets(card);
     }
@@ -525,30 +566,31 @@ export default class OseItem extends Item {
 
     // Re-enable the button
     button.disabled = false;
+    return undefined;
   }
 
-  static _getChatCardActor(card) {
+  static _getChatCardActor(card: HTMLElement): OwningActor | null {
     // Case 1 - a synthetic actor from a Token
     const tokenKey = card.dataset.tokenId;
     if (tokenKey) {
       const [sceneId, tokenId] = tokenKey.split(".");
-      const scene = game.scenes.get(sceneId);
+      const scene = game.scenes.get(sceneId as string);
       if (!scene) return null;
-      const tokenData = scene.getEmbeddedDocument("Token", tokenId);
+      const tokenData = scene.getEmbeddedDocument("Token", tokenId as string, {});
       if (!tokenData) return null;
-      const token = new Token(tokenData);
+      const token = new (Token as unknown as new (data: unknown) => { actor: OwningActor })(tokenData);
       return token.actor;
     }
 
     // Case 2 - use Actor ID directory
     const { actorId } = card.dataset;
-    return game.actors.get(actorId) || null;
+    return game.actors.get(actorId as string) || null;
   }
 
-  static _getChatCardTargets(_card) {
+  static _getChatCardTargets(_card: HTMLElement) {
     const { character } = game.user;
-    const { controlled } = canvas.tokens;
-    const targets = controlled.filter((t) => t.actor).map((t) => t.actor);
+    const { controlled } = canvas.tokens as unknown as { controlled: { actor?: OwningActor }[] };
+    const targets = controlled.flatMap((t) => (t.actor ? [t.actor] : []));
     if (character && controlled.length === 0) targets.push(character);
     return targets;
   }
