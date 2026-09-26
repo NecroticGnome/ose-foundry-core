@@ -1,7 +1,31 @@
 /**
  * @file The data model for Items of type Weapon
  */
-export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
+import type { Save } from "../config";
+import type { DisplayTag, ItemTag, WeaponItemData } from "./item-types";
+
+// fvtt-types cannot resolve this system's data models, so a precise Parent forces
+// casts here and full Item stubs in tests. Revisit if they are ever registered.
+// biome-ignore lint/suspicious/noExplicitAny: see above
+export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel<any, any> implements WeaponItemData {
+  declare damage: string;
+  declare save: Save | "";
+  declare range: { short: number; medium: number; long: number };
+  declare bonus: number | null;
+  declare pattern: string;
+  declare missile: boolean;
+  declare melee: boolean;
+  declare slow: boolean;
+  declare counter: { value: number; max: number };
+  declare description: string;
+  declare tags: ItemTag[];
+  declare equipped: boolean;
+  declare cost: number;
+  declare containerId: string;
+  declare quantity: { value: number | null; max: number | null };
+  declare weight: number | null;
+  declare itemslots: number;
+
   static defineSchema() {
     const { SchemaField, StringField, NumberField, BooleanField, ArrayField, ObjectField } = foundry.data.fields;
     return {
@@ -35,7 +59,7 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
     };
   }
 
-  get #missileTag() {
+  get #missileTag(): DisplayTag[] | null {
     if (!this.missile) return null;
     return [
       CONFIG.OSE.auto_tags.missile,
@@ -46,17 +70,17 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
     ];
   }
 
-  get #meleeTag() {
+  get #meleeTag(): DisplayTag | null {
     if (!this.melee) return null;
     return CONFIG.OSE.auto_tags.melee;
   }
 
-  get #slowTag() {
+  get #slowTag(): DisplayTag | null {
     if (!this.slow) return null;
     return CONFIG.OSE.auto_tags.slow;
   }
 
-  get #saveTag() {
+  get #saveTag(): DisplayTag | null {
     if (!this.save) return null;
 
     return {
@@ -65,10 +89,10 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
     };
   }
 
-  get manualTags() {
+  get manualTags(): ItemTag[] | null {
     if (!this.tags) return null;
 
-    const tagNames = new Set(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
+    const tagNames = new Set<string>(Object.values(CONFIG.OSE.auto_tags).map(({ label }) => label));
     return this.tags.filter(({ value }) => !tagNames.has(value));
   }
 
@@ -77,7 +101,7 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
    *
    * @returns {Array} - An array of qualities that display in the "Qualities" column on an Actor's Inventory sheet
    */
-  get qualities() {
+  get qualities(): DisplayTag[] {
     return [
       ...this.autoTags
         .filter((t) => !!t.image)
@@ -85,11 +109,11 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel {
           ...t,
           title: t.label,
         })),
-      ...this.manualTags,
+      ...(this.manualTags ?? []),
     ];
   }
 
-  get autoTags() {
+  get autoTags(): DisplayTag[] {
     const tagNames = Object.values(CONFIG.OSE.auto_tags);
 
     const autoTags = this.tags.map(({ value }) => tagNames.find(({ label }) => value === label));

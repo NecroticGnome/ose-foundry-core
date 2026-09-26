@@ -2,6 +2,8 @@
  * @file Contains helpers for tag generation
  */
 
+import type { RollType } from "./config";
+
 const OseTags = {
   /**
    * Returns the formula used for dice roll calculations
@@ -9,18 +11,13 @@ const OseTags = {
    * @param data.roll - The string used to generate a formula
    * @returns tagFormula - The constructed roll formula
    */
-  rollTagFormula({
-    actor = {},
-    data = {
-      roll: "",
-    },
-  } = {}) {
+  rollTagFormula({ actor = {}, data = { roll: "" } }: { actor?: unknown; data?: { roll?: string } } = {}) {
     const formulaData = {
       actor,
       data,
     };
 
-    const tagFormula = new Roll(data.roll, formulaData).formula;
+    const tagFormula = new Roll(data.roll ?? "", formulaData).formula;
     return tagFormula;
   },
 
@@ -29,8 +26,9 @@ const OseTags = {
    * @param rollType - Type of roll target used
    * @returns tagTarget - The constructed type and target value
    */
-  rollTagTarget({ rollType = "" as keyof typeof CONFIG.OSE.roll_type, rollTarget = null } = {}) {
-    const tagTarget = rollTarget === null ? "" : ` ${CONFIG.OSE.roll_type[rollType]}${rollTarget}`;
+  rollTagTarget({ rollType = "", rollTarget = null }: { rollType?: RollType | ""; rollTarget?: number | null } = {}) {
+    // Indexing with "" yields undefined, which the original relies on; preserved.
+    const tagTarget = rollTarget === null ? "" : ` ${CONFIG.OSE.roll_type[rollType as RollType]}${rollTarget}`;
 
     return tagTarget;
   },

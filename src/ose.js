@@ -18,12 +18,7 @@ import handlebarsHelpers from "./module/helpers-handlebars";
 import * as macros from "./module/helpers-macros";
 import * as party from "./module/helpers-party";
 import * as treasure from "./module/helpers-treasure";
-import OseDataModelAbility from "./module/item/data-model-ability";
-import OseDataModelArmor from "./module/item/data-model-armor";
-import OseDataModelContainer from "./module/item/data-model-container";
-import OseDataModelItem from "./module/item/data-model-item";
-import OseDataModelSpell from "./module/item/data-model-spell";
-import OseDataModelWeapon from "./module/item/data-model-weapon";
+import { ITEM_DATA_MODELS } from "./module/item/data-models";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
 import OsePartySheet from "./module/party/party-sheet";
@@ -40,7 +35,6 @@ import "./e2e";
 
 Hooks.once("init", async () => {
   CONFIG.OSE = OSE;
-
   // Give modules a chance to add encumbrance schemes
   // They can do so by adding their encumbrance schemes
   // to CONFIG.OSE.encumbranceOptions
@@ -89,14 +83,7 @@ Hooks.once("init", async () => {
     character: OseDataModelCharacter,
     monster: OseDataModelMonster,
   };
-  CONFIG.Item.dataModels = {
-    weapon: OseDataModelWeapon,
-    armor: OseDataModelArmor,
-    item: OseDataModelItem,
-    spell: OseDataModelSpell,
-    ability: OseDataModelAbility,
-    container: OseDataModelContainer,
-  };
+  CONFIG.Item.dataModels = ITEM_DATA_MODELS;
 
   // Register sheet application classes
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
