@@ -6,7 +6,7 @@
   {{/each}}
 </div>
 {{#if @root.config.encumbranceStrengthMod}}
-<span class="encumbrance-label">{{value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
+<span class="encumbrance-label">{{round value}} / {{#if usingEquippedEncumbrance}}{{max}}{{else}}{{add max @root.system.scores.str.mod}}{{/if}}</span>
 {{else}}
-<span class="encumbrance-label">{{value}} / {{max}}</span>
+<span class="encumbrance-label">{{round value}} / {{max}}</span>
 {{/if}}

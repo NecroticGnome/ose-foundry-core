@@ -52,6 +52,8 @@ const registerHelpers = async () => {
 
   Handlebars.registerHelper("ceil", (val) => Math.ceil(val));
 
+  Handlebars.registerHelper("round", (val) => Math.round(Number(val) * 100) / 100);
+
   Handlebars.registerHelper("partial", (path) => `${OSE.systemPath()}/templates/${path}`);
 };
 

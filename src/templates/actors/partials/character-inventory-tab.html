@@ -173,7 +173,7 @@
           @root.config.encumbrance
           "detailed")}}_{{else if (eq
             @root.config.encumbrance
-            "itembased")}}_{{else}}{{bag.system.totalWeight}}{{/if}}
+            "itembased")}}_{{else}}{{round bag.system.totalWeight}}{{/if}}
         </div>
         <div class="field-short container-item-weight">
           {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
@@ -234,7 +234,7 @@
               {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
               @root.config.encumbrance
               "detailed")}}_{{else if (eq @root.config.encumbrance
-                "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+                "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
             </div>
             {{#if @root.owner}}
             <div class="item-controls">
@@ -313,7 +313,7 @@
           {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
           @root.config.encumbrance
           "detailed")}}_{{else if (eq @root.config.encumbrance
-            "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+            "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
         </div>
         {{#if @root.owner}}
         <div class="item-controls">
@@ -362,7 +362,7 @@
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Treasure"}}</div>
     <div class="field-long">
-      {{treasure}} <i class="fas fa-circle"></i>
+      {{round treasure}} <i class="fas fa-circle"></i>
     </div>
     <div class="field-short"><i class="fas fa-hashtag"></i></div>
     <div class="field-short"><i class="fas fa-weight-hanging"></i></div>
@@ -388,7 +388,7 @@
         ></div>
         <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
         <div class="field-long">
-          {{item.system.cumulativeCost}}
+          {{round item.system.cumulativeCost}}
         </div>
         <div class="field-short quantity">
           <input
@@ -403,7 +403,7 @@
         </div>
         <div class="field-short">
           {{#if (eq @root.config.encumbrance
-          "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+          "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
         </div>
         {{#if @root.owner}}
         <div class="item-controls">
