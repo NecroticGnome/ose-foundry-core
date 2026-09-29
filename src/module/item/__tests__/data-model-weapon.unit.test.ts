@@ -19,6 +19,7 @@ describe("OseDataModelWeapon", () => {
       expect(weapon.tags).toEqual([]);
       expect(weapon.equipped).toBe(false);
       expect(weapon.itemslots).toBe(1);
+      expect(weapon.weight).toBe(0);
     });
   });
 

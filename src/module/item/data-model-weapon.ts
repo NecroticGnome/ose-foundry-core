@@ -54,7 +54,7 @@ export default class OseDataModelWeapon extends foundry.abstract.TypeDataModel<a
         value: new NumberField({ min: 0 }),
         max: new NumberField({ min: 0 }),
       }),
-      weight: new NumberField({ min: 0 }),
+      weight: new NumberField({ min: 0, initial: 0 }),
       itemslots: new NumberField({ min: 0, initial: 1 }),
     };
   }

@@ -3,7 +3,7 @@ import OseDataModelContainer from "../data-model-container";
 
 const CONTAINER_ID = "container-1";
 
-const carried = (containerId: string, weight: number, quantity?: { value: number }) => ({
+const carried = (containerId: string, weight: number | undefined, quantity?: { value: number }) => ({
   system: { containerId, weight, quantity },
 });
 
@@ -75,6 +75,15 @@ describe("OseDataModelContainer", () => {
       const container = new OseDataModelContainer({}, { parent: parentIn([carried(CONTAINER_ID, 7, { value: 0 })]) });
 
       expect(container.totalWeight).toBe(7);
+    });
+
+    it("treats a missing weight as 0", () => {
+      const container = new OseDataModelContainer(
+        {},
+        { parent: parentIn([carried(CONTAINER_ID, undefined, { value: 2 }), carried(CONTAINER_ID, 5)]) },
+      );
+
+      expect(container.totalWeight).toBe(5);
     });
   });
 

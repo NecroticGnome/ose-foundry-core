@@ -78,11 +78,9 @@ export default class OseItem extends Item {
   async prepareDerivedData(): Promise<void> {
     // Rich text description
     (this.system as AnyItemSystem).enrichedDescription =
-      // `async` was removed from EnrichmentOptions in v13; kept so the call is
-      // byte-identical to the JavaScript this replaces.
       await foundry.applications.ux.TextEditor.implementation.enrichHTML((this.system as AnyItemSystem).description, {
-        async: true,
-      } as never);
+        secrets: game.user?.isGM,
+      });
   }
 
   static chatListeners(html: HTMLElement) {
