@@ -1,9 +1,24 @@
 /**
  * @file The data model for Items of type Ability
  */
+import type { RollType, Save } from "../config";
 import OseTags from "../helpers-tags";
+import type { AbilityItemData, DisplayTag, ItemTag } from "./item-types";
 
-export default class OseDataModelAbility extends foundry.abstract.TypeDataModel {
+// fvtt-types cannot resolve this system's data models, so a precise Parent forces
+// casts here and full Item stubs in tests. Revisit if they are ever registered.
+// biome-ignore lint/suspicious/noExplicitAny: see above
+export default class OseDataModelAbility extends foundry.abstract.TypeDataModel<any, any> implements AbilityItemData {
+  declare save: Save | "";
+  declare pattern: string;
+  declare requirements: string;
+  declare roll: string;
+  declare rollType: RollType | "";
+  declare rollTarget: number | null;
+  declare blindroll: boolean;
+  declare description: string;
+  declare tags: ItemTag[];
+
   static defineSchema() {
     const { StringField, NumberField, BooleanField, ArrayField, ObjectField } = foundry.data.fields;
     return {
@@ -19,7 +34,7 @@ export default class OseDataModelAbility extends foundry.abstract.TypeDataModel 
     };
   }
 
-  get #rollTag() {
+  get #rollTag(): DisplayTag | null {
     if (!this.roll) return null;
 
     const rollLabel = game.i18n.localize("OSE.items.Roll");
@@ -39,7 +54,7 @@ export default class OseDataModelAbility extends foundry.abstract.TypeDataModel 
     };
   }
 
-  get #saveTag() {
+  get #saveTag(): DisplayTag | null {
     if (!this.save) return null;
 
     return {
@@ -48,11 +63,11 @@ export default class OseDataModelAbility extends foundry.abstract.TypeDataModel 
     };
   }
 
-  get manualTags() {
+  get manualTags(): ItemTag[] {
     return this.tags || [];
   }
 
-  get autoTags() {
+  get autoTags(): DisplayTag[] {
     return [
       ...(this.requirements?.split(",").map((req) => ({ label: req.trim() })) || []),
       this.#rollTag,

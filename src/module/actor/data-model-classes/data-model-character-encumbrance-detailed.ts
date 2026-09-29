@@ -45,7 +45,7 @@ export default class OseDataModelCharacterEncumbranceDetailed
 
         let value = acc;
 
-        if (type === "item" && treasure) value += quantity.value * weight;
+        if (type === "item" && treasure) value += (quantity.value ?? 0) * (weight ?? 0);
         if (["weapon", "armor", "container"].includes(type)) value += weight;
 
         return value;
