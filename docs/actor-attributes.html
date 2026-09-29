@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Actor Attributes - Old School Essentials system for Foundry VTT</title>
+  <meta name="description" content="Actor data reference for module authors, macro writers, and Active Effects." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="css/normalize.css" />
+  <link rel="stylesheet" href="css/skeleton.css" />
+  <link rel="stylesheet" href="css/custom.css" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+</head>
+
+<body>
+<section class="header">
+  <h2>Actor Attributes</h2>
+  <p>Old-School Essentials system for Foundry VTT</p>
+</section>
+<div class="container">
+  <p><a href="index.html">&larr; Back to the user guide</a></p>
+  <div class="docs-section attributes">
+<p>Actor data exposed by the <strong>Old-School Essentials</strong> system, for macros, modules, and Active Effects.</p>
+<ul>
+<li><a href="#reading-this-reference">Reading this reference</a></li>
+<li><a href="#character">Character</a></li>
+<li><a href="#monster">Monster</a></li>
+<li><a href="#items-that-affect-actors">Items that affect actors</a></li>
+</ul>
+<hr />
+<h2 id="reading-this-reference">Reading this reference</h2>
+<p>Keys are listed as Active Effect paths (<code>system.hp.value</code>). In roll formulas, drop <code>system.</code> and prefix <code>@</code> (<code>@hp.value</code>). In code, use <code>actor.system.hp.value</code>.</p>
+<p><strong>Derived</strong> fields are recalculated every time the actor prepares. They can be read in formulas but not written: an update or Active Effect on them is discarded. Target the input instead:</p>
+<table>
+<thead>
+<tr>
+<th>Instead of</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.ac.value</code></td>
+<td><code>system.ac.mod</code></td>
+</tr>
+<tr>
+<td><code>system.scores.str.mod</code></td>
+<td><code>system.scores.str.value</code></td>
+</tr>
+<tr>
+<td><code>system.movement.encounter</code></td>
+<td><code>system.movement.base</code></td>
+</tr>
+<tr>
+<td><code>system.encumbrance.pct</code></td>
+<td><code>system.encumbrance.max</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="character">Character</h2>
+<h3 id="hit-points">Hit points</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.hp.value</code></td>
+<td><code>20</code></td>
+<td>Current</td>
+</tr>
+<tr>
+<td><code>system.hp.max</code></td>
+<td><code>20</code></td>
+<td>Maximum</td>
+</tr>
+<tr>
+<td><code>system.hp.hd</code></td>
+<td><code>"1d8"</code></td>
+<td>Hit dice, e.g. <code>"2d8+1"</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="armour-class">Armour class</h3>
+<p>Both descending (<code>ac</code>) and ascending (<code>aac</code>) are always maintained; the <code>ascendingAC</code> setting picks which is shown and rolled against.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.ac.mod</code></td>
+<td><code>0</code></td>
+<td>Flat modifier. <strong>Use this to adjust AC.</strong> Mirrors <code>aac.mod</code></td>
+</tr>
+<tr>
+<td><code>system.aac.mod</code></td>
+<td><code>0</code></td>
+<td>Mirrors <code>ac.mod</code></td>
+</tr>
+</tbody>
+</table>
+<p>Derived: <code>ac.value</code> (<code>armour - shield - mod</code>, or <code>naked</code> with no armour), <code>ac.base</code> (<code>9</code>), <code>ac.naked</code> (<code>9 - dex.mod</code>), <code>ac.shield</code>, and the <code>aac</code> equivalents (<code>base</code> <code>10</code>, values added instead of subtracted). <code>ac</code> and <code>aac</code> are each derived from their own field on the armour, so they disagree if the armour's <code>ac</code>/<code>aac</code> values don't sum to 19.</p>
+<h3 id="attack">Attack</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.thac0.value</code></td>
+<td><code>19</code></td>
+<td>THAC0. Kept at <code>19 - bba</code> on update</td>
+</tr>
+<tr>
+<td><code>system.thac0.bba</code></td>
+<td><code>0</code></td>
+<td>Base attack bonus (ascending AC)</td>
+</tr>
+<tr>
+<td><code>system.thac0.mod.melee</code></td>
+<td><code>0</code></td>
+<td>Melee attack bonus (Tweaks)</td>
+</tr>
+<tr>
+<td><code>system.thac0.mod.missile</code></td>
+<td><code>0</code></td>
+<td>Missile attack bonus (Tweaks)</td>
+</tr>
+</tbody>
+</table>
+<p>The attack roll is <code>1d20 [+ bba if ascending] + str.mod or dex.mod + thac0.mod.&lt;melee|missile&gt; + weapon bonus</code>. Melee damage adds <code>str.mod</code> and <code>thac0.mod.melee</code>; missile damage doesn't.</p>
+<p><code>meleeMod</code> and <code>rangedMod</code> are derived display values for the sheet only - the roll doesn't read them.</p>
+<h3 id="saving-throws">Saving throws</h3>
+<p><code>system.saves.&lt;death|wand|paralysis|breath|spell&gt;.value</code> - integer, unset (<code>null</code>) until a class is applied. Roll <code>1d20</code> at or above. Magic-based saves add <code>scores.wis.mod</code> and <code>details.magic.bonus</code>.</p>
+<h3 id="ability-scores">Ability scores</h3>
+<p><code>system.scores.&lt;str|int|wis|dex|con|cha&gt;.value</code> - default <code>0</code> (so a blank character has <code>-3</code> modifiers). Each also has a <code>.bonus</code> field that is stored but not used by the system. Scores aren't type-checked on write.</p>
+<p>Derived per score:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scores.&lt;ability&gt;.mod</code></td>
+<td>Standard OSE modifier, -3 to +3</td>
+</tr>
+<tr>
+<td><code>scores.str.od</code></td>
+<td>Open doors, 0-5 in 6</td>
+</tr>
+<tr>
+<td><code>scores.int.literacy</code>, <code>scores.int.spoken</code></td>
+<td><strong>i18n keys</strong>, not numbers - localize before display</td>
+</tr>
+<tr>
+<td><code>scores.dex.init</code>, <code>scores.cha.npc</code></td>
+<td>Capped modifier, -2 to +2</td>
+</tr>
+<tr>
+<td><code>scores.cha.loyalty</code>, <code>scores.cha.retain</code></td>
+<td>Retainer loyalty (<code>mod + 7</code>) and max retainers (<code>mod + 4</code>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="movement">Movement</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.movement.base</code></td>
+<td><code>120</code></td>
+<td>Feet per turn</td>
+</tr>
+</tbody>
+</table>
+<p>Derived: <code>movement.encounter</code> (<code>base / 3</code>) and <code>movement.overland</code> (<code>base / 5</code>). When <code>config.movementAuto</code> is on, <code>base</code> itself is reduced by encumbrance (x0.75, x0.5, x0.25 at each breakpoint, <code>0</code> when over maximum).</p>
+<h3 id="initiative">Initiative</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.initiative.value</code></td>
+<td><code>0</code></td>
+<td>Base</td>
+</tr>
+<tr>
+<td><code>system.initiative.mod</code></td>
+<td><code>0</code></td>
+<td>Flat (Tweaks)</td>
+</tr>
+</tbody>
+</table>
+<p>Derived: <code>init</code> = <code>value + mod + scores.dex.init</code>, or <code>0</code> under group initiative. The tracker rolls <code>1d6 + @init</code>.</p>
+<h3 id="exploration-skills">Exploration skills</h3>
+<p>Roll <code>1d6</code> at or under. <code>0</code> is rejected - use <code>null</code> for no chance.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Skill</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.exploration.ld</code></td>
+<td><code>1</code></td>
+<td>Listen at doors</td>
+</tr>
+<tr>
+<td><code>system.exploration.od</code></td>
+<td><code>2</code></td>
+<td>Open doors</td>
+</tr>
+<tr>
+<td><code>system.exploration.sd</code></td>
+<td><code>1</code></td>
+<td>Secret doors</td>
+</tr>
+<tr>
+<td><code>system.exploration.ft</code></td>
+<td><code>1</code></td>
+<td>Find traps</td>
+</tr>
+<tr>
+<td><code>system.exploration.fg</code></td>
+<td><code>1</code></td>
+<td>Forage</td>
+</tr>
+<tr>
+<td><code>system.exploration.hn</code></td>
+<td><code>1</code></td>
+<td>Hunt</td>
+</tr>
+</tbody>
+</table>
+<p><code>exploration.od</code> is unrelated to the derived <code>scores.str.od</code>.</p>
+<h3 id="details">Details</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.details.class</code></td>
+<td><code>""</code></td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>system.details.title</code></td>
+<td><code>""</code></td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>system.details.alignment</code></td>
+<td><code>""</code></td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>system.details.level</code></td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.details.xp.value</code></td>
+<td><code>0</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.details.xp.next</code></td>
+<td><code>2000</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.details.xp.bonus</code></td>
+<td><code>0</code></td>
+<td>% bonus on earned XP</td>
+</tr>
+<tr>
+<td><code>system.details.xp.share</code></td>
+<td><code>100</code></td>
+<td>% share of party XP</td>
+</tr>
+<tr>
+<td><code>system.details.magic.bonus</code></td>
+<td><code>0</code></td>
+<td>Added to magic-based saves</td>
+</tr>
+<tr>
+<td><code>system.details.biography</code></td>
+<td><code>""</code></td>
+<td>HTML</td>
+</tr>
+<tr>
+<td><code>system.details.notes</code></td>
+<td><code>""</code></td>
+<td>HTML</td>
+</tr>
+</tbody>
+</table>
+<h3 id="encumbrance">Encumbrance</h3>
+<p><code>system.encumbrance.max</code> is the only input - default <code>1600</code> (<code>9</code> for item-based). Everything else is derived and depends on the world's <code>encumbranceOption</code> setting:</p>
+<ul>
+<li>All variants: <code>value</code>, <code>pct</code> (0-100), <code>encumbered</code>, <code>enabled</code>, <code>variant</code>, <code>steps</code>, <code>atFirstBreakpoint</code> / <code>atSecondBreakpoint</code> / <code>atThirdBreakpoint</code>.</li>
+<li><code>complete</code> / <code>detailed</code>: coin weight, breakpoints at 25%, 37.5%, 50%.</li>
+<li><code>basic</code>: breakpoints come from heaviest equipped armour and treasure carried; adds <code>overTreasureThreshold</code>, <code>overSignificantTreasureThreshold</code>.</li>
+<li><code>itembased</code>: item slots; adds <code>equippedValue</code> / <code>packedValue</code>, <code>equippedPct</code> / <code>packedPct</code>, <code>weightMod</code>, and related fields.</li>
+</ul>
+<h3 id="spells">Spells</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.spells.enabled</code></td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.spells.&lt;level&gt;.max</code></td>
+<td><code>0</code></td>
+<td>Slots per level - <strong>write</strong> here</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Read</strong> slots from <code>@spells.slots.&lt;level&gt;.max</code> and <code>@spells.slots.&lt;level&gt;.used</code> - <code>@spells.1.max</code> is always undefined. <code>spells.spellList</code> holds owned spells grouped by level.</p>
+<h3 id="other">Other</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.languages.value</code></td>
+<td><code>[]</code></td>
+<td>Not enforced as an array - guard before use</td>
+</tr>
+<tr>
+<td><code>system.retainer.enabled</code></td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.retainer.loyalty</code></td>
+<td><code>null</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.retainer.wage</code></td>
+<td><code>""</code></td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>system.config.movementAuto</code></td>
+<td><code>true</code></td>
+<td>Reduce <code>movement.base</code> by encumbrance</td>
+</tr>
+<tr>
+<td><code>system.config.enableInventory</code></td>
+<td>unset</td>
+<td>Show the inventory tab</td>
+</tr>
+<tr>
+<td><code>system.config.ignoreBonusDamage</code></td>
+<td>unset</td>
+<td>Leave weapon bonus out of damage rolls</td>
+</tr>
+</tbody>
+</table>
+<h3 id="computed-properties">Computed properties</h3>
+<p>Read-only values the system computes, directly on <code>actor.system</code> (not under <code>details</code>). Usable as <code>@name</code> in formulas.</p>
+<ul>
+<li><code>usesAscendingAC</code> - the <code>ascendingAC</code> setting</li>
+<li><code>init</code> - see <a href="#initiative">Initiative</a></li>
+<li><code>isNew</code> - all ability scores are <code>0</code></li>
+<li><code>isSlow</code> - any equipped weapon is slow</li>
+<li><code>carriedTreasure</code> - total value of treasure carried</li>
+<li>Item lists: <code>weapons</code>, <code>armor</code>, <code>abilities</code>, <code>items</code>, <code>treasures</code>, <code>containers</code>, <code>spellList</code></li>
+</ul>
+<hr />
+<h2 id="monster">Monster</h2>
+<p>Monsters use a smaller model. <strong>They have no <code>system.scores</code></strong> (<code>scores.str.mod</code> throws), <strong>no derived AC</strong>, and no <code>exploration</code>, <code>meleeMod</code>, <code>rangedMod</code>, <code>details.class</code>, <code>details.title</code>, <code>details.level</code>, or <code>details.magic.bonus</code>.</p>
+<p>Same as characters: <code>hp</code>, <code>thac0</code>, <code>saves</code>, <code>spells</code>, <code>languages</code>, <code>retainer</code>, <code>initiative</code> (but <code>init</code> has no DEX term). THAC0 and save tables by HD are in <code>CONFIG.OSE.monster_thac0</code> and <code>CONFIG.OSE.monster_saves</code>, but aren't applied automatically.</p>
+<h3 id="armour-class-1">Armour class</h3>
+<p><code>system.ac.value</code> and <code>system.aac.value</code> are stored directly (default <code>0</code>); write either and the other is kept at <code>19 - x</code>. Armour items don't affect them. <code>ac.mod</code> / <code>aac.mod</code> exist but aren't applied.</p>
+<h3 id="movement-1">Movement</h3>
+<p><code>system.movement.base</code> (default <code>120</code>) is never reduced - monsters always use the disabled encumbrance variant. <code>encounter</code> and <code>overland</code> are derived as for characters. <code>system.details.movement</code> is free text for display only.</p>
+<h3 id="details-1">Details</h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.details.alignment</code></td>
+<td><code>""</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>system.details.xp</code></td>
+<td><code>0</code></td>
+<td><strong>A number</strong>, not the character object</td>
+</tr>
+<tr>
+<td><code>system.details.specialAbilities</code></td>
+<td><code>0</code></td>
+<td>Count, for XP</td>
+</tr>
+<tr>
+<td><code>system.details.morale</code></td>
+<td><code>0</code></td>
+<td>Used when the <code>morale</code> setting is on</td>
+</tr>
+<tr>
+<td><code>system.details.treasure.table</code></td>
+<td><code>""</code></td>
+<td>RollTable UUID or name</td>
+</tr>
+<tr>
+<td><code>system.details.treasure.type</code></td>
+<td><code>""</code></td>
+<td>Free text</td>
+</tr>
+<tr>
+<td><code>system.details.appearing.d</code></td>
+<td><code>0</code></td>
+<td>Number appearing, dungeon</td>
+</tr>
+<tr>
+<td><code>system.details.appearing.w</code></td>
+<td><code>0</code></td>
+<td>Number appearing, wilderness</td>
+</tr>
+<tr>
+<td><code>system.details.biography</code></td>
+<td><code>""</code></td>
+<td>HTML</td>
+</tr>
+</tbody>
+</table>
+<p><code>system.config.ignoreBonusDamage</code> works as for characters.</p>
+<h3 id="computed-properties-1">Computed properties</h3>
+<p>Read-only values the system computes, directly on <code>actor.system</code> (not under <code>details</code>). Usable as <code>@name</code> in formulas.</p>
+<ul>
+<li><code>usesAscendingAC</code>, <code>init</code> - as for characters</li>
+<li><code>isNew</code> - all saves are unset</li>
+<li><code>isSlow</code> - <code>true</code> only if <em>all</em> of the monster's weapons are slow. Unlike characters, it ignores whether they're equipped</li>
+<li><code>attackPatterns</code> - weapons and abilities grouped by <code>system.pattern</code></li>
+<li>Item lists as for characters, sorted by name (no <code>spellList</code> - use <code>spells.spellList</code>)</li>
+</ul>
+<hr />
+<h2 id="items-that-affect-actors">Items that affect actors</h2>
+<p><strong>Armour</strong> sets character AC. Only equipped items count, and only the first armour and first shield found.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>system.ac.value</code></td>
+<td><code>9</code></td>
+<td>AC this armour <strong>sets</strong> (not a bonus)</td>
+</tr>
+<tr>
+<td><code>system.aac.value</code></td>
+<td><code>10</code></td>
+<td>Keep equal to <code>19 - ac.value</code></td>
+</tr>
+<tr>
+<td><code>system.type</code></td>
+<td><code>"light"</code></td>
+<td><code>"light"</code>, <code>"heavy"</code>, or <code>"shield"</code></td>
+</tr>
+<tr>
+<td><code>system.equipped</code></td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>system.itemslots</code></strong> drives item-based encumbrance. Default <code>1</code> on weapons, armour, and containers; <code>0</code> on plain items. Slots used are <code>ceil(itemslots * quantity)</code>.</p>  </div>
+</div>
+</body>
+
+</html>
