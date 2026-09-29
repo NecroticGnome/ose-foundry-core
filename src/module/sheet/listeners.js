@@ -1,50 +1,31 @@
 /**
- * @file DOM event handlers for sheets that manage expand/collapse state
- *       and other inline UI toggles. Stage 6 keeps these jQuery-aware
- *       (called from V1 activateListeners); stage 7 will switch to native
- *       DOM via the V2 _onRender path.
+ * @file DOM handlers for sheet expand/collapse state and inline UI toggles.
  */
 
-export const toggleItemCategory = (event) => {
-  event.preventDefault();
-  const targetCategory = $(event.currentTarget);
-  const items = targetCategory.next(".item-list");
-
-  if (items.css("display") === "none") {
-    const el = $(event.currentTarget).find(".fas.fa-caret-right");
-    el.removeClass("fa-caret-right").addClass("fa-caret-down");
-    items.slideDown(200);
-  } else {
-    const el = $(event.currentTarget).find(".fas.fa-caret-down");
-    el.removeClass("fa-caret-down").addClass("fa-caret-right");
-    items.slideUp(200);
-  }
+const toggleList = (list, caretScope) => {
+  if (!list) return;
+  const hidden = list.style.display === "none";
+  list.style.display = hidden ? "" : "none";
+  const caret = caretScope.querySelector(".category-caret .fas");
+  caret?.classList.toggle("fa-caret-down", hidden);
+  caret?.classList.toggle("fa-caret-right", !hidden);
 };
 
-export const toggleContainedItems = (event) => {
-  event.preventDefault();
-  const targetItems = $(event.target.closest(".container"));
-  const items = targetItems.find(".item-list.contained-items");
-
-  if (items.css("display") === "none") {
-    const el = targetItems.find(".fas.fa-caret-right");
-    el.removeClass("fa-caret-right").addClass("fa-caret-down");
-    items.slideDown(200);
-  } else {
-    const el = targetItems.find(".fas.fa-caret-down");
-    el.removeClass("fa-caret-down").addClass("fa-caret-right");
-    items.slideUp(200);
-  }
+export const toggleItemCategory = (event, target) => {
+  if (event.target.closest("input, .item-controls")) return;
+  const list = target.nextElementSibling;
+  if (list?.matches(".item-list")) toggleList(list, target);
 };
 
-export const toggleItemSummary = (sheet, event) => {
-  event.preventDefault();
-  const item = event.currentTarget.closest(".item-entry.item");
-  const itemSummary = item.querySelector(".item-summary");
-  if (itemSummary.classList.contains("expanded")) {
-    sheet._expanded.delete(item.dataset.itemId);
-  } else {
-    sheet._expanded.add(item.dataset.itemId);
-  }
-  itemSummary.classList.toggle("expanded");
+export const toggleContainedItems = (target) => {
+  const container = target.closest(".container");
+  if (container) toggleList(container.querySelector(".item-list.contained-items"), container);
+};
+
+export const toggleItemSummary = (sheet, target) => {
+  const item = target.closest(".item-entry.item");
+  const itemSummary = item?.querySelector(".item-summary");
+  if (!itemSummary) return;
+  if (itemSummary.classList.toggle("expanded")) sheet._expanded.add(item.dataset.itemId);
+  else sheet._expanded.delete(item.dataset.itemId);
 };

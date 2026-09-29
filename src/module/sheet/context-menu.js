@@ -1,13 +1,13 @@
 /**
  * @file Inventory-row context menu wired from the V2 actor sheet's
- *       `_onRender`.
+ *       `_onFirstRender`.
  */
 import { promptRemoveItemFromActor } from "./dialogs";
 import { toggleItemEquipped } from "./inventory-actions";
 
 const EQUIPPABLE_TYPES = ["item", "armor", "weapon", "treasure", "container"];
 
-const ROW_SELECTOR = ".item";
+const ROW_SELECTOR = ".item[data-item-id]";
 
 /**
  * Resolve the item a context-menu row belongs to.
@@ -64,16 +64,13 @@ const inventoryEntries = (sheet) => {
 /**
  * Attach the inventory-row context menu to a rendered actor sheet.
  *
- * Safe to call from a V1 `renderActorSheet` hook or a V2 sheet's `_onRender`;
- * it reads only `sheet.actor`, so it does not depend on the app version.
+ * Bind once per sheet element; re-binding stacks menus.
  * @param {Application} sheet - The actor sheet being rendered.
- * @param {HTMLElement} root - The sheet's rendered root element.
+ * @param {HTMLElement} root - The sheet's root element.
  * @returns {foundry.applications.ux.ContextMenu|null} The menu, or null when not applicable.
  */
 export const bindInventoryContextMenu = (sheet, root) => {
   if (!sheet?.actor?.isOwnerOrObserver) return null;
-  // ContextMenu no longer accepts jQuery roots (deprecated since Foundry v13).
-  if (!(root instanceof HTMLElement)) return null;
 
   return new foundry.applications.ux.ContextMenu(root, ROW_SELECTOR, inventoryEntries(sheet), { jQuery: false });
 };

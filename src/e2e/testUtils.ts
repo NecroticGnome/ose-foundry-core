@@ -74,7 +74,7 @@ export const waitUntil = async (
 };
 
 export const openWindows = (className: string) =>
-  Object.values(ui.windows).filter((o) => o.options.classes.includes(className));
+  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes(className));
 
 export const openDialogs = () => Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
 

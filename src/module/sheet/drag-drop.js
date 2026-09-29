@@ -1,7 +1,5 @@
 /**
- * @file Shared drag-and-drop handlers used by actor sheets. Stage 6 keeps
- *       these jQuery-aware since the sheet is still V1; stage 7 will drop
- *       the V1 paths.
+ * @file Shared drag-and-drop handlers used by actor sheets.
  */
 
 export const onDragStartItem = (sheet, event) => {
@@ -60,8 +58,7 @@ export const onSortItem = (sheet, event, itemData, fallback) => {
   return fallback(event, itemData);
 };
 
-export const onDropFolder = async (sheet, _event, data) => {
-  const folder = await fromUuid(data.uuid);
+export const onDropFolder = async (sheet, _event, folder) => {
   if (!folder || folder.type !== "Item") return;
 
   let itemArray = folder.contents || [];
@@ -79,12 +76,11 @@ export const onDropFolder = async (sheet, _event, data) => {
   return onDropItemCreate(sheet, itemArray);
 };
 
-export const onDropItem = async (sheet, event, data) => {
+export const onDropItem = async (sheet, event, item) => {
   const targetId = event.target.closest(".item")?.dataset?.itemId;
   const targetItem = sheet.actor.items.get(targetId);
   const targetIsContainer = targetItem?.type === "container";
 
-  const item = await Item.implementation.fromDropData(data);
   const itemData = item.toObject();
 
   const exists = !!sheet.actor.items.get(item.id);

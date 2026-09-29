@@ -1,7 +1,9 @@
 /**
  * @file The base class we use for Character and Monster sheets. Shared behavior goes here!
  */
+// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import { displayItemInChat } from "../sheet/chat-helpers";
+import { bindInventoryContextMenu } from "../sheet/context-menu";
 import { prepareActorContext } from "../sheet/data-context";
 import { chooseItemType, openEntityTweaksFor, promptRemoveItemFromActor } from "../sheet/dialogs";
 import {
@@ -26,27 +28,86 @@ import {
 } from "../sheet/inventory-actions";
 import { toggleContainedItems, toggleItemCategory, toggleItemSummary } from "../sheet/listeners";
 
-export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ActorSheetV2 } = foundry.applications.sheets;
+
+export default class OseActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+  static DEFAULT_OPTIONS = {
+    // Always light.
+    classes: ["ose", "sheet", "actor", "themed", "theme-light"],
+    form: { submitOnChange: true },
+    window: {
+      resizable: true,
+      controls: [
+        {
+          action: "configureActor",
+          icon: "fas fa-code",
+          label: "OSE.dialog.tweaks",
+          ownership: "OWNER",
+          visible: function () {
+            return this.isEditable;
+          },
+        },
+      ],
+    },
+    actions: {
+      configureActor: OseActorSheet._onConfigureActor,
+      rollSave: OseActorSheet._onRollSave,
+      rollAttack: OseActorSheet._onRollAttack,
+      rollHitDice: OseActorSheet._onRollHitDice,
+      rollItem: OseActorSheet._onRollItem,
+      toggleCategory: OseActorSheet._onToggleCategory,
+      toggleContained: OseActorSheet._onToggleContained,
+      toggleSummary: OseActorSheet._onToggleSummary,
+      showItem: OseActorSheet._onShowItem,
+      createItem: OseActorSheet._onCreateItem,
+      editItem: OseActorSheet._onEditItem,
+      deleteItem: OseActorSheet._onDeleteItem,
+      consumableSpend: OseActorSheet._onConsumableSpend,
+      consumableRestore: OseActorSheet._onConsumableRestore,
+      resetSpells: OseActorSheet._onResetSpells,
+    },
+  };
+
+  /**
+   * @param {string} _tabId
+   * @returns {boolean} Whether the tab is shown for this actor.
+   */
+  _isTabVisible(_tabId) {
+    return true;
+  }
+
+  _getTabsConfig(group) {
+    const config = super._getTabsConfig(group);
+    if (!config) return config;
+    const tabs = config.tabs.filter((tab) => this._isTabVisible(tab.id));
+    if (!tabs.some((tab) => tab.id === this.tabGroups[group])) this.tabGroups[group] = tabs[0]?.id;
+    return { ...config, tabs };
+  }
+
+  get title() {
+    if (!this.actor.isToken) return this.actor.name;
+    return `[${game.i18n.localize(foundry.documents.TokenDocument.metadata.label)}] ${this.actor.name}`;
+  }
+
   /**
    * IDs for items on the sheet that have been expanded.
    * @type {Set<string>}
    */
   _expanded = new Set();
 
-  async getData() {
-    const data = foundry.utils.deepClone(super.getData().data);
-    Object.assign(data, await prepareActorContext(this.actor, this._expanded));
-    data.editable = this.actor.sheet.isEditable;
-    return data;
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+    return Object.assign(context, {
+      ...this.actor.toObject(false),
+      system: this.actor.system,
+      cssClass: this.options.classes.join(" "),
+      ...(await prepareActorContext(this.actor, this._expanded)),
+    });
   }
 
-  activateEditor(name, options, initialContent) {
-    super.activateEditor(name, options, initialContent);
-  }
-
-  _getItemFromActor(event) {
-    const li = event.currentTarget.closest(".item-entry");
-    return this.actor.items.get(li.dataset.itemId);
+  _getItemFromActor(element) {
+    return this.actor.items.get(element.closest(".item-entry")?.dataset.itemId);
   }
 
   // Delegates retained as instance methods so subclasses (and tests) can override.
@@ -68,109 +129,116 @@ export default class OseActorSheet extends foundry.appv1.sheets.ActorSheet {
   _onDropItemCreate(droppedItem, targetContainer) {
     return onDropItemCreate(this, droppedItem, targetContainer);
   }
-  _onDropFolder(event, data) {
-    return onDropFolder(this, event, data);
+  _onDropFolder(event, folder) {
+    return onDropFolder(this, event, folder);
   }
-  _onDropItem(event, data) {
-    return onDropItem(this, event, data);
+  _onDropItem(event, item) {
+    if (!this.actor.isOwner) return null;
+    return onDropItem(this, event, item);
   }
   _onDragStart(event) {
     return onDragStartItem(this, event);
   }
-  _onSortItem(event, itemData) {
-    return onSortItem(this, event, itemData, (ev, data) => super._onSortItem(ev, data));
+  _onSortItem(event, item) {
+    return onSortItem(this, event, item, (ev, data) => super._onSortItem(ev, data));
   }
 
-  // Resizable lifecycle (V1-only — stage 7 replaces with V2 _onRender)
-  async _renderInner(...args) {
-    const html = await super._renderInner(...args);
-    this.form = html[0];
-    const resizable = html.find(".resizable");
-    if (resizable.length === 0) return;
-    resizable.each((_, el) => {
-      const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize, 10)}px`;
-    });
-    return html;
+  async _onFirstRender(context, options) {
+    await super._onFirstRender(context, options);
+    bindInventoryContextMenu(this, this.element);
   }
 
-  async _onResize(event) {
-    super._onResize(event);
-    const html = $(this.form);
-    const resizable = html.find(".resizable");
-    if (resizable.length === 0) return;
-    resizable.each((_, el) => {
-      const heightDelta = this.position.height - this.options.height;
-      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize, 10)}px`;
-    });
-    const editors = html.find(".editor");
-    editors.each((_id, editor) => {
-      const container = editor.closest(".resizable-editor");
-      if (container) {
-        const heightDelta = this.position.height - this.options.height;
-        editor.style.height = `${heightDelta + Number.parseInt(container.dataset.editorSize, 10)}px`;
-      }
-    });
-  }
-
-  _getHeaderButtons() {
-    let buttons = super._getHeaderButtons();
-    const canConfigure = game.user.isGM || this.actor.isOwner;
-    if (this.options.editable && canConfigure) {
-      buttons = [
-        {
-          label: game.i18n.localize("OSE.dialog.tweaks"),
-          class: "configure-actor",
-          icon: "fas fa-code",
-          onclick: () => openEntityTweaksFor(this),
-        },
-        ...buttons,
-      ];
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    this._sizeResizables();
+    if (!this.isEditable) return;
+    for (const input of this.element.querySelectorAll(".quantity input, .memorize input, .counter input")) {
+      input.addEventListener("click", (event) => event.target.select());
     }
-    return buttons;
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onPosition(position) {
+    super._onPosition(position);
+    this._sizeResizables();
+  }
 
-    // Attributes
-    html.find(".saving-throw .attribute-name a").click((event) => rollSave(this, event));
-    html.find(".attack a").click((event) => rollAttack(this, event));
-    html.find(".hit-dice .attribute-name").click((event) => this.actor.rollHitDice({ event }));
+  _sizeResizables() {
+    const heightDelta = this.position.height - this.options.position.height;
+    for (const el of this.element?.querySelectorAll(".resizable") ?? []) {
+      el.style.height = `${heightDelta + Number.parseInt(el.dataset.baseSize, 10)}px`;
+    }
+  }
 
-    // Items (Abilities, Inventory and Spells)
-    html.find(".item-rollable .item-image").click((event) => rollAbility(this, event));
-    html.find(".inventory .item-category-title").click(toggleItemCategory);
-    html.find(".inventory .item-category-title input").click((event) => event.stopPropagation());
-    html.find(".inventory .category-caret").click(toggleContainedItems);
-    html.find(".item-name").click((event) => toggleItemSummary(this, event));
-    html.find(".item-controls .item-show").click((event) => displayItemInChat(this, event));
+  // Item row inputs update the item, not the actor.
+  _onChangeForm(formConfig, event) {
+    const input = event.target;
+    if (input.closest(".quantity")) return updateItemQuantity(this, event);
+    if (input.closest(".memorize")) return onSpellChange(this, event);
+    return super._onChangeForm(formConfig, event);
+  }
 
-    if (!this.options.editable) return;
+  /* -------------------------------------------- */
+  /*  Actions                                     */
+  /* -------------------------------------------- */
 
-    // Item Management
-    html.find(".item-create").click((event) => createItem(this, event));
-    html.find(".item-edit").click((event) => this._getItemFromActor(event).sheet.render(true));
-    html.find(".item-delete").click((event) => {
-      const item = this._getItemFromActor(event);
-      this._promptRemoveItemFromActor(item);
-    });
+  static _onConfigureActor() {
+    return openEntityTweaksFor(this);
+  }
 
-    html
-      .find(".quantity input")
-      .click((ev) => ev.target.select())
-      .change((event) => updateItemQuantity(this, event));
+  static _onRollSave(event, target) {
+    return rollSave(this, event, target);
+  }
 
-    // Consumables
-    html.find(".consumable-counter .full-mark").click((event) => useConsumable(this, event, true));
-    html.find(".consumable-counter .empty-mark").click((event) => useConsumable(this, event, false));
+  static _onRollAttack(event, target) {
+    return rollAttack(this, event, target);
+  }
 
-    // Spells
-    html
-      .find(".memorize input")
-      .click((event) => event.target.select())
-      .change((event) => onSpellChange(this, event));
+  static _onRollHitDice(event) {
+    return this.actor.rollHitDice({ event });
+  }
 
-    html.find(".spells .item-reset[data-action='reset-spells']").click((event) => resetSpells(this, event));
+  static _onRollItem(event, target) {
+    return rollAbility(this, event, target);
+  }
+
+  static _onToggleCategory(event, target) {
+    return toggleItemCategory(event, target);
+  }
+
+  static _onToggleContained(_event, target) {
+    return toggleContainedItems(target);
+  }
+
+  static _onToggleSummary(_event, target) {
+    return toggleItemSummary(this, target);
+  }
+
+  static _onShowItem(_event, target) {
+    return displayItemInChat(this, target);
+  }
+
+  static _onCreateItem(_event, target) {
+    if (this.isEditable) return createItem(this, target);
+  }
+
+  static _onEditItem(_event, target) {
+    if (this.isEditable) return this._getItemFromActor(target)?.sheet.render(true);
+  }
+
+  static _onDeleteItem(_event, target) {
+    const item = this._getItemFromActor(target);
+    if (this.isEditable && item) return this._promptRemoveItemFromActor(item);
+  }
+
+  static _onConsumableSpend(_event, target) {
+    if (this.isEditable) return useConsumable(this, target, true);
+  }
+
+  static _onConsumableRestore(_event, target) {
+    if (this.isEditable) return useConsumable(this, target, false);
+  }
+
+  static _onResetSpells(_event, target) {
+    if (this.isEditable) return resetSpells(this, target);
   }
 }

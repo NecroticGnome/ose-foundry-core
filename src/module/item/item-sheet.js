@@ -57,7 +57,7 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
 
   _onRender(context, options) {
     super._onRender(context, options);
-    const tagInput = this.element.querySelector('input[data-action="add-tag"]');
+    const tagInput = this.element.querySelector('input[data-action="addTag"]');
     if (!tagInput) return;
     tagInput.addEventListener("keydown", (ev) => {
       if (ev.key !== "Enter") return;

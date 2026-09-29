@@ -28,8 +28,8 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
     await closeSheets();
   });
 
-  describe("defaultOptions()", () => {
-    it("Has correctly set defaultOptions", async () => {
+  describe("DEFAULT_OPTIONS", () => {
+    it("Has correctly set DEFAULT_OPTIONS", async () => {
       const actor = await createMockActorKey("monster", {}, key);
       const sheet = actor?.sheet as unknown as OseActorSheetMonster;
 
@@ -38,18 +38,14 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(sheet.options.classes).contain("actor");
       expect(sheet.options.classes).contain("monster");
 
-      expect(sheet.options.template).contain("/templates/actors/monster-sheet.html");
-      expect(sheet.options.width).equal(450);
-      expect(sheet.options.height).equal(560);
-      expect(sheet.options.resizable).is.true;
+      const Sheet = sheet.constructor as typeof OseActorSheetMonster;
+      expect(Sheet.PARTS.sheet.template).contain("/templates/actors/monster-sheet.html");
+      expect(sheet.options.position.width).equal(450);
+      expect(sheet.options.position.height).equal(573);
+      expect(sheet.options.window.resizable).is.true;
 
-      expect(sheet.options.tabs.length).equal(1);
-      expect(Object.keys(sheet.options.tabs[0])).contain("navSelector");
-      expect(sheet.options.tabs[0].navSelector).equal(".tabs");
-      expect(Object.keys(sheet.options.tabs[0])).contain("contentSelector");
-      expect(sheet.options.tabs[0].contentSelector).equal(".sheet-body");
-      expect(Object.keys(sheet.options.tabs[0])).contain("initial");
-      expect(sheet.options.tabs[0].initial).equal("attributes");
+      expect(Sheet.TABS.primary.initial).equal("attributes");
+      expect(Sheet.TABS.primary.tabs.map((t) => t.id)).deep.equal(["attributes", "inventory", "spells", "notes"]);
     });
 
     after(async () => {
@@ -60,10 +56,10 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
   // @todo: Do we need separate tests for this, or is getData() enough?
   describe("_prepareItems(data)", () => {});
 
-  describe("getData()", () => {
+  describe("_prepareContext()", () => {
     it("returns the expected data", async () => {
       const actor = await createMockActorKey("monster", {}, key);
-      const data = await actor?.sheet?.getData();
+      const data = await actor?.sheet?._prepareContext({});
 
       // _prepareItems tests
       expect(Object.keys(data)).contain("owned");
@@ -79,8 +75,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(data?.config.morale).equal(game.settings.get(game.system.id, "morale"));
       expect(Object.keys(data)).contain("system");
       expect(Object.keys(data?.system)).contain("details");
-      expect(Object.keys(data?.system.details)).contain("treasure");
-      expect(Object.keys(data?.system.details.treasure)).contain("link");
+      expect(Object.keys(data)).contain("treasureLink");
     });
 
     after(async () => {
@@ -166,7 +161,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(item.system.counter.value).equal(1);
 
       // Click on reset
-      $(".item-reset").trigger("click");
+      actor?.sheet?.element.querySelector<HTMLElement>(".item-reset")?.click();
       await waitForInput();
 
       expect(item.system.counter.value).equal(4);
@@ -199,7 +194,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(item.system.counter.value).equal(4);
 
       // Click on reset
-      $(`.tab .item[data-item-id="${item.id}"] .item-image`).trigger("click");
+      actor?.sheet?.element.querySelector<HTMLElement>(`.tab .item[data-item-id="${item.id}"] .item-image`)?.click();
       await waitForInput();
 
       expect(item.system.counter.value).equal(3);
@@ -233,7 +228,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
           const nextIndex = patternIndex + 1 === colors.length ? 0 : patternIndex + 1;
 
           // Click the thing
-          $(".item-pattern").trigger("click");
+          actor?.sheet?.element.querySelector<HTMLElement>(".item-pattern")?.click();
           await delay(200);
 
           // Verify

@@ -11,6 +11,49 @@
 
 .ose.sheet.actor {
   $detailsHeight: 44px;
+  overflow: visible;
+  backdrop-filter: blur(4px);
+  .window-content {
+    backdrop-filter: none;
+    padding: 8px;
+    background: url("../../../ui/parchment.jpg") repeat;
+    color: #191813;
+    line-height: normal;
+  }
+  input[type="text"],
+  input[type="number"] {
+    height: 26px;
+    padding: 1px 3px;
+    color: #191813;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .charname input {
+    height: 48px;
+    line-height: 48px;
+  }
+  .window-content {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: var(--font-primary);
+      font-weight: normal;
+      line-height: unset;
+      color: inherit;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    h4 {
+      font-size: revert;
+    }
+    .flexrow {
+      align-items: initial;
+    }
+  }
   .blinking {
     font-weight: bold;
     animation: 0.8s ease-in 1s infinite alternate notify;
@@ -51,6 +94,7 @@
   /* Header Summary Details */
   .header-details {
     h1 {
+      margin: 0;
       input {
         margin: 0 0 10px 0;
       }
@@ -111,14 +155,16 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: space-around;
+    justify-content: flex-start;
+    gap: 7px;
     .item {
       max-height: 35px; /* tab padding fix */
-      padding: 1px 10px 0;
-      margin-left: -5px;
+      padding: 1px 6px 0;
+      margin-left: 0;
       text-indent: 4px;
       line-height: 16px;
-      background: url("/ui/parchment.jpg");
+      background: url("../../../ui/parchment.jpg");
+      color: #333;
       border-top-right-radius: 4px;
       border-top-left-radius: 80px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.15);
@@ -138,6 +184,9 @@
     height: calc(100% - 140px);
     .tab {
       height: 100%;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-border) transparent;
     }
     .attributes {
       list-style: none;
@@ -320,11 +369,11 @@
         }
         .item-rollable {
           &:hover .item-image {
-            background-image: url("/icons/svg/d20-grey.svg") !important;
+            background-image: url("../../../icons/svg/d20-grey.svg") !important;
             cursor: pointer;
           }
           .item-image:hover {
-            background-image: url("/icons/svg/d20-black.svg") !important;
+            background-image: url("../../../icons/svg/d20-black.svg") !important;
           }
         }
 
@@ -414,7 +463,7 @@
         margin-right: 4px;
         white-space: nowrap;
         .item-unequipped {
-          color: rgba(0, 0, 0, 0.2);
+          opacity: 0.25;
         }
         a:hover {
           color: $colorCrimson;
@@ -437,6 +486,10 @@
     .editor {
       flex: 1 0 300px;
       padding: 4px;
+      button.toggle {
+        top: 4px;
+        right: 4px;
+      }
     }
   }
 }

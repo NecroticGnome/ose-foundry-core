@@ -13,6 +13,7 @@ import {
   openV2Dialogs,
   trashChat,
   waitForInput,
+  waitUntil,
 } from "../../../e2e/testUtils";
 import type OseActorSheetCharacter from "../character-sheet";
 
@@ -25,8 +26,8 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
     await closeSheets();
   });
 
-  describe("defaultOptions()", () => {
-    it("Has correctly set defaultOptions", async () => {
+  describe("DEFAULT_OPTIONS", () => {
+    it("Has correctly set DEFAULT_OPTIONS", async () => {
       const actor = await createMockActorKey("character", {}, key);
       const sheet = actor?.sheet as unknown as OseActorSheetCharacter;
 
@@ -35,21 +36,28 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       expect(sheet.options.classes).contain("actor");
       expect(sheet.options.classes).contain("character");
 
-      expect(sheet.options.template).contain("/templates/actors/character-sheet.html");
-      expect(sheet.options.width).equal(450);
-      expect(sheet.options.height).equal(530);
-      expect(sheet.options.resizable).is.true;
+      const Sheet = sheet.constructor as typeof OseActorSheetCharacter;
+      expect(Sheet.PARTS.sheet.template).contain("/templates/actors/character-sheet.html");
+      expect(sheet.options.position.width).equal(450);
+      expect(sheet.options.position.height).equal(558);
+      expect(sheet.options.window.resizable).is.true;
 
-      expect(sheet.options.tabs.length).equal(1);
-      expect(Object.keys(sheet.options.tabs[0])).contain("navSelector");
-      expect(sheet.options.tabs[0].navSelector).equal(".sheet-tabs");
-      expect(Object.keys(sheet.options.tabs[0])).contain("contentSelector");
-      expect(sheet.options.tabs[0].contentSelector).equal(".sheet-body");
-      expect(Object.keys(sheet.options.tabs[0])).contain("initial");
-      expect(sheet.options.tabs[0].initial).equal("attributes");
+      expect(Sheet.TABS.primary.initial).equal("attributes");
+      expect(Sheet.TABS.primary.tabs.map((t) => t.id)).deep.equal([
+        "attributes",
+        "abilities",
+        "spells",
+        "inventory",
+        "notes",
+      ]);
+    });
 
-      expect(sheet.options.scrollY.length).equal(1);
-      expect(sheet.options.scrollY[0]).equal(".inventory");
+    it("hides the spells tab unless spellcasting is enabled", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const sheet = actor?.sheet as unknown as OseActorSheetCharacter;
+      expect(Object.keys((await sheet._prepareContext({})).tabs)).not.contain("spells");
+      await actor?.update({ system: { spells: { enabled: true } } });
+      expect(Object.keys((await sheet._prepareContext({})).tabs)).contain("spells");
     });
 
     after(async () => {
@@ -96,16 +104,16 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       const windows = openV2AppsByClass("creator");
       expect(windows.length).equal(1);
 
-      Object.keys(scores).forEach(async (score) => {
-        document
-          .querySelector(`.creator div[data-score="${score}"] a[data-action="rollScore"]`)
+      const creator = windows[0].element;
+      for (const score of Object.keys(scores)) {
+        creator
+          .querySelector(`div[data-score="${score}"] a[data-action="rollScore"]`)
           ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        await waitForInput();
-
-        const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
-        const { value } = scoreValue;
-        expect(Number.parseInt(value, 10) > 0).equal(true);
-      });
+      }
+      const rolled = (score: string) =>
+        Number.parseInt(creator.querySelector(`div[data-score="${score}"] input.score-value`)?.value, 10) > 0;
+      await waitUntil(() => Object.keys(scores).every(rolled));
+      for (const score of Object.keys(scores)) expect(rolled(score)).equal(true);
 
       for (const window of windows) {
         await window.close();
@@ -123,19 +131,20 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       const windows = openV2AppsByClass("creator");
       expect(windows.length).equal(1);
 
+      const creator = windows[0].element;
       for (const score of Object.keys(scores)) {
-        document
-          .querySelector(`.creator div[data-score="${score}"] a[data-action="rollScore"]`)
+        creator
+          .querySelector(`div[data-score="${score}"] a[data-action="rollScore"]`)
           ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
-        const scoreValue = document.querySelector(`.creator div[data-score="${score}"] input.score-value`);
+        const scoreValue = creator.querySelector(`div[data-score="${score}"] input.score-value`);
         const { value } = scoreValue;
         expect(Number.parseInt(value, 10) > 0).equal(true);
         scores[score] = Number.parseInt(value, 10);
       }
 
-      document.querySelector(".creator")?.requestSubmit?.();
+      creator.requestSubmit?.();
       await waitForInput();
 
       expect(actor?.system.scores.str.value).equal(scores.str);
@@ -153,6 +162,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       // Don't delete actors or close windows in bulk, as it interferes with the
       // tests still running.
       await trashChat();
+      for (const window of openV2AppsByClass("creator")) await window.close();
       await delay(300);
     });
 
@@ -161,10 +171,10 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
     });
   });
 
-  describe("getData()", () => {
+  describe("_prepareContext()", () => {
     it("returns the expected data", async () => {
       const actor = await createMockActorKey("character", {}, key);
-      const data = await actor?.sheet?.getData();
+      const data = await actor?.sheet?._prepareContext({});
 
       expect(Object.keys(data)).contain("enrichedBiography");
       expect(Object.keys(data)).contain("enrichedNotes");
@@ -181,10 +191,10 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       expect(Object.keys(data)).contain("spells");
       expect(Object.keys(data)).contain("slots");
       expect(Object.keys(data)).contain("system");
-      expect(Object.keys(data?.system)).contain("usesAscendingAC");
-      expect(Object.keys(data?.system)).contain("meleeMod");
-      expect(Object.keys(data?.system)).contain("rangedMod");
-      expect(Object.keys(data?.system)).contain("init");
+      expect(data?.system.usesAscendingAC).not.undefined;
+      expect(data?.system.meleeMod).not.undefined;
+      expect(data?.system.rangedMod).not.undefined;
+      expect(data?.system.init).not.undefined;
     });
 
     after(async () => {
@@ -225,14 +235,17 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       dialogs[0].close();
     });
 
-    it("adds language on OK", async () => {
+    it("adds language on OK", async function () {
+      this.timeout(10_000);
       const actor = await createMockActorKey("character", {}, key);
+      await closeV2Dialogs();
+      await waitUntil(() => openV2Dialogs().length === 0);
       // eslint-disable-next-line no-underscore-dangle
       actor?.sheet?._pushLang(table);
-      await delay(220);
+      await waitUntil(() => openV2Dialogs().length === 1);
 
-      $(`button[data-action="ok"]`).trigger("click");
-      await delay(500);
+      openV2Dialogs()[0]?.element.querySelector<HTMLButtonElement>('button[data-action="ok"]')?.click();
+      await waitUntil(() => openV2Dialogs().length === 0 && actor?.system.languages.value.length === 1);
 
       const dialogs = openV2Dialogs();
       expect(dialogs.length).equal(0);
@@ -288,7 +301,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       actor?.sheet?.render(true);
       await waitForInput();
 
-      $(`.sheet .profile a[data-action="modifiers"]`).trigger("click");
+      actor?.sheet?.element.querySelector<HTMLElement>(`.profile a[data-action="modifiers"]`)?.click();
       await delay(200);
 
       const dialogs = openV2AppsByClass("modifiers");
@@ -320,7 +333,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       actor?.sheet?.render(true);
       await waitForInput();
 
-      $(`.sheet .profile a[data-action="gp-cost"]`).trigger("click");
+      actor?.sheet?.element.querySelector<HTMLElement>(`.profile a[data-action="gpCost"]`)?.click();
       await delay(200);
 
       const dialogs = openV2AppsByClass("gp-cost");

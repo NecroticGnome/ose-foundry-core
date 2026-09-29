@@ -4,7 +4,7 @@
         <ul class="attributes">
             <li class="attribute ability-score" data-score="str">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.str.long">
-                    <a>{{ localize "OSE.scores.str.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.str.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.str.value" type="text" value="{{system.scores.str.value}}" placeholder="0"
@@ -13,7 +13,7 @@
             </li>
             <li class="attribute ability-score" data-score="int">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.int.long">
-                    <a>{{ localize "OSE.scores.int.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.int.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.int.value" type="text" value="{{system.scores.int.value}}" placeholder="0"
@@ -22,7 +22,7 @@
             </li>
             <li class="attribute ability-score" data-score="wis">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.wis.long">
-                    <a>{{ localize "OSE.scores.wis.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.wis.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.wis.value" type="text" value="{{system.scores.wis.value}}" placeholder="0"
@@ -31,7 +31,7 @@
             </li>
             <li class="attribute ability-score" data-score="dex">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.dex.long">
-                    <a>{{ localize "OSE.scores.dex.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.dex.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.dex.value" type="text" value="{{system.scores.dex.value}}" placeholder="0"
@@ -40,7 +40,7 @@
             </li>
             <li class="attribute ability-score" data-score="con">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.con.long">
-                    <a>{{ localize "OSE.scores.con.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.con.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.con.value" type="text" value="{{system.scores.con.value}}" placeholder="0"
@@ -49,7 +49,7 @@
             </li>
             <li class="attribute ability-score" data-score="cha">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.scores.cha.long">
-                    <a>{{ localize "OSE.scores.cha.short" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.scores.cha.short" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.scores.cha.value" type="text" value="{{system.scores.cha.value}}" placeholder="0"
@@ -59,7 +59,7 @@
             {{#if system.retainer.enabled}}
             <li class="attribute ability-score" data-stat="lr">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.Loyalty">
-                    <a>{{ localize "OSE.LoyaltyShort" }}</a>
+                    <a data-action="rollAbilityScore">{{ localize "OSE.LoyaltyShort" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.retainer.loyalty" type="text" value="{{system.retainer.loyalty}}" placeholder="0"
@@ -101,7 +101,7 @@
         <div class="flexrow">
             <ul class="attributes flexrow">
                 <li class="attribute hit-dice">
-                    <h4 class="attribute-name box-title" data-tooltip="OSE.HitDice">
+                    <h4 class="attribute-name box-title" data-tooltip="OSE.HitDice" data-action="rollHitDice">
                         <a>{{ localize "OSE.HitDiceShort" }}</a>
                     </h4>
                     <div class="attribute-value">
@@ -125,7 +125,7 @@
             <ul class="attributes flexrow">
                 <li class="attribute attribute-secondaries attack" data-attack="melee">
                     <h4 class="attribute-name box-title" data-tooltip="OSE.Melee">
-                        <a>{{localize 'OSE.MeleeShort'}}</a>
+                        <a data-action="rollAttack">{{localize 'OSE.MeleeShort'}}</a>
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value"
@@ -159,7 +159,7 @@
                 {{/if}}
                 <li class="attribute attribute-secondaries attack" data-attack="missile">
                     <h4 class="attribute-name box-title" data-tooltip="OSE.Missile">
-                        <a>{{localize 'OSE.MissileShort'}}</a>
+                        <a data-action="rollAttack">{{localize 'OSE.MissileShort'}}</a>
                     </h4>
                     <div class="flexrow">
                         <div class="attribute-value"
@@ -206,7 +206,7 @@
         <ul class="attributes">
             <li class="attribute saving-throw" data-save="death">
                 <h4 class="attribute-name box-title">
-                    <a>{{ localize "OSE.saves.death.long" }}</a>
+                    <a data-action="rollSave">{{ localize "OSE.saves.death.long" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.death.value" type="text" value="{{system.saves.death.value}}" placeholder="0"
@@ -214,7 +214,7 @@
             </li>
             <li class="attribute saving-throw" data-save="wand">
                 <h4 class="attribute-name box-title">
-                    <a>{{ localize "OSE.saves.wand.long" }}</a>
+                    <a data-action="rollSave">{{ localize "OSE.saves.wand.long" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.wand.value" type="text" value="{{system.saves.wand.value}}" placeholder="0"
@@ -222,7 +222,7 @@
             </li>
             <li class="attribute saving-throw" data-save="paralysis">
                 <h4 class="attribute-name box-title">
-                    <a>{{ localize "OSE.saves.paralysis.long" }}</a>
+                    <a data-action="rollSave">{{ localize "OSE.saves.paralysis.long" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.paralysis.value" type="text" value="{{system.saves.paralysis.value}}"
@@ -230,7 +230,7 @@
             </li>
             <li class="attribute saving-throw" data-save="breath">
                 <h4 class="attribute-name box-title">
-                    <a>{{ localize "OSE.saves.breath.long" }}</a>
+                    <a data-action="rollSave">{{ localize "OSE.saves.breath.long" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.breath.value" type="text" value="{{system.saves.breath.value}}"
@@ -238,7 +238,7 @@
             </li>
             <li class="attribute saving-throw" data-save="spell">
                 <h4 class="attribute-name box-title">
-                    <a>{{ localize "OSE.saves.spell.long" }}</a>
+                    <a data-action="rollSave">{{ localize "OSE.saves.spell.long" }}</a>
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.spell.value" type="text" value="{{system.saves.spell.value}}"

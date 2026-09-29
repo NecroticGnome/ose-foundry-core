@@ -1,19 +1,14 @@
 /**
  * @file Action handlers for inventory operations (equip, stow, add, remove,
- *       quantity, container moves, rolls). Each takes the actor or sheet
- *       (V1 still calls these from instance methods; V2 will call from the
- *       static actions map).
+ *       quantity, container moves, rolls).
  */
 import skipRollDialogCheck from "../helpers-behaviour";
 import { chooseItemType } from "./dialogs";
 
-const getItemFromEvent = (sheet, event) => {
-  const li = event.currentTarget.closest(".item-entry");
-  return sheet.actor.items.get(li.dataset.itemId);
-};
+const getItemFromElement = (sheet, element) => sheet.actor.items.get(element.closest(".item-entry")?.dataset.itemId);
 
-export const useConsumable = (sheet, event, decrement) => {
-  const item = getItemFromEvent(sheet, event);
+export const useConsumable = (sheet, target, decrement) => {
+  const item = getItemFromElement(sheet, target);
   if (!item) return null;
   let {
     quantity: { value: quantity },
@@ -24,8 +19,7 @@ export const useConsumable = (sheet, event, decrement) => {
 };
 
 export const onSpellChange = async (sheet, event) => {
-  event.preventDefault();
-  const item = getItemFromEvent(sheet, event);
+  const item = getItemFromElement(sheet, event.target);
   if (event.target.dataset.field === "cast") {
     return item.update({ "system.cast": Number.parseInt(event.target.value, 10) });
   }
@@ -34,8 +28,8 @@ export const onSpellChange = async (sheet, event) => {
   }
 };
 
-export const resetSpells = async (sheet, event) => {
-  const spellsContainer = event.currentTarget.closest(".inventory.spells");
+export const resetSpells = async (sheet, target) => {
+  const spellsContainer = target.closest(".inventory.spells");
   const spellElements = spellsContainer.querySelectorAll(".item-entry");
 
   const updates = [];
@@ -51,9 +45,11 @@ export const resetSpells = async (sheet, event) => {
   }
 };
 
-export const rollAbility = async (sheet, event) => {
-  const item = getItemFromEvent(sheet, event);
-  const itemData = item?.system;
+export const rollAbility = async (sheet, event, target) => {
+  if (!target.closest(".item-rollable")) return;
+  const item = getItemFromElement(sheet, target);
+  if (!item) return;
+  const itemData = item.system;
   if (item.type === "weapon") {
     if (sheet.actor.type === "monster") {
       await item.update({ "system.counter.value": itemData.counter.value - 1 });
@@ -66,13 +62,13 @@ export const rollAbility = async (sheet, event) => {
   }
 };
 
-export const rollSave = (sheet, event) => {
-  const { save } = event.currentTarget.parentElement.parentElement.dataset;
+export const rollSave = (sheet, event, target) => {
+  const { save } = target.closest("[data-save]").dataset;
   return sheet.actor.rollSave(save, { event });
 };
 
-export const rollAttack = (sheet, event) => {
-  const { attack } = event.currentTarget.parentElement.parentElement.dataset;
+export const rollAttack = (sheet, event, target) => {
+  const { attack } = target.closest(".attack").dataset;
   return sheet.actor.targetAttack({ roll: {} }, attack, {
     type: attack,
     skipDialog: skipRollDialogCheck(event),
@@ -80,8 +76,7 @@ export const rollAttack = (sheet, event) => {
 };
 
 export const updateItemQuantity = async (sheet, event) => {
-  event.preventDefault();
-  const item = getItemFromEvent(sheet, event);
+  const item = getItemFromElement(sheet, event.target);
   if (event.target.dataset.field === "value") {
     return item.update({ "system.quantity.value": Number.parseInt(event.target.value, 10) });
   }
@@ -111,9 +106,8 @@ export const removeItemFromActor = async (actor, item) => {
   return actor.deleteEmbeddedDocuments("Item", [item._id]);
 };
 
-export const createItem = (sheet, event) => {
-  event.preventDefault();
-  const header = event.currentTarget;
+export const createItem = (sheet, target) => {
+  const header = target;
   const { treasure, type, lvl } = header.dataset;
   const buildItem = (t, name) => ({
     name: name || `New ${t.capitalize()}`,

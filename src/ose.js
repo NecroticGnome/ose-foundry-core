@@ -26,7 +26,6 @@ import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
 import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
-import { bindInventoryContextMenu } from "./module/sheet/context-menu";
 
 import "./e2e";
 
@@ -87,7 +86,6 @@ Hooks.once("init", async () => {
   CONFIG.Item.dataModels = ITEM_DATA_MODELS;
 
   // Register sheet application classes
-  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
   foundry.documents.collections.Actors.registerSheet(game.system.id, OseActorSheetCharacter, {
     types: ["character"],
     makeDefault: true,
@@ -99,7 +97,6 @@ Hooks.once("init", async () => {
     label: "OSE.SheetClassMonster",
   });
 
-  foundry.documents.collections.Items.unregisterSheet("core", foundry.applications.sheets.ItemSheetV2);
   foundry.documents.collections.Items.registerSheet(game.system.id, OseItemSheet, {
     makeDefault: true,
     label: "OSE.SheetClassItem",
@@ -179,17 +176,6 @@ Hooks.on("createCombatant", (combatant) => {
     return;
   }
   combatant.assignGroup();
-});
-
-// TODO(appv2 stage 7): this hook fires only for V1 ActorSheet instances.
-// When OseActorSheet moves to ActorSheetV2 in stage 7, drop this hook and call
-// bindInventoryContextMenu from the V2 sheet's `_onRender` instead.
-/**
- * @param {Application} app - The actor sheet application
- * @param {HTMLElement|JQuery} html - Sheet root (v1 hooks may still pass jQuery)
- */
-Hooks.on("renderActorSheet", (app, html) => {
-  bindInventoryContextMenu(app, html instanceof HTMLElement ? html : html?.[0]);
 });
 
 Hooks.on("renderCompendium", renderList.RenderCompendium);
