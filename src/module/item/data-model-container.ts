@@ -49,7 +49,7 @@ export default class OseDataModelContainer
     if (!this.contents) return 0;
 
     return this.contents.reduce(
-      (acc, { system: { weight, quantity } }) => acc + Number(weight) * (quantity?.value || 1),
+      (acc, { system: { weight, quantity } }) => acc + (weight ?? 0) * (quantity?.value || 1),
       0,
     );
   }
