@@ -20,6 +20,11 @@ body {
     border-top: 1px solid #eee;
     padding: 4rem 0;
     margin-bottom: 0;}
+  .attributes table {
+    display: block;
+    overflow-x: auto; }
+  .attributes code {
+    white-space: nowrap; }
   .value-img {
     display: block;
     text-align: center;
