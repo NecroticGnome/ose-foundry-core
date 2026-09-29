@@ -1,33 +1,56 @@
 /**
  * @file The sheet class for Actors of type Monster
  */
+// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import OSE from "../config";
 import OseActorSheet from "./actor-sheet";
+
+const TextEditor = foundry.applications.ux.TextEditor.implementation;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
 export default class OseActorSheetMonster extends OseActorSheet {
-  /**
-   * Extend and override the default options used by the Actor Sheet
-   *
-   * @returns {object} - The sheet's default options
-   */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(OseActorSheet.defaultOptions, {
-      classes: ["ose", "sheet", "monster", "actor"],
-      template: `${OSE.systemPath()}/templates/actors/monster-sheet.html`,
-      width: 450,
-      height: 560,
-      resizable: true,
+  static DEFAULT_OPTIONS = {
+    classes: ["monster"],
+    position: { width: 450, height: 573 },
+    actions: {
+      rollMorale: OseActorSheetMonster._onRollMorale,
+      rollReaction: OseActorSheetMonster._onRollReaction,
+      rollAppearing: OseActorSheetMonster._onRollAppearing,
+      rollHP: OseActorSheetMonster._onRollHP,
+      cyclePattern: OseActorSheetMonster._onCyclePattern,
+      resetAttacks: OseActorSheetMonster._onResetAttacks,
+      generateSaves: OseActorSheetMonster._onGenerateSaves,
+    },
+  };
+
+  static PARTS = {
+    sheet: {
+      root: true,
+      template: "systems/__SYSTEM_ID__/dist/templates/actors/monster-sheet.html",
+      scrollable: ["attributes", "spells", "inventory"].map((tab) => `.tab[data-tab="${tab}"] .resizable`),
+    },
+  };
+
+  static TABS = {
+    primary: {
       tabs: [
-        {
-          navSelector: ".tabs",
-          contentSelector: ".sheet-body",
-          initial: "attributes",
-        },
+        { id: "attributes", label: "OSE.category.attributes" },
+        { id: "inventory", label: "OSE.category.inventory" },
+        { id: "spells", label: "OSE.category.spells" },
+        { id: "notes", label: "OSE.category.notes" },
       ],
-    });
+      initial: "attributes",
+    },
+  };
+
+  _isTabVisible(tabId) {
+    if (tabId === "notes") return true;
+    if (!this.actor.isOwnerOrObserver) return false;
+    if (tabId === "inventory") return this.actor.system.config.enableInventory;
+    if (tabId === "spells") return this.actor.system.spells.enabled;
+    return true;
   }
 
   /**
@@ -50,29 +73,18 @@ export default class OseActorSheetMonster extends OseActorSheet {
     data.spells = this.actor.system.spells.spellList;
   }
 
-  /**
-   * Prepare data for rendering the Actor sheet
-   * The prepared data object contains both the actor data as well as additional sheet options
-   */
-  async getData() {
-    const data = await super.getData();
+  async _prepareContext(options) {
+    const data = await super._prepareContext(options);
     // Prepare owned items
     this._prepareItems(data);
 
-    const monsterData = data?.system;
-
     // Settings
     data.config.morale = game.settings.get(game.system.id, "morale");
-    monsterData.details.treasure.link = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      monsterData.details.treasure.table,
-      { async: true },
-    );
+    const enrichOptions = { relativeTo: this.actor, secrets: game.user.isGM };
+    data.treasureLink = await TextEditor.enrichHTML(this.actor.system.details.treasure.table, enrichOptions);
     data.isNew = this.actor.isNew();
 
-    data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      this.object.system.details.biography,
-      { secrets: game.user?.isGM },
-    );
+    data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
 
     // Monsters don't show an encumbrance bar
     data.encumbranceTemplate = "";
@@ -120,14 +132,9 @@ export default class OseActorSheetMonster extends OseActorSheet {
   }
 
   async _onDrop(event) {
-    super._onDrop(event);
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData("text/plain"));
-      if (data.type !== "RollTable") return;
-    } catch (_error) {
-      return false;
-    }
+    await super._onDrop(event);
+    const data = TextEditor.getDragEventData(event);
+    if (data.type !== "RollTable" || !this.isEditable) return;
 
     let link = "";
     if (data.pack) {
@@ -153,8 +160,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
   }
 
   async _updateAttackCounter(event) {
-    event.preventDefault();
-    const item = this._getItemFromActor(event);
+    const item = this._getItemFromActor(event.target);
 
     if (event.target.dataset.field === "value") {
       return item.update({
@@ -168,8 +174,8 @@ export default class OseActorSheetMonster extends OseActorSheet {
     }
   }
 
-  _cycleAttackPatterns(event) {
-    const item = super._getItemFromActor(event);
+  _cycleAttackPatterns(target) {
+    const item = this._getItemFromActor(target);
     const currentColor = item.system.pattern;
     // Attack patterns include all OSE colors and transparent
     const colors = Object.keys(CONFIG.OSE.colors);
@@ -185,52 +191,43 @@ export default class OseActorSheetMonster extends OseActorSheet {
     });
   }
 
-  /**
-   * Activate event listeners using the prepared sheet HTML
-   *
-   * @param html - {HTML}   The prepared HTML object ready to be rendered into the DOM
-   */
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    html.find(".morale-check a").click((ev) => {
-      const actorObject = this.actor;
-      actorObject.rollMorale({ event: ev });
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    this.element.querySelector(".treasure-table")?.addEventListener("contextmenu", (event) => {
+      if (event.target.closest("a") && this.isEditable) this.actor.update({ "system.details.treasure.table": null });
     });
+  }
 
-    html.find(".reaction-check a").click((ev) => {
-      const actorObject = this.actor;
-      actorObject.rollReaction({ event: ev });
-    });
+  _onChangeForm(formConfig, event) {
+    if (event.target.closest(".counter")) return this._updateAttackCounter(event);
+    return super._onChangeForm(formConfig, event);
+  }
 
-    html.find(".appearing-check a").click((ev) => {
-      const actorObject = this.actor;
-      const check = $(ev.currentTarget).closest(".check-field").data("check");
-      actorObject.rollAppearing({ event: ev, check });
-    });
+  static _onRollMorale(event) {
+    return this.actor.rollMorale({ event });
+  }
 
-    html.find(".treasure-table a").contextmenu((_ev) => {
-      this.actor.update({ "system.details.treasure.table": null });
-    });
+  static _onRollReaction(event) {
+    return this.actor.rollReaction({ event });
+  }
 
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
+  static _onRollAppearing(event, target) {
+    return this.actor.rollAppearing({ event, check: target.closest(".check-field").dataset.check });
+  }
 
-    html.find(".item-reset[data-action='reset-attacks']").click((ev) => {
-      this._resetAttacks(ev);
-    });
+  static _onRollHP(event) {
+    if (this.isEditable) return this.actor.rollHP({ event });
+  }
 
-    html
-      .find(".counter input")
-      .click((ev) => ev.target.select())
-      .change(this._updateAttackCounter.bind(this));
+  static _onCyclePattern(_event, target) {
+    if (this.isEditable) return this._cycleAttackPatterns(target);
+  }
 
-    html.find(".hp-roll").click((ev) => {
-      this.actor.rollHP({ event: ev });
-    });
+  static _onResetAttacks(event) {
+    if (this.isEditable) return this._resetAttacks(event);
+  }
 
-    html.find(".item-pattern").click((ev) => this._cycleAttackPatterns(ev));
-
-    html.find('button[data-action="generate-saves"]').click(() => this.generateSave());
+  static _onGenerateSaves() {
+    if (this.isEditable) return this.generateSave();
   }
 }

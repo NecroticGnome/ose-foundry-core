@@ -8,9 +8,9 @@
             {{#if @root.owner}}
             <div class="item-controls">
               <a
-                class="item-control item-push"
+                class="item-control item-push" data-action="pushLang"
                 data-array="languages"
-                title="{{localize 'OSE.Add'}}"
+                data-tooltip="OSE.Add"
                 ><i class="fa fa-plus"></i
               ></a>
             </div>
@@ -23,9 +23,9 @@
               {{#if @root.owner}}
               <div class="item-controls">
                 <a
-                  class="item-control item-pop"
+                  class="item-control item-pop" data-action="popLang"
                   data-array="languages"
-                  title="{{localize 'OSE.Delete'}}"
+                  data-tooltip="OSE.Delete"
                   ><i class="fa fa-trash"></i
                 ></a>
               </div>
@@ -38,8 +38,11 @@
       <div class="flex3 description">
         <div class="item-category-title">Biography</div>
         <div>
-          {{editor enrichedBiography target="system.details.biography"
-          button=true editable=editable async=true engine="prosemirror"}}
+          {{#if editable}}
+          <prose-mirror name="system.details.biography" toggled="true" button="true" value="{{system.details.biography}}">{{{enrichedBiography}}}</prose-mirror>
+          {{else}}
+          <div class="editor-content">{{{enrichedBiography}}}</div>
+          {{/if}}
         </div>
       </div>
     </div>
@@ -48,8 +51,11 @@
     <div class="inventory notes">
       <div class="item-category-title">{{localize "OSE.category.notes"}}</div>
       <div class="resizable-editor">
-        {{editor enrichedNotes target="system.details.notes" button=true
-        editable=editable async=true engine="prosemirror"}}
+        {{#if editable}}
+        <prose-mirror name="system.details.notes" toggled="true" button="true" value="{{system.details.notes}}">{{{enrichedNotes}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enrichedNotes}}}</div>
+        {{/if}}
       </div>
     </div>
   {{/if}}

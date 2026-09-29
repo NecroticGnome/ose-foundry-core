@@ -1,48 +1,43 @@
-<form class="{{cssClass}}" autocomplete="off">
-  {{! Sheet Header }}
-  <header class="sheet-header flexrow">
-    {{> (path "/templates/actors/partials/monster-header.html") }}
-  </header>
+{{! Sheet Header }}
+<header class="sheet-header flexrow">
+  {{> (path "/templates/actors/partials/monster-header.html") }}
+</header>
 
-  {{! Sheet Tab Navigation }}
-  <nav class="sheet-tabs tabs flexrow" data-group="primary">
-    {{#if isOwnerOrObserver}}
-      <a class="item" data-tab="attributes">
-        {{localize "OSE.category.attributes"}}
-      </a>
-      {{#if system.config.enableInventory}}
-      <a class="item" data-tab="inventory">
-        {{localize "OSE.category.inventory"}}
-      </a>
-      {{/if}} {{#if system.spells.enabled}}
-      <a class="item" data-tab="spells"> {{localize "OSE.category.spells"}} </a>
-      {{/if}}
-    {{/if}}
-    <a class="item" data-tab="notes"> {{localize "OSE.category.notes"}} </a>
-  </nav>
-  {{! Sheet Body }}
-  <section class="sheet-body">
-    {{! Attributes Tab }}
-    <div class="tab" data-group="primary" data-tab="attributes">
-      {{> (path "/templates/actors/partials/monster-attributes-tab.html") }}
-    </div>
-    {{#if system.config.enableInventory}}
-    <div class="tab" data-group="primary" data-tab="inventory">
-      {{> (path "/templates/actors/partials/character-inventory-tab.html") }}
-    </div>
-    {{/if}} {{#if system.spells.enabled }}
-    <div class="tab" data-group="primary" data-tab="spells">
-      {{> (path "/templates/actors/partials/character-spells-tab.html") }}
-    </div>
-    {{/if}}
-    <div class="tab" data-group="primary" data-tab="notes">
-      <div class="inventory">
-        <div class="item-category-title">{{localize "OSE.category.notes"}}</div>
-        <div class="resizable-editor">
-          {{editor enrichedBiography target="system.details.biography"
-          button=true editable=editable async=true engine="prosemirror"}}
-        </div>
+{{! Sheet Tab Navigation }}
+<nav class="sheet-tabs tabs" data-group="primary">
+  {{#each tabs as |tab|}}
+  <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{localize tab.label}}
+  </a>
+  {{/each}}
+</nav>
+{{! Sheet Body }}
+<section class="sheet-body">
+  {{#if tabs.attributes}}
+  <div class="tab {{tabs.attributes.cssClass}}" data-group="primary" data-tab="attributes">
+    {{> (path "/templates/actors/partials/monster-attributes-tab.html") }}
+  </div>
+  {{/if}}
+  {{#if tabs.inventory}}
+  <div class="tab {{tabs.inventory.cssClass}}" data-group="primary" data-tab="inventory">
+    {{> (path "/templates/actors/partials/character-inventory-tab.html") }}
+  </div>
+  {{/if}}
+  {{#if tabs.spells}}
+  <div class="tab {{tabs.spells.cssClass}}" data-group="primary" data-tab="spells">
+    {{> (path "/templates/actors/partials/character-spells-tab.html") }}
+  </div>
+  {{/if}}
+  <div class="tab {{tabs.notes.cssClass}}" data-group="primary" data-tab="notes">
+    <div class="inventory">
+      <div class="item-category-title">{{localize "OSE.category.notes"}}</div>
+      <div class="resizable-editor">
+        {{#if editable}}
+        <prose-mirror name="system.details.biography" toggled="true" button="true" value="{{system.details.biography}}">{{{enrichedBiography}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enrichedBiography}}}</div>
+        {{/if}}
       </div>
     </div>
-  </section>
-</form>
+  </div>
+</section>

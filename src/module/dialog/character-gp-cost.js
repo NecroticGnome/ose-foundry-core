@@ -1,178 +1,126 @@
 /**
- * @file An application for deducting currency from an actor using the Shopping Cart feature
+ * @file An application for deducting currency from an actor using the Shopping Cart feature.
  */
-// eslint-disable-next-line no-unused-vars
-import OSE from "../config";
+const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
-export default class OseCharacterGpCost extends FormApplication {
+export default class OseCharacterGpCost extends HandlebarsApplicationMixin(ApplicationV2) {
   static physicalItemTypes = new Set(["item", "container", "weapon", "armor"]);
 
-  constructor(event, preparedData, position) {
-    super(event, position);
-    this.object.preparedData = preparedData;
+  constructor(document, preparedData, options = {}) {
+    super(options);
+    this.document = document;
+    this.preparedData = preparedData;
   }
 
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(FormApplication.defaultOptions, {
-      classes: ["ose", "dialog", "gp-cost"],
-      id: "sheet-gp-cost",
-      template: `${OSE.systemPath()}/templates/actors/dialogs/gp-cost-dialog.html`,
-      width: 240,
-    });
+  /** Bring an open dialog forward (closing if it's for a different actor) before creating a new one. */
+  static open(document, preparedData, options = {}) {
+    const existing = foundry.applications.instances.get("sheet-gp-cost");
+    if (existing?.document === document) {
+      existing.preparedData = preparedData;
+      existing.render();
+      existing.bringToFront();
+      return existing;
+    }
+    existing?.close();
+    const sheet = new OseCharacterGpCost(document, preparedData, options);
+    sheet.render({ force: true });
+    return sheet;
   }
 
-  /* -------------------------------------------- */
+  static DEFAULT_OPTIONS = {
+    id: "sheet-gp-cost",
+    classes: ["ose", "dialog", "gp-cost"],
+    tag: "form",
+    form: {
+      handler: OseCharacterGpCost.#onSubmitForm,
+      submitOnChange: false,
+      closeOnSubmit: false,
+    },
+    position: { width: 240, height: "auto" },
+    window: { resizable: true },
+  };
 
-  /**
-   * Add the Entity name into the window title
-   *
-   * @type {string}
-   * @returns {string} - A localized window title
-   */
+  static PARTS = {
+    main: { template: "systems/__SYSTEM_ID__/dist/templates/actors/dialogs/gp-cost-dialog.html" },
+  };
+
   get title() {
-    return `${this.object.name}: ${game.i18n.localize("OSE.dialog.shoppingCart")}`;
+    return `${this.document.name}: ${game.i18n.localize("OSE.dialog.shoppingCart")}`;
   }
 
-  /* -------------------------------------------- */
-
-  /**
-   * Construct and return the data object used to render the HTML template for this form application.
-   *
-   * @returns {object} - The template data
-   */
-  async getData() {
-    const data = await foundry.utils.deepClone(this.object.preparedData);
-    data.totalCost = await this.#getTotalCost(data);
-    data.user = game.user;
-    this.inventory = this.object.items;
-    return data;
+  async _prepareContext() {
+    const context = foundry.utils.deepClone(this.preparedData);
+    context.totalCost = await this._getTotalCost(context);
+    context.user = game.user;
+    return context;
   }
 
-  async close(options) {
-    return super.close(options);
+  static async #onSubmitForm(_event, _form, _formData) {
+    // biome-ignore lint/complexity/noThisInStatic: V2 form.handler binds `this` to the application instance.
+    return this._submit();
   }
 
-  /**
-   * An object that provides options to _onSubmit
-   *
-   * @typedef submitOptions
-   * @property {boolean} preventClose - Should the application be stopped from closing?
-   * @property {boolean} preventRender - Should the application be stopped from rendering?
-   */
+  async _submit() {
+    const context = await this._prepareContext();
+    const totalCost = context.totalCost;
 
-  /**
-   * Override Foundry's default _onSubmit event to add our own behaviors
-   *
-   * @param {Event} event - The native form submit event
-   * @param {submitOptions} options - Options for the _onSubmit event
-   */
-  // eslint-disable-next-line no-underscore-dangle
-  async _onSubmit(event, { preventClose = false, preventRender = false } = {}) {
-    // eslint-disable-next-line no-underscore-dangle
-    super._onSubmit(event, {
-      preventClose,
-      preventRender,
-    });
-    // Generate gold
-    const totalCost = await this.#getTotalCost(await this.getData());
-    const gp = await this.object.items.find((item) => {
-      const itemData = item.system;
-      return (
-        (item.name === game.i18n.localize("OSE.items.gp.short") || item.name === "GP") && // legacy behavior used GP, even for other languages
-        itemData.treasure
-      );
-    });
+    // Legacy behaviour used "GP" even for other languages
+    const gp = this.document.items.find(
+      (item) => (item.name === game.i18n.localize("OSE.items.gp.short") || item.name === "GP") && item.system.treasure,
+    );
     if (!gp) {
       ui.notifications.error(game.i18n.localize("OSE.error.noGP"));
       return;
     }
+
     const newGP = gp.system.quantity.value - totalCost;
-    if (newGP >= 0) {
-      await this.object.updateEmbeddedDocuments("Item", [{ _id: gp.id, "system.quantity.value": newGP }]);
-
-      // Mark all items in the cart as "paid for" by setting a flag
-      await this.#markItemsAsPaid();
-
-      // Close the dialog after successful transaction
-      await this.close();
-    } else {
+    if (newGP < 0) {
       ui.notifications.error(game.i18n.localize("OSE.error.notEnoughGP"));
+      return;
     }
-  }
 
-  /**
-   * This method is called upon form submission after form data is validated
-   *
-   * @param {Event} event - The initial triggering submission event
-   * @param {object} formData - The object of validated form data with which to update the object
-   * @private
-   */
-  async _updateObject(event, formData) {
-    event.preventDefault();
+    await this.document.updateEmbeddedDocuments("Item", [{ _id: gp.id, "system.quantity.value": newGP }]);
+    await this._markItemsAsPaid();
 
-    const speaker = ChatMessage.getSpeaker({ actor: this });
-    const templateData = await this.getData();
+    // Post the cart receipt to chat
     const content = await foundry.applications.handlebars.renderTemplate(
-      `${OSE.systemPath()}/templates/chat/inventory-list.html`,
-      templateData,
+      "systems/__SYSTEM_ID__/dist/templates/chat/inventory-list.html",
+      context,
     );
-    ChatMessage.create({
+    await ChatMessage.create({
+      style: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content,
-      speaker,
+      speaker: ChatMessage.getSpeaker({ actor: this.document }),
     });
-    // Update the actor
-    await this.object.update(formData);
 
-    // Re-draw the updated sheet
-    this.object.sheet.render(true);
+    await this.close();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async #getTotalCost(data) {
+  async _getTotalCost(data) {
     return data.items.reduce((total, item) => {
       const itemData = item.system;
       // Only count non-treasure physical items that haven't been paid for yet
       if (OseCharacterGpCost.physicalItemTypes.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
         return total + (itemData.quantity.max ? itemData.cost * itemData.quantity.value : itemData.cost);
       }
-
       return total;
     }, 0);
   }
 
   /**
-   * Mark all items in the shopping cart as paid for
-   * This prevents them from appearing in the cart on subsequent openings
-   * Items remain in inventory but won't be counted in cart calculations
-   * @private
+   * Mark all items in the shopping cart as paid for so they no longer appear in
+   * the cart on subsequent openings.
    */
-  async #markItemsAsPaid() {
+  async _markItemsAsPaid() {
     const updates = [];
-
-    this.object.items.forEach((item) => {
+    for (const item of this.document.items) {
       const itemData = item.system;
-      // Mark all non-treasure physical items that haven't been paid for yet
       if (OseCharacterGpCost.physicalItemTypes.has(item.type) && !itemData.treasure && !item.flags?.ose?.paid) {
-        updates.push({
-          _id: item.id,
-          "flags.ose.paid": true,
-        });
+        updates.push({ _id: item.id, "flags.ose.paid": true });
       }
-    });
-
-    // Update all items in one batch
-    if (updates.length > 0) {
-      await this.object.updateEmbeddedDocuments("Item", updates);
     }
-  }
-
-  /* -------------------------------------------- */
-
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.find("a.auto-deduct").click(() => {
-      this.submit();
-    });
+    if (updates.length > 0) {
+      await this.document.updateEmbeddedDocuments("Item", updates);
+    }
   }
 }

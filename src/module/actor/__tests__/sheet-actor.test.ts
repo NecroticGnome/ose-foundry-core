@@ -15,9 +15,11 @@ import {
   createWorldTestItem,
   delay,
   itemTypes,
+  openV2AppsByClass,
   openV2Dialogs,
   openWindows,
   trashChat,
+  waitForElement,
   waitForInput,
   waitUntil,
 } from "../../../e2e/testUtils";
@@ -64,11 +66,11 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     game.settings.set(game.system.id, "invertedCtrlBehavior", originalCtrlSetting);
   });
 
-  describe("getData()", () => {
+  describe("_prepareContext()", () => {
     it("returns the expected data", async () => {
       const actor = (await createMockActorKey("character", {}, key)) as OseActor;
-      const sheet = new OseActorSheet(actor);
-      const data = await sheet.getData();
+      const sheet = new OseActorSheet({ document: actor });
+      const data = await sheet._prepareContext({});
 
       expect(data.owner).equal(actor?.isOwner);
       expect(data.editable).equal(actor?.sheet?.isEditable);
@@ -118,14 +120,14 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
         }
 
         // Setup what to click
-        const clickElement = document.querySelector(`${tab} .item-name`);
+        const clickElement = actor?.sheet?.element.querySelector(`${tab} .item-name`);
         const descriptionElement = clickElement?.parentElement?.nextElementSibling;
         expect([...(descriptionElement?.classList ?? [])])
           .to.be.an("array")
           .that.does.not.include("expanded");
 
         // Mock event
-        document.querySelector(`${tab} .item-name`)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        clickElement?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await delay(200);
 
         // Verify method
@@ -615,7 +617,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       expect(element).is.not.null;
       if (element) {
         element.value = 3;
-        element.dispatchEvent(new Event("change"));
+        element.dispatchEvent(new Event("change", { bubbles: true }));
       }
       await waitForInput();
 
@@ -629,7 +631,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       expect(element).is.not.null;
       if (element) {
         element.value = 3;
-        element.dispatchEvent(new Event("change"));
+        element.dispatchEvent(new Event("change", { bubbles: true }));
       }
       await waitForInput();
 
@@ -659,7 +661,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
 
     it("resetting spells resets the cast field to maximum", async () => {
       const actor = await getActor();
-      document.querySelector(`#OseActorSheetCharacter-Actor-${actor.id} a[data-action='reset-spells']`)?.click();
+      document.querySelector(`#OseActorSheetCharacter-Actor-${actor.id} a[data-action='resetSpells']`)?.click();
       await waitForInput();
 
       expect(actor?.items.contents[0].system.cast).equal(actor?.items.contents[0].system.memorized);
@@ -1141,14 +1143,14 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
         await delay(200);
         expect(actor?.items.size).equal(0);
 
-        let selector = `.sheet .item-create[data-type="${itemType}"]`;
+        let selector = `.item-create[data-type="${itemType}"]`;
         // Treasure is also an item, so we need to use a different selector
         if (itemType === "item") {
-          selector += `:not([data-treasure="true"]`;
+          selector += `:not([data-treasure="true"])`;
         } else if (itemType === "treasure") {
-          selector = `.sheet .item-create[data-type="item"][data-treasure="true"]`;
+          selector = `.item-create[data-type="item"][data-treasure="true"]`;
         }
-        document.querySelector(selector)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        actor?.sheet?.element.querySelector(selector)?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         await waitForInput();
 
         expect(actor?.items.size).equal(1);
@@ -1169,7 +1171,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     const updateQuantity = (element: HTMLInputElement, modifier: number) => {
       // eslint-disable-next-line no-param-reassign
       element.value = String(Number.parseInt(element.value, 10) + modifier);
-      const event = new InputEvent("change");
+      const event = new InputEvent("change", { bubbles: true });
       element.dispatchEvent(event);
     };
 
@@ -1213,37 +1215,44 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     });
   });
 
-  // @todo: How to test?
-  describe("_renderInner(...args)", () => {});
-  // @todo: How to test?
-  describe("_onResize(event)", () => {});
+  describe("_sizeResizables()", () => {
+    it("grows .resizable lists with the window height", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const sheet = actor?.sheet;
+      await sheet?.render(true);
+      await waitUntil(() => !!sheet?.element?.querySelector(".resizable"));
+
+      const list = sheet?.element.querySelector<HTMLElement>(".resizable");
+      const baseSize = Number.parseInt(list?.dataset.baseSize ?? "0", 10);
+      expect(list?.style.height).equal(`${baseSize}px`);
+
+      sheet?.setPosition({ height: sheet.options.position.height + 100 });
+      expect(list?.style.height).equal(`${baseSize + 100}px`);
+      await sheet?.close();
+      await actor?.delete();
+    });
+  });
 
   describe("_onConfigureActor(event)", () => {
     for (const actorType of ["character", "monster"]) {
       it(`Entity Tweaks renders for ${actorType}`, async () => {
         const actor = await createMockActorKey(actorType, {}, `${key} ${actorType}`);
-        await actor?.sheet?.render(true);
-        // Wait for sheet to render - the header buttons are not available for the first 500ms
-        await delay(600);
+        const sheet = actor?.sheet;
+        await sheet?.render(true);
 
-        document
-          .querySelector(`#OseActorSheet${actorType.capitalize()}-Actor-${actor?.id} .configure-actor`)
-          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        await waitForInput();
+        const control = [...sheet._headerControlButtons()].find((c) => c.action === "configureActor");
+        expect(control).not.undefined;
+        sheet.options.actions.configureActor.call(sheet);
+        await waitForElement("#entity-tweaks");
 
-        const windows = openWindows("sheet-tweaks");
-        const w = windows.filter((win) => win.object?.name === `Test Actor ${key} ${actorType}`);
-        expect(w.length).equal(1);
-        const windowElement = w?.[0]?.element?.[0];
+        const dialogs = openV2AppsByClass("sheet-tweaks").filter((d) => d.document === actor);
+        expect(dialogs.length).equal(1);
+        const windowElement = dialogs[0].element;
         expect(windowElement).not.undefined;
-        expect(windowElement.querySelector("h4.window-title").innerHTML).to.include(`Test Actor ${key} ${actorType}`);
-        // eslint-disable-next-line no-restricted-syntax
-        await w?.[0]?.close();
+        expect(windowElement.querySelector(".window-title").innerHTML).to.include(`Test Actor ${key} ${actorType}`);
+        await dialogs[0].close();
         await actor?.delete();
       });
     }
   });
-
-  // @todo: How to test?
-  describe("_getHeaderButtons()", () => {});
 };

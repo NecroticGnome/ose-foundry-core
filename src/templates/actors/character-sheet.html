@@ -1,47 +1,40 @@
-<form class="{{cssClass}}" autocomplete="off">
-  {{! Sheet Header }}
-  <header class="sheet-header flexrow">
-    {{> (path "/templates/actors/partials/character-header.html") }}
-  </header>
+{{! Sheet Header }}
+<header class="sheet-header flexrow">
+  {{> (path "/templates/actors/partials/character-header.html") }}
+</header>
 
-  {{! Sheet Tab Navigation }}
-  <nav class="sheet-tabs tabs" data-group="primary">
-    {{#if isOwnerOrObserver}}
-      <a class="item" data-tab="attributes">
-        {{localize "OSE.category.attributes"}}
-      </a>
-      <a class="item" data-tab="abilities">
-        {{localize "OSE.category.abilities"}}
-      </a>
-      {{#if system.spells.enabled}}
-      <a class="item" data-tab="spells"> {{localize "OSE.category.spells"}} </a>
-      {{/if}}
-      <a class="item" data-tab="inventory">
-        {{localize "OSE.category.inventory"}}
-      </a>
-    {{/if}}
-    <a class="item" data-tab="notes"> {{localize "OSE.category.notes"}} </a>
-  </nav>
+{{! Sheet Tab Navigation }}
+<nav class="sheet-tabs tabs" data-group="primary">
+  {{#each tabs as |tab|}}
+  <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{localize tab.label}}
+  </a>
+  {{/each}}
+</nav>
 
-  {{! Sheet Body }}
-  <section class="sheet-body">
-    {{! Attributes Tab }}
-    <div class="tab" data-group="primary" data-tab="attributes">
-      {{> (path "/templates/actors/partials/character-attributes-tab.html") }}
-    </div>
-    <div class="tab" data-group="primary" data-tab="abilities">
-      {{> (path "/templates/actors/partials/character-abilities-tab.html") }}
-    </div>
-    {{#if system.spells.enabled}}
-    <div class="tab" data-group="primary" data-tab="spells">
-      {{> (path "/templates/actors/partials/character-spells-tab.html") }}
-    </div>
-    {{/if}}
-    <div class="tab" data-group="primary" data-tab="inventory">
-      {{> (path "/templates/actors/partials/character-inventory-tab.html") }}
-    </div>
-    <div class="tab" data-group="primary" data-tab="notes">
-      {{> (path "/templates/actors/partials/character-notes-tab.html") }}
-    </div>
-  </section>
-</form>
+{{! Sheet Body }}
+<section class="sheet-body">
+  {{#if tabs.attributes}}
+  <div class="tab {{tabs.attributes.cssClass}}" data-group="primary" data-tab="attributes">
+    {{> (path "/templates/actors/partials/character-attributes-tab.html") }}
+  </div>
+  {{/if}}
+  {{#if tabs.abilities}}
+  <div class="tab {{tabs.abilities.cssClass}}" data-group="primary" data-tab="abilities">
+    {{> (path "/templates/actors/partials/character-abilities-tab.html") }}
+  </div>
+  {{/if}}
+  {{#if tabs.spells}}
+  <div class="tab {{tabs.spells.cssClass}}" data-group="primary" data-tab="spells">
+    {{> (path "/templates/actors/partials/character-spells-tab.html") }}
+  </div>
+  {{/if}}
+  {{#if tabs.inventory}}
+  <div class="tab {{tabs.inventory.cssClass}}" data-group="primary" data-tab="inventory">
+    {{> (path "/templates/actors/partials/character-inventory-tab.html") }}
+  </div>
+  {{/if}}
+  <div class="tab {{tabs.notes.cssClass}}" data-group="primary" data-tab="notes">
+    {{> (path "/templates/actors/partials/character-notes-tab.html") }}
+  </div>
+</section>

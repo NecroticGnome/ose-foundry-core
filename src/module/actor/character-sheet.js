@@ -1,35 +1,61 @@
 /**
  * @file Extend the basic ActorSheet with some very simple modifications
  */
+// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
 import OseCharacterModifiers from "../dialog/character-modifiers";
+import { toggleItemEquipped } from "../sheet/inventory-actions";
 import OseActorSheet from "./actor-sheet";
 import { prepareExplorationSkills } from "./exploration-skills";
 
+const TextEditor = foundry.applications.ux.TextEditor.implementation;
+
 export default class OseActorSheetCharacter extends OseActorSheet {
-  /**
-   * Extend and override the default options used by the 5e Actor Sheet
-   *
-   * @returns {object} - The default options for this sheet.
-   */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(OseActorSheet.defaultOptions, {
-      classes: ["ose", "sheet", "actor", "character"],
-      template: `${OSE.systemPath()}/templates/actors/character-sheet.html`,
-      width: 450,
-      height: 530,
-      resizable: true,
-      tabs: [
-        {
-          navSelector: ".sheet-tabs",
-          contentSelector: ".sheet-body",
-          initial: "attributes",
-        },
+  static DEFAULT_OPTIONS = {
+    classes: ["character"],
+    position: { width: 450, height: 558 },
+    actions: {
+      rollAbilityScore: OseActorSheetCharacter._onRollAbilityScore,
+      rollExploration: OseActorSheetCharacter._onRollExploration,
+      modifiers: OseActorSheetCharacter._onShowModifiers,
+      gpCost: OseActorSheetCharacter._onShowGpCost,
+      generateScores: OseActorSheetCharacter._onGenerateScores,
+      pushLang: OseActorSheetCharacter._onPushLang,
+      popLang: OseActorSheetCharacter._onPopLang,
+      toggleEquipped: OseActorSheetCharacter._onToggleEquipped,
+    },
+  };
+
+  static PARTS = {
+    sheet: {
+      root: true,
+      template: "systems/__SYSTEM_ID__/dist/templates/actors/character-sheet.html",
+      scrollable: [
+        ...["abilities", "spells", "inventory"].map((tab) => `.tab[data-tab="${tab}"] .resizable`),
+        '.tab[data-tab="notes"]',
       ],
-      scrollY: [".inventory"],
-    });
+    },
+  };
+
+  static TABS = {
+    primary: {
+      tabs: [
+        { id: "attributes", label: "OSE.category.attributes" },
+        { id: "abilities", label: "OSE.category.abilities" },
+        { id: "spells", label: "OSE.category.spells" },
+        { id: "inventory", label: "OSE.category.inventory" },
+        { id: "notes", label: "OSE.category.notes" },
+      ],
+      initial: "attributes",
+    },
+  };
+
+  _isTabVisible(tabId) {
+    if (tabId === "notes") return true;
+    if (!this.actor.isOwnerOrObserver) return false;
+    return tabId !== "spells" || this.actor.system.spells.enabled;
   }
 
   /**
@@ -53,13 +79,6 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     data.spells = this.actor.system.spells.spellList;
     data.slots = this.actor.system.spellSlots;
 
-    // These values are getters that aren't getting
-    // cloned when `this.actor.system` is cloned
-    data.system.usesAscendingAC = this.actor.system.usesAscendingAC;
-    data.system.meleeMod = this.actor.system.meleeMod;
-    data.system.rangedMod = this.actor.system.rangedMod;
-    data.system.init = this.actor.system.init;
-
     // Sort by sort order (see ActorSheet)
     // biome-ignore lint/suspicious/useIterableCallbackReturn: .sort() is called for side effects on each array, return value unused
     [...Object.values(data.owned), ...Object.values(data?.spells?.spellList || {}), data.abilities].forEach((o) =>
@@ -68,32 +87,25 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   }
 
   generateScores() {
-    new OseCharacterCreator(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterCreator.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
-  /**
-   * Prepare data for rendering the Actor sheet
-   * The prepared data object contains both the actor data as well as additional sheet options
-   */
-  async getData() {
-    const data = await super.getData();
+  async _prepareContext(options) {
+    const data = await super._prepareContext(options);
 
     // Prepare owned items
     this._prepareItems(data);
 
     data.explorationSkills = prepareExplorationSkills(this.actor.system.exploration);
 
-    data.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      this.object.system.details.biography,
-      { secrets: game.user?.isGM },
-    );
-    data.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      this.object.system.details.notes,
-      { secrets: game.user?.isGM },
-    );
+    const enrichOptions = { relativeTo: this.actor, secrets: game.user.isGM };
+    data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
+    data.enrichedNotes = await TextEditor.enrichHTML(this.actor.system.details.notes, enrichOptions);
 
     return data;
   }
@@ -159,19 +171,20 @@ export default class OseActorSheetCharacter extends OseActorSheet {
 
   /* -------------------------------------------- */
 
-  _onShowModifiers(event) {
-    event.preventDefault();
-    new OseCharacterModifiers(this.actor, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+  static _onShowModifiers() {
+    OseCharacterModifiers.open(this.actor, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
   /**
    * Prepare shopping cart data by filtering out items that have already been paid for
    */
   async _prepareShoppingCartData() {
-    const data = await this.getData();
+    const data = await this._prepareContext({});
 
     // Filter out items that have been marked as paid
     const filterUnpaidItems = (items) => {
@@ -195,81 +208,40 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     return cartData;
   }
 
-  async _onShowGpCost(event) {
-    event.preventDefault();
+  static async _onShowGpCost() {
     const cartData = await this._prepareShoppingCartData();
-    new OseCharacterGpCost(this.actor, cartData, {
-      top: this.position.top + 40,
-      left: this.position.left + (this.position.width - 400) / 2,
-    }).render(true);
+    OseCharacterGpCost.open(this.actor, cartData, {
+      position: {
+        top: this.position.top + 40,
+        left: this.position.left + (this.position.width - 400) / 2,
+      },
+    });
   }
 
-  /**
-   * Activate event listeners using the prepared sheet HTML
-   *
-   * @param html - {HTML}   The prepared HTML object ready to be rendered into the DOM
-   */
-  activateListeners(html) {
-    super.activateListeners(html);
+  static _onRollAbilityScore(event, target) {
+    const { score, stat } = target.closest(".ability-score").dataset;
+    if (score) return this.actor.rollCheck(score, { event });
+    if (stat === "lr") return this.actor.rollLoyalty(score, { event });
+  }
 
-    html.find(".ability-score .attribute-name a").click((ev) => {
-      const actorObject = this.actor;
-      const element = ev.currentTarget;
-      const { score } = element.parentElement.parentElement.dataset;
-      const { stat } = element.parentElement.parentElement.dataset;
-      if (score) {
-        actorObject.rollCheck(score, { event: ev });
-      } else if (stat === "lr") {
-        actorObject.rollLoyalty(score, { event: ev });
-      }
-    });
+  static _onRollExploration(event, target) {
+    return this.actor.rollExploration(target.closest("[data-exploration]").dataset.exploration, { event });
+  }
 
-    html.find(".exploration .attribute-name a").click((ev) => {
-      const actorObject = this.actor;
-      const element = ev.currentTarget;
-      const expl = element.parentElement.parentElement.dataset.exploration;
-      actorObject.rollExploration(expl, { event: ev });
-    });
+  static _onGenerateScores() {
+    if (this.isEditable) this.generateScores();
+  }
 
-    html.find("a[data-action='modifiers']").click((ev) => {
-      this._onShowModifiers(ev);
-    });
+  static _onPushLang(_event, target) {
+    if (this.isEditable) this._pushLang(target.dataset.array);
+  }
 
-    html.find("a[data-action='gp-cost']").click((ev) => {
-      this._onShowGpCost(ev);
-    });
+  static _onPopLang(_event, target) {
+    if (this.isEditable) return this._popLang(target.dataset.array, target.closest("[data-lang]").dataset.lang);
+  }
 
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
-
-    // Language Management
-    html.find(".item-push").click((ev) => {
-      ev.preventDefault();
-      const header = ev.currentTarget;
-      const table = header.dataset.array;
-      this._pushLang(table);
-    });
-
-    html.find(".item-pop").click((ev) => {
-      ev.preventDefault();
-      const header = ev.currentTarget;
-      const table = header.dataset.array;
-      this._popLang(table, $(ev.currentTarget).closest(".item").data("lang"));
-    });
-
-    // Toggle Equipment
-    html.find(".item-toggle").click(async (ev) => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      await item.update({
-        system: {
-          equipped: !item.system.equipped,
-        },
-      });
-    });
-
-    html.find("a[data-action='generate-scores']").click((ev) => {
-      this.generateScores(ev);
-    });
+  static _onToggleEquipped(_event, target) {
+    const item = this._getItemFromActor(target);
+    if (this.isEditable && item) return toggleItemEquipped(item);
   }
 }
