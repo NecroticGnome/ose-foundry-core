@@ -52,7 +52,7 @@ export default class OseItemSheet extends foundry.appv1.sheets.ItemSheet {
     data.enriched = {
       description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         this.item.system?.description || "",
-        { async: true },
+        { secrets: game.user?.isGM },
       ),
     };
     return data;
