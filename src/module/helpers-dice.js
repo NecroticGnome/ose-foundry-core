@@ -89,12 +89,14 @@ const OseDice = {
       isFailure: false,
       target: data.roll.target,
       total: roll.total,
+      direction: "",
     };
 
     const die = roll.dice?.[0]?.results?.[0]?.result ?? roll.total;
     // eslint-disable-next-line default-case
     switch (data.roll.type) {
       case "result": {
+        result.direction = "OSE.roll.direction.exactly";
         if (roll.total === result.target) {
           result.isSuccess = true;
         } else {
@@ -105,6 +107,7 @@ const OseDice = {
       }
 
       case "above": {
+        result.direction = "OSE.roll.direction.orHigher";
         // SAVING THROWS
         if (roll.total >= result.target) {
           result.isSuccess = true;
@@ -116,6 +119,7 @@ const OseDice = {
       }
 
       case "below": {
+        result.direction = "OSE.roll.direction.orLower";
         // MORALE, EXPLORATION
         if (roll.total <= result.target) {
           result.isSuccess = true;
@@ -127,6 +131,7 @@ const OseDice = {
       }
 
       case "check": {
+        result.direction = "OSE.roll.direction.orLower";
         // SCORE CHECKS (1s and 20s)
         if (die === 1 || (roll.total <= result.target && die < 20)) {
           result.isSuccess = true;
@@ -158,6 +163,10 @@ const OseDice = {
         break;
       }
     }
+
+    // Without a target, there's no direction to show
+    if (result.target == null) result.direction = "";
+
     return result;
   },
 
