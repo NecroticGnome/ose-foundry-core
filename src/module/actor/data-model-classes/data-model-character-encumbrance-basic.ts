@@ -67,7 +67,7 @@ export default class OseDataModelCharacterEncumbranceBasic
 
     this.#weight = items.reduce(
       (acc: number, { type, system: { treasure, quantity, weight } }: Item) =>
-        type !== "item" || !treasure ? acc : acc + quantity.value * weight,
+        type !== "item" || !treasure ? acc : acc + (quantity.value ?? 0) * (weight ?? 0),
       0,
     );
 

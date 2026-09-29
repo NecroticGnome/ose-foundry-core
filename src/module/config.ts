@@ -38,6 +38,9 @@ export type Color = keyof OseConfig["colors"];
 /** A weapon/item quality tag key (e.g. `melee`, `missile`, `slow`, `twohanded`). */
 export type InventoryItemTag = keyof OseConfig["tags"];
 
+/** A tag's stored value: the localization key it is saved as, e.g. `OSE.items.Blunt`. */
+export type InventoryItemTagValue = OseConfig["tags"][InventoryItemTag];
+
 /** An encumbrance-scheme key: `basic`, `detailed`, `complete`, `disabled`, or `itembased`. */
 export type EncumbranceOption = keyof OseConfig["encumbranceOptions"];
 
@@ -195,7 +198,7 @@ export const OSE = {
     splash: "OSE.items.Splash",
     reload: "OSE.items.Reload",
     charge: "OSE.items.Charge",
-  },
+  } as const,
   /** Display metadata (label, image, icon) for each item tag, derived on access. */
   auto_tags: {
     get melee() {

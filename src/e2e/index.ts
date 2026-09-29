@@ -62,6 +62,10 @@ import actorSheetMonsterTests, {
   key as actorSheetMonsterKey,
   options as actorSheetMonsterOptions,
 } from "../module/actor/__tests__/sheet-monster.test";
+import actorTrackableAttributesTests, {
+  key as actorTrackableAttributesKey,
+  options as actorTrackableAttributesOptions,
+} from "../module/actor/__tests__/trackable-attributes.test";
 import actorDataModelCharacterACTests, {
   key as actorDataModelCharacterACKey,
   options as actorDataModelCharacterACOptions,
@@ -182,6 +186,8 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   quench.registerBatch(actorSheetDragNDropKey, actorSheetDragNDropTests, actorSheetDragNDropOptions);
   quench.registerBatch(actorSheetCharacterKey, actorSheetCharacterTests, actorSheetCharacterOptions);
   quench.registerBatch(actorSheetMonsterKey, actorSheetMonsterTests, actorSheetMonsterOptions);
+
+  quench.registerBatch(actorTrackableAttributesKey, actorTrackableAttributesTests, actorTrackableAttributesOptions);
 
   /* ------------------------------------------- */
   /* COMBAT TESTING                              */
