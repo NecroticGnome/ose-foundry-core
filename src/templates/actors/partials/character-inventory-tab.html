@@ -1,5 +1,5 @@
 <section class="inventory resizable" data-base-size="{{#if (eq @root.config.encumbrance "itembased")}}300{{else}}320{{/if}}">
-  <div id="weapons" class="item-category-title flexrow">
+  <div id="weapons" data-action="toggleCategory" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Weapons"}}</div>
     <div class="icon-row">{{localize "OSE.items.Qualities"}}</div>
@@ -7,9 +7,9 @@
     {{#if @root.owner}}
     <div class="item-controls">
       <a
-        class="item-control item-create"
+        class="item-control item-create" data-action="createItem"
         data-type="weapon"
-        title="{{localize 'OSE.Add'}}"
+        data-tooltip="OSE.Add"
         ><i class="fa fa-plus"></i
       ></a>
     </div>
@@ -17,24 +17,24 @@
   </div>
   <ol class="item-list">
     {{#each owned.weapons as |item|}}
-    <li class="item-entry item" data-item-id="{{item.id}}">
+    <li class="item-entry item draggable" data-item-id="{{item.id}}">
       <div class="item-header item-rollable flexrow">
         <div
-          class="item-image"
+          class="item-image" data-action="rollItem"
           style="background-image: url({{item.img}})"
         ></div>
-        <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+        <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
         <div class="tag-row icon-row">
           {{#each item.system.qualities as |tag|}} {{#if tag.image}}
           <img
-            title="{{tag.title}}"
+            data-tooltip="{{tag.title}}"
             src="{{tag.image}}"
             width="24"
             height="24"
           />
           {{/if}} {{/each}} {{#each item.system.manualTags as |tag|}} {{#unless
           (getTagIcon tag.value)}}
-          <span title="{{tag.title}}"
+          <span data-tooltip="{{tag.title}}"
             >{{tag.value}}{{#unless @last}},{{/unless}}</span
           >
 
@@ -47,21 +47,21 @@
         </div>
         {{#if @root.owner }}
         <div class="item-controls">
-          <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+          <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
           ><i class="fas fa-eye"></i
           ></a>
           {{#if (eq @root.type "character")}}
             <a
-              class="item-control item-toggle {{#unless item.system.equipped}}item-unequipped{{/unless}}"
-              title='{{localize "OSE.items.Equip"}}'
+              data-action="toggleEquipped" class="item-control item-toggle {{#unless item.system.equipped}}item-unequipped{{/unless}}"
+              data-tooltip="OSE.items.Equip"
             >
               <i class="fas fa-hand"></i>
             </a>
           {{/if}}
-          <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+          <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
             ><i class="fas fa-edit"></i
           ></a>
-          <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
+          <a class="item-control item-delete" data-action="deleteItem" data-tooltip="OSE.Delete"
             ><i class="fas fa-trash"></i
           ></a>
         </div>
@@ -74,7 +74,7 @@
     </li>
     {{/each}}
   </ol>
-  <div id="armors" class="item-category-title flexrow">
+  <div id="armors" data-action="toggleCategory" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Armors"}}</div>
     {{#if @root.config.ascendingAC}}
@@ -86,9 +86,9 @@
     {{#if @root.owner}}
     <div class="item-controls">
       <a
-        class="item-control item-create"
+        class="item-control item-create" data-action="createItem"
         data-type="armor"
-        title="{{localize 'OSE.Add'}}"
+        data-tooltip="OSE.Add"
         ><i class="fa fa-plus"></i
       ></a>
     </div>
@@ -96,13 +96,13 @@
   </div>
   <ol class="item-list">
     {{#each owned.armors as |item|}}
-    <li class="item-entry item" data-item-id="{{item.id}}">
+    <li class="item-entry item draggable" data-item-id="{{item.id}}">
       <div class="item-header flexrow">
         <div
-          class="item-image"
+          class="item-image" data-action="rollItem"
           style="background-image: url({{item.img}})"
         ></div>
-        <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+        <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
         <div class="field-short">
           {{#if @root.config.ascendingAC}} {{item.system.aac.value}} {{else}}
           {{item.system.ac.value}} {{/if}}
@@ -114,21 +114,21 @@
         </div>
         {{#if @root.owner }}
         <div class="item-controls">
-          <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+          <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
           ><i class="fas fa-eye"></i
           ></a>
           {{#if (eq @root.type "character")}}
             <a
-              class="item-control item-toggle {{#unless item.system.equipped}}item-unequipped{{/unless}}"
-              title='{{localize "OSE.items.Equip"}}'
+              data-action="toggleEquipped" class="item-control item-toggle {{#unless item.system.equipped}}item-unequipped{{/unless}}"
+              data-tooltip="OSE.items.Equip"
             >
               <i class="fas fa-tshirt"></i>
             </a>
           {{/if}}
-          <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+          <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
             ><i class="fas fa-edit"></i
           ></a>
-          <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
+          <a class="item-control item-delete" data-action="deleteItem" data-tooltip="OSE.Delete"
             ><i class="fas fa-trash"></i
           ></a>
         </div>
@@ -142,7 +142,7 @@
     {{/each}}
   </ol>
   {{!-- Containers items --}}
-  <div id="container" class="item-category-title flexrow">
+  <div id="container" data-action="toggleCategory" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Containers"}}</div>
     <div class="field-short"><i class="fas fa-suitcase"></i></div>
@@ -150,9 +150,9 @@
     {{#if @root.owner}}
     <div class="item-controls">
       <a
-        class="item-control item-create"
+        class="item-control item-create" data-action="createItem"
         data-type="container"
-        title="{{localize 'OSE.Add'}}"
+        data-tooltip="OSE.Add"
         ><i class="fa fa-plus"></i
       ></a>
     </div>
@@ -160,20 +160,20 @@
   </div>
   <ol class="item-list">
     {{#each owned.containers as |bag|}}
-    <li class="container item-entry item" data-item-id="{{bag.id}}">
+    <li class="container item-entry item draggable" data-item-id="{{bag.id}}">
       <div class="item-header flexrow">
         <div
-          class="item-image"
+          class="item-image" data-action="rollItem"
           style="background-image: url({{bag.img}})"
         ></div>
-        <div class="category-caret"><i class="fas fa-caret-down"></i></div>
-        <h4 class="item-name" title="{{bag.name}}">{{bag.name~}}</h4>
+        <div class="category-caret" data-action="toggleContained"><i class="fas fa-caret-down"></i></div>
+        <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{bag.name}}">{{bag.name~}}</h4>
         <div class="field-short container-total-weight">
           {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
           @root.config.encumbrance
           "detailed")}}_{{else if (eq
             @root.config.encumbrance
-            "itembased")}}_{{else}}{{bag.system.totalWeight}}{{/if}}
+            "itembased")}}_{{else}}{{round bag.system.totalWeight}}{{/if}}
         </div>
         <div class="field-short container-item-weight">
           {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
@@ -184,23 +184,23 @@
         </div>
         {{#if @root.owner}}
         <div class="item-controls">
-          <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+          <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
           ><i class="fas fa-eye"></i
           ></a>
           {{#if (eq @root.type "character") }} {{#unless
           bag.system.contents.length }}
             <a
-              class="item-control item-toggle {{#unless
+              data-action="toggleEquipped" class="item-control item-toggle {{#unless
                bag.system.equipped}}item-unequipped{{/unless}}"
-              title='{{localize "OSE.items.Equip"}}'
+              data-tooltip="OSE.items.Equip"
             >
               <i class="fas fa-hand"></i>
             </a>
           {{/unless }} {{/if }}
-          <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+          <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
             ><i class="fas fa-edit"></i
           ></a>
-          <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
+          <a class="item-control item-delete" data-action="deleteItem" data-tooltip="OSE.Delete"
             ><i class="fas fa-trash"></i
           ></a>
         </div>
@@ -212,15 +212,15 @@
       </div>
       <ol class="item-list contained-items">
         {{#each bag.system.contents as |item|}}
-        <li class="item-entry item" data-item-id="{{item.id}}">
+        <li class="item-entry item draggable" data-item-id="{{item.id}}">
           <div
             class="item-header flexrow {{#if (eq item.type 'weapon') }}item-rollable{{/if}}"
           >
             <div
-              class="item-image"
+              class="item-image" data-action="rollItem"
               style="background-image: url({{item.img}})"
             ></div>
-            <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+            <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
             <div class="field-short quantity">
               <input
                 value="{{item.system.quantity.value}}"
@@ -234,19 +234,19 @@
               {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
               @root.config.encumbrance
               "detailed")}}_{{else if (eq @root.config.encumbrance
-                "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+                "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
             </div>
             {{#if @root.owner}}
             <div class="item-controls">
-              <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+              <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
               ><i class="fas fa-eye"></i
               ></a>
-              <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+              <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
                 ><i class="fas fa-edit"></i
               ></a>
               <a
-                class="item-control item-delete"
-                title='{{localize "OSE.Delete"}}'
+                class="item-control item-delete" data-action="deleteItem"
+                data-tooltip="OSE.Delete"
                 ><i class="fas fa-trash"></i
               ></a>
             </div>
@@ -257,10 +257,10 @@
           <div class="consumable-counter">
             <label>{{localize "OSE.items.uses"}}</label>
             {{#times item.system.quantity.value}}
-            <div class="full-mark"></div>
+            <div class="full-mark" data-action="consumableSpend"></div>
             {{/times}} {{#times (subtract item.system.quantity.max
             item.system.quantity.value)}}
-            <div class="empty-mark"></div>
+            <div class="empty-mark" data-action="consumableRestore"></div>
             {{/times}}
           </div>
           {{/if}} {{/if}}
@@ -275,7 +275,7 @@
     {{/each}}
   </ol>
   {{!-- Misc items --}}
-  <div id="gear" class="item-category-title flexrow">
+  <div id="gear" data-action="toggleCategory" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Misc"}}</div>
     <div class="field-short"><i class="fas fa-hashtag"></i></div>
@@ -283,9 +283,9 @@
     {{#if @root.owner}}
     <div class="item-controls">
       <a
-        class="item-control item-create"
+        class="item-control item-create" data-action="createItem"
         data-type="item"
-        title="{{localize 'OSE.Add'}}"
+        data-tooltip="OSE.Add"
         ><i class="fa fa-plus"></i
       ></a>
     </div>
@@ -293,13 +293,13 @@
   </div>
   <ol class="item-list">
     {{#each owned.items as |item|}}
-    <li class="item-entry item" data-item-id="{{item.id}}">
+    <li class="item-entry item draggable" data-item-id="{{item.id}}">
       <div class="item-header flexrow">
         <div
-          class="item-image"
+          class="item-image" data-action="rollItem"
           style="background-image: url({{item.img}})"
         ></div>
-        <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+        <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
         <div class="field-short quantity">
           <input
             value="{{item.system.quantity.value}}"
@@ -313,26 +313,26 @@
           {{#if (eq @root.config.encumbrance "basic")}}_{{else if (eq
           @root.config.encumbrance
           "detailed")}}_{{else if (eq @root.config.encumbrance
-            "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+            "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
         </div>
         {{#if @root.owner}}
         <div class="item-controls">
-            <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+            <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
             ><i class="fas fa-eye"></i
             ></a>
             {{#if (eq @root.type "character") }}
               <a
-                class="item-control item-toggle {{#unless
+                data-action="toggleEquipped" class="item-control item-toggle {{#unless
                 item.system.equipped}}item-unequipped{{/unless}}"
-                title='{{localize "OSE.items.Equip"}}'
+                data-tooltip="OSE.items.Equip"
               >
                 <i class="fas fa-hand"></i>
               </a>
             {{/if }}
-          <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+          <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
             ><i class="fas fa-edit"></i
           ></a>
-          <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
+          <a class="item-control item-delete" data-action="deleteItem" data-tooltip="OSE.Delete"
             ><i class="fas fa-trash"></i
           ></a>
         </div>
@@ -343,10 +343,10 @@
       <div class="consumable-counter">
         <label>{{localize "OSE.items.uses"}}</label>
         {{#times item.system.quantity.value}}
-        <div class="full-mark"></div>
+        <div class="full-mark" data-action="consumableSpend"></div>
         {{/times}} {{#times (subtract item.system.quantity.max
         item.system.quantity.value)}}
-        <div class="empty-mark"></div>
+        <div class="empty-mark" data-action="consumableRestore"></div>
         {{/times}}
       </div>
       {{/if}} {{/if}}
@@ -358,21 +358,21 @@
     {{/each}}
   </ol>
   {{!-- Treasure items --}}
-  <div id="treasure" class="item-category-title flexrow">
+  <div id="treasure" data-action="toggleCategory" class="item-category-title flexrow">
     <div class="category-caret"><i class="fas fa-caret-down"></i></div>
     <div class="category-name">{{localize "OSE.items.Treasure"}}</div>
     <div class="field-long">
-      {{treasure}} <i class="fas fa-circle"></i>
+      {{round treasure}} <i class="fas fa-circle"></i>
     </div>
     <div class="field-short"><i class="fas fa-hashtag"></i></div>
     <div class="field-short"><i class="fas fa-weight-hanging"></i></div>
     {{#if @root.owner}}
     <div class="item-controls">
       <a
-        class="item-control item-create"
+        class="item-control item-create" data-action="createItem"
         data-type="item"
         data-treasure="true"
-        title="{{localize 'OSE.Add'}}"
+        data-tooltip="OSE.Add"
         ><i class="fa fa-plus"></i
       ></a>
     </div>
@@ -380,15 +380,15 @@
   </div>
   <ol class="item-list">
     {{#each owned.treasures as |item|}}
-    <li class="item-entry item" data-item-id="{{item.id}}">
+    <li class="item-entry item draggable" data-item-id="{{item.id}}">
       <div class="item-header flexrow">
         <div
-          class="item-image"
+          class="item-image" data-action="rollItem"
           style="background-image: url({{item.img}})"
         ></div>
-        <h4 class="item-name" title="{{item.name}}">{{item.name~}}</h4>
+        <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
         <div class="field-long">
-          {{item.system.cumulativeCost}}
+          {{round item.system.cumulativeCost}}
         </div>
         <div class="field-short quantity">
           <input
@@ -403,26 +403,26 @@
         </div>
         <div class="field-short">
           {{#if (eq @root.config.encumbrance
-          "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{item.system.cumulativeWeight}}{{/if}}
+          "itembased")}}{{item.system.cumulativeItemslots}}{{else}}{{round item.system.cumulativeWeight}}{{/if}}
         </div>
         {{#if @root.owner}}
         <div class="item-controls">
-            <a class="item-control item-show" title='{{localize "OSE.Show"}}'
+            <a class="item-control item-show" data-action="showItem" data-tooltip="OSE.Show"
             ><i class="fas fa-eye"></i
             ></a>
             {{#if (eq @root.type "character") }}
               <a
-                class="item-control item-toggle {{#unless
+                data-action="toggleEquipped" class="item-control item-toggle {{#unless
                 item.system.equipped}}item-unequipped{{/unless}}"
-                title='{{localize "OSE.items.Equip"}}'
+                data-tooltip="OSE.items.Equip"
               >
                 <i class="fas fa-hand"></i>
               </a>
             {{/if }}
-          <a class="item-control item-edit" title='{{localize "OSE.Edit"}}'
+          <a class="item-control item-edit" data-action="editItem" data-tooltip="OSE.Edit"
             ><i class="fas fa-edit"></i
           ></a>
-          <a class="item-control item-delete" title='{{localize "OSE.Delete"}}'
+          <a class="item-control item-delete" data-action="deleteItem" data-tooltip="OSE.Delete"
             ><i class="fas fa-trash"></i
           ></a>
         </div>

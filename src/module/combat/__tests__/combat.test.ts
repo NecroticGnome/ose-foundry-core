@@ -693,6 +693,34 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(game.messages.size).to.equal(3);
       expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
+
+    it("should reroll initiative only for groups without player-owned combatants", async () => {
+      await trashChat();
+      await waitUntil(() => game.messages.size === 0);
+      const groups = game.combat.groups.contents.filter((g) => g.members.size);
+      const playerGroups = groups.filter((g) => g.members.some((c) => c.hasPlayerOwner));
+      const npcGroups = groups.filter((g) => !g.members.some((c) => c.hasPlayerOwner));
+      expect(playerGroups.length).to.be.greaterThan(0);
+      expect(npcGroups.length).to.be.greaterThan(0);
+      const playerInitiatives = new Map(playerGroups.map((g) => [g.id, g.initiative]));
+      const hasMessageFor = (group: string) =>
+        game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group })));
+
+      const button = document.querySelector(
+        ".combat-tracker-header .combat-control[data-action='rerollNPCInitiative']",
+      );
+      expect(button).to.not.be.null;
+      button?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      await waitUntil(() => game.messages.size === npcGroups.length);
+      await waitForInput();
+
+      expect(game.messages.size).to.equal(npcGroups.length);
+      for (const g of npcGroups) expect(hasMessageFor(g.name)).to.be.true;
+      for (const g of playerGroups) {
+        expect(hasMessageFor(g.name)).to.be.false;
+        expect(game.combat.groups.get(g.id)?.initiative).to.equal(playerInitiatives.get(g.id));
+      }
+    });
   });
 
   describe("groupCombat(reset)", function () {

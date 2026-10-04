@@ -77,7 +77,7 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
       const actor = (await createMockActorKey("character", {}, key)) as OseActor;
       expect(actor).not.undefined;
 
-      await actor.sheet?.render(true);
+      await actor.sheet?.render({ force: true });
 
       const [item] = await createActorTestItem(actor, "weapon");
       expect(item).not.undefined;
@@ -162,7 +162,7 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
       [items.source.item] = await createActorTestItem(actor, "weapon");
 
       // Render UI elements
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
 
       items.source.itemElement = await waitForElement(
         `.sheet .inventory li.item[data-item-id="${items.source?.item?.id}"]`,
@@ -224,8 +224,8 @@ export default ({ describe, it, expect, after, beforeEach }: QuenchMethods) => {
           [items.target.item] = await createActorTestItem(documents.actor, "container", "TargetContainer");
 
           // Render UI elements
-          documents.actor?.sheet?.render(true);
-          documents.compendium?.render(true);
+          documents.actor?.sheet?.render({ force: true });
+          documents.compendium?.render({ force: true });
 
           const inventoryTab = await waitForElement<HTMLElement>(
             `#OseActorSheetCharacter-Actor-${documents.actor.id} nav.sheet-tabs a[data-tab="inventory"]`,

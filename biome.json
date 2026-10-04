@@ -37,6 +37,9 @@
       },
       "suspicious": {
         "noExplicitAny": "warn"
+      },
+      "complexity": {
+        "noThisInStatic": "off"
       }
     }
   },
@@ -54,26 +57,14 @@
       "Hooks",
       "Item",
       "Items",
-      "ItemDirectory",
-      "ItemSheet",
       "Actor",
       "Actors",
-      "ActorDirectory",
-      "ActorSheet",
       "Token",
       "Macro",
-      "Settings",
-      "FormApplication",
-      "FrameViewer",
       "ChatMessage",
-      "TextEditor",
       "Roll",
-      "$",
-      "Dialog",
-      "renderTemplate",
       "canvas",
       "ui",
-      "isNewerVersion",
       "fromUuid",
       "fromUuidSync",
       "PoolTerm"

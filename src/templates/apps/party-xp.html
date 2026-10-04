@@ -1,4 +1,4 @@
-<form autocomplete="off">
+<div class="party-xp-content">
   <div class="form-group">
     <label>{{localize 'OSE.dialog.xp.amount'}}</label>
     <input name="total" placeholder="0" type="number" data-dtype="Number" />
@@ -9,13 +9,13 @@
     <li class="actor form-group" data-actor-id="{{e.id}}">
       <span class="share-tag">{{e.system.details.xp.share}}%</span>
       <label title="{{e.name}}">{{e.name}}</label>
-      <input name="" placeholder="0" type="number" data-dtype="Number" />
+      <input name="xp-{{e.id}}" placeholder="0" type="number" data-dtype="Number" />
     </li>
     {{/each}}
   </ul>
   <div class="dialog-buttons">
-    <button type="button" data-action="deal-xp">
+    <button type="submit">
       <i class="fas fa-hand-holding"></i> {{localize 'OSE.dialog.xp.deal'}}
     </button>
   </div>
-</form>
+</div>

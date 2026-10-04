@@ -91,8 +91,10 @@ export default class OseItem extends Item {
         OseItem._onChatCardAction(event);
       }
 
-      const itemName = (event.target as HTMLElement).closest(".item-name");
-      if (itemName) {
+      const header = (event.target as HTMLElement).closest(
+        ".ose.chat-card.collapsible :is(.chat-header, .card-header)",
+      );
+      if (header) {
         OseItem._onChatCardToggleContent(event);
       }
     });
@@ -162,7 +164,7 @@ export default class OseItem extends Item {
             },
           },
         ],
-      }).render(true);
+      }).render({ force: true });
       return true;
     }
     if (itemData.missile && !isNPC) {
@@ -479,21 +481,14 @@ export default class OseItem extends Item {
   }
 
   /**
-   * Handle toggling the visibility of chat card content when the name is clicked
+   * Handle toggling the visibility of chat card content when the header is clicked
    *
    * @param {Event} event - The originating click event
    * @private
    */
   static _onChatCardToggleContent(event: Event) {
     event.preventDefault();
-    const header = (event.target as HTMLElement).closest(".item-name");
-    const card = header?.closest(".chat-card") as HTMLElement | null;
-    const content = card?.querySelector(".card-content") as HTMLElement;
-    if (content.style.display === "none") {
-      $(content).slideDown(200);
-    } else {
-      $(content).slideUp(200);
-    }
+    (event.target as HTMLElement).closest(".chat-card")?.classList.toggle("collapsed");
   }
 
   static async _onChatCardAction(event: Event): Promise<unknown> {

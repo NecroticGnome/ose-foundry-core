@@ -24,7 +24,6 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
     OseDataModelMonster.#migrateMonsterLanguages(source);
     OseDataModelMonster.#migrateCantrips(source);
 
-    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 

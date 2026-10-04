@@ -107,7 +107,6 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
       };
     }
 
-    // biome-ignore lint/complexity/noThisInStatic: super.migrateData() correctly calls parent static method
     return super.migrateData(source);
   }
 

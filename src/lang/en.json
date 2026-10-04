@@ -143,6 +143,7 @@
   "OSE.AscArmorClassShort": "AAC",
   "OSE.ArmorClassBonus": "Armor Class Bonus",
   "OSE.Thac0": "THAC0",
+  "OSE.Thac0Long": "To Hit Armor Class 0",
   "OSE.ABShort": "AB",
   "OSE.AB": "Attack Bonus",
   "OSE.MeleeShort": "MEL",
@@ -339,6 +340,7 @@
 
   "OSE.combat.SetCombatantAsActive": "Set Active",
   "OSE.combat.SetCombatantGroups": "Set Combatant Groups",
+  "OSE.combat.RerollNPCs": "Reroll NPCs",
   "OSE.CombatFlag.SpellDeclared": "Spell Declared",
   "OSE.CombatFlag.RetreatFromMeleeDeclared": "Retreat From Melee Declared",
 

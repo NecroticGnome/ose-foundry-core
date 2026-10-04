@@ -22,6 +22,13 @@ export const trashChat = (): undefined | Promise<Document[]> => {
  */
 export const waitForInput = () => delay(inputDelay);
 
+export const waitFor = async (predicate: () => boolean, { timeout = 2000, interval = 50 } = {}) => {
+  const start = Date.now();
+  while (!predicate() && Date.now() - start < timeout) {
+    await delay(interval);
+  }
+};
+
 /**
  * Poll the DOM until a selector matches an element, or `timeout` elapses.
  *
@@ -67,12 +74,14 @@ export const waitUntil = async (
 };
 
 export const openWindows = (className: string) =>
-  Object.values(ui.windows).filter((o) => o.options.classes.includes(className));
+  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes(className));
 
 export const openDialogs = () => Object.values(ui.windows).filter((o) => o.options.classes.includes("dialog"));
 
-export const openV2Dialogs = () =>
-  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes("dialog"));
+export const openV2AppsByClass = (className: string) =>
+  Array.from(foundry.applications.instances.values()).filter((o) => o.options.classes.includes(className));
+
+export const openV2Dialogs = () => openV2AppsByClass("dialog");
 
 export const closeDialogs = async () => {
   for (const o of openDialogs()) {

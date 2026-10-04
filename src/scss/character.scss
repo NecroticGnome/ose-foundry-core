@@ -27,7 +27,7 @@
         left: 0;
         bottom: 0;
         height: 20px;
-        width: 140px;
+        width: 145px;
         padding: 2px 5px;
         color: whitesmoke;
         background: $colorDark;
@@ -179,6 +179,7 @@
     grid-template-columns: 1fr max-content;
     gap: 5px 0;
     margin-top: 5px;
+    padding-right: 14px;
 
     .encumbrance-label {
       height: 10px;

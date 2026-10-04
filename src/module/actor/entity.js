@@ -179,7 +179,7 @@ export default class OseActor extends Actor {
   /* -------------------------------------------- */
 
   async rollHP(_options = {}) {
-    const { total } = await new Roll(this.system.hp.hd).roll({ async: true });
+    const { total } = await new Roll(this.system.hp.hd).evaluate();
     return this.update({ "system.hp": { max: total, value: total } });
   }
 

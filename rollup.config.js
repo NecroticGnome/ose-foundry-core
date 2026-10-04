@@ -1,5 +1,9 @@
+import { readFileSync } from "node:fs";
+import replace from "@rollup/plugin-replace";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
+
+const { id: systemId } = JSON.parse(readFileSync("./system.json", "utf-8"));
 
 const staticFileFolders = ["lang", "packs", "templates"];
 
@@ -11,6 +15,10 @@ export default {
     sourcemap: true,
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      values: { __SYSTEM_ID__: systemId },
+    }),
     typescript({
       tsconfig: "./tsconfig.json",
       compilerOptions: {

@@ -4,6 +4,7 @@
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../../e2e";
 import {
+  cleanUpActorsByKey,
   cleanUpWorldItems,
   closeV2Dialogs,
   createActorTestItem,
@@ -12,7 +13,9 @@ import {
   getActiveNotifications,
   openV2Dialogs,
   trashChat,
+  waitFor,
   waitForInput,
+  waitUntil,
 } from "../../../e2e/testUtils";
 import { getRollMode, setRollMode } from "../../helpers-message-mode";
 import OseItem from "../entity";
@@ -28,7 +31,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
   const { defaultIcons } = OseItem;
 
   after(async () => {
-    cleanUpWorldItems();
+    await cleanUpWorldItems();
   });
 
   describe("defaultIcons()", () => {
@@ -42,12 +45,19 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
   });
 
   describe("create()", () => {
+    // Free the notification slots first: the "Can't create…" tests assert on the
+    // visible list, which permanent notifications from earlier batches can fill.
+    beforeEach(async () => {
+      await ui.notifications?.clear();
+    });
+
     const testItemCreate = async (type: string) => {
       const item = await createWorldTestItem(type);
       expect(item).is.not.undefined;
       expect(item?.img).equals(defaultIcons[type]);
       const itemName = item?.name;
       await item?.delete();
+      await waitFor(() => !game.items?.find((o) => o.name === itemName));
       expect(game.items?.find((o) => o.name === itemName)).is.undefined;
     };
 
@@ -516,8 +526,66 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     });
   });
 
-  // @todo: How to test? Mock Event?
-  describe("_onChatCardToggleContent(event)", () => {});
+  describe("_onChatCardToggleContent(event)", () => {
+    const key = "ose.item.entity.chat-toggle";
+    const lastCard = async () => {
+      await waitUntil(() => (game.messages?.size ?? 0) > 0);
+      const id = game.messages?.contents.at(-1)?.id;
+      await waitUntil(() => !!ui.chat.element?.querySelector(`[data-message-id="${id}"] .ose.chat-card`));
+      return ui.chat.element.querySelector(`[data-message-id="${id}"] .ose.chat-card`) as HTMLElement;
+    };
+    const isHidden = (el: Element | null) => !!el && getComputedStyle(el).display === "none";
+
+    beforeEach(async () => {
+      await setRollMode("publicroll");
+      await trashChat();
+    });
+
+    after(async () => {
+      await cleanUpWorldItems();
+      await cleanUpActorsByKey(key);
+      await trashChat();
+    });
+
+    it("clicking an item card header collapses and then expands the card", async () => {
+      const item: OseItem = await createWorldTestItem("item");
+      await item.update({ system: { description: "<p>card body</p>" } });
+      await item.show();
+      const card = await lastCard();
+      const header = card.querySelector(".chat-header") as HTMLElement;
+      const content = card.querySelector(".card-content");
+
+      header.click();
+      await waitUntil(() => isHidden(content));
+      expect(isHidden(content)).is.true;
+      expect(isHidden(header)).is.false;
+
+      header.click();
+      await waitUntil(() => !isHidden(content));
+      expect(isHidden(content)).is.false;
+    });
+
+    it("clicking a roll card header does not collapse it", async () => {
+      const actor = (await createMockActorKey("character", {}, key)) as OseActor;
+      await actor.rollSave("death", { fastForward: true });
+      const card = await lastCard();
+
+      (card.querySelector(".chat-header") as HTMLElement).click();
+      await waitForInput();
+      expect(card.classList.contains("collapsed")).is.false;
+    });
+
+    it("clicking the card body does not collapse it", async () => {
+      const item: OseItem = await createWorldTestItem("item");
+      await item.update({ system: { description: "<p>card body</p>" } });
+      await item.show();
+      const card = await lastCard();
+
+      (card.querySelector(".card-content") as HTMLElement).click();
+      await waitForInput();
+      expect(card.classList.contains("collapsed")).is.false;
+    });
+  });
   describe("_onChatCardAction(event)", () => {});
 
   // @todo: How to mock?

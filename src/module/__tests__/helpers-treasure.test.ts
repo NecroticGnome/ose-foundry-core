@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../e2e";
-import { rollSpecificNumber, trashChat, waitForInput } from "../../e2e/testUtils";
+import { rollSpecificNumber, trashChat, waitFor, waitForElement, waitForInput } from "../../e2e/testUtils";
 import { functionsForTesting } from "../helpers-treasure";
 
 const { drawTreasure, rollTreasure } = functionsForTesting;
@@ -118,6 +118,19 @@ export default ({ describe, it, expect, after }: QuenchMethods) => {
       await waitForInput();
       expect(game.messages?.size).equal(1);
       expect(game.messages?.contents[0].content).contains("100% Chance");
+    });
+
+    it("Clicking the sheet's Roll Treasure button posts and highlights the result", async () => {
+      trashChat();
+      const table = await createMockTreasureTable();
+      await table.createEmbeddedDocuments("TableResult", [{ text: "100% Chance", range: [1, 1], weight: 100 }]);
+      await table.sheet?.render({ force: true });
+      const button = await waitForElement<HTMLButtonElement>(`#${table.sheet?.id} .roll-treasure`);
+      button?.click();
+      await waitFor(() => (game.messages?.size ?? 0) > 0);
+      expect(game.messages?.contents[0]?.content).contains("100% Chance");
+      expect(table.sheet?.element.querySelector("[data-result-id].active")).not.null;
+      await table.sheet?.close();
     });
   });
 
