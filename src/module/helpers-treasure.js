@@ -110,6 +110,8 @@ async function drawTreasure(table, data) {
  * @param options
  */
 export async function rollTreasure(table, options = {}) {
+  // currentTarget is cleared once the click finishes dispatching.
+  const button = options.event?.currentTarget;
   // Draw treasure
   const data = await drawTreasure(table, {});
   const templateData = {
@@ -118,9 +120,8 @@ export async function rollTreasure(table, options = {}) {
   };
 
   // Animation
-  if (options.event) {
-    const results =
-      options.event.currentTarget.parentElement.previousElementSibling?.querySelectorAll(".table-result") ?? [];
+  if (button) {
+    const results = button.closest(".roll-table-sheet")?.querySelectorAll("[data-result-id]") ?? [];
     results.forEach((item) => {
       item.classList.remove("active");
       if (data.treasure[item.dataset.resultId]) {
