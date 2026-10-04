@@ -1,4 +1,14 @@
 .ose.sheet.item {
+  input[type="checkbox"] {
+    --checkbox-background-color: color-mix(in oklab, var(--color-text-primary), transparent 80%);
+    --checkbox-checked-color: var(--color-text-secondary);
+
+    &:disabled {
+      --checkbox-background-color: color-mix(in oklab, var(--color-text-primary), transparent 90%);
+      --checkbox-checked-color: var(--color-text-subtle);
+    }
+  }
+
   .item-sheet-content {
     display: flex;
     flex-direction: column;
@@ -129,6 +139,12 @@
           min-width: 0;
           height: var(--form-field-height, 22px);
           line-height: normal;
+        }
+
+        input[type="checkbox"] {
+          width: var(--checkbox-size);
+          height: var(--checkbox-size);
+          margin-block: calc((var(--form-field-height, 22px) - var(--checkbox-size)) / 2);
         }
 
         input:not([type="checkbox"]):hover:not(:focus):not(:disabled),
