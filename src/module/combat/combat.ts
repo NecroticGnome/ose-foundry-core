@@ -79,8 +79,9 @@ export class OSECombat extends foundry.documents.Combat {
    * @param {boolean} [options.excludeAlreadyRolled=false] - If true, exclude combatants that have already rolled initiative.
    * @param {boolean} [options.updateTurn=false] - Update the Combat turn after adding new initiative scores to
    *                                               keep the turn on the same Combatant.
+   * @param {boolean} [options.npcOnly=false] - If true, only reroll groups with no player-owned combatants.
    */
-  async smartRerollInitiative({ excludeAlreadyRolled = false, updateTurn = false } = {}) {
+  async smartRerollInitiative({ excludeAlreadyRolled = false, updateTurn = false, npcOnly = false } = {}) {
     if (!this.isGroupInitiative) {
       return this.#rollAbsolutelyEveryone({ excludeAlreadyRolled, updateTurn });
     }
@@ -89,6 +90,9 @@ export class OSECombat extends foundry.documents.Combat {
     const messages = [];
     for (const group of this.groups) {
       if (group.members.size === 0 || (excludeAlreadyRolled && group.initiative !== null) || group.name === "slow") {
+        continue;
+      }
+      if (npcOnly && group.members.some((c) => c.hasPlayerOwner)) {
         continue;
       }
 
@@ -118,6 +122,13 @@ export class OSECombat extends foundry.documents.Combat {
     await this.updateEmbeddedDocuments("CombatantGroup", updates);
 
     return this;
+  }
+
+  /**
+   * Reroll initiative for groups with no player-owned combatants.
+   */
+  async rerollNPCInitiative() {
+    return this.smartRerollInitiative({ npcOnly: true });
   }
 
   /**

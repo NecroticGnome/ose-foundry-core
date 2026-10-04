@@ -122,6 +122,20 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       reRollButton.dataset.tooltip = game.i18n.localize("OSE.Reroll");
       reRollButton.ariaLabel = game.i18n.localize("OSE.Reroll");
 
+      const reRollNPCButton = document.createElement("button");
+      reRollNPCButton.type = "button";
+      reRollNPCButton.classList.add(
+        "inline-control",
+        "combat-control",
+        "combat-button",
+        "icon",
+        "fa-solid",
+        "fa-users-cog",
+      );
+      reRollNPCButton.dataset.action = "rerollNPCInitiative";
+      reRollNPCButton.dataset.tooltip = game.i18n.localize("OSE.combat.RerollNPCs");
+      reRollNPCButton.ariaLabel = game.i18n.localize("OSE.combat.RerollNPCs");
+
       const setCombatantGroupsButton = document.createElement("button");
       setCombatantGroupsButton.type = "button";
       setCombatantGroupsButton.classList.add(
@@ -136,7 +150,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       setCombatantGroupsButton.dataset.tooltip = game.i18n.localize("OSE.combat.SetCombatantGroups");
       setCombatantGroupsButton.ariaLabel = game.i18n.localize("OSE.combat.SetCombatantGroups");
 
-      headerButtonContainer.replaceChildren(reRollButton, setCombatantGroupsButton);
+      headerButtonContainer.replaceChildren(reRollButton, reRollNPCButton, setCombatantGroupsButton);
     }
 
     const list = html.querySelector(".directory-list, .combat-tracker");

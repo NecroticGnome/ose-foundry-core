@@ -337,6 +337,7 @@
 
   "OSE.combat.SetCombatantAsActive": "Set Active",
   "OSE.combat.SetCombatantGroups": "Set Combatant Groups",
+  "OSE.combat.RerollNPCs": "Reroll NPCs",
   "OSE.CombatFlag.SpellDeclared": "Spell Declared",
   "OSE.CombatFlag.RetreatFromMeleeDeclared": "Retreat From Melee Declared",
 
