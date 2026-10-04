@@ -174,7 +174,7 @@ Hooks.on("updateCombatantGroup", async (combatantGroup) => {
 });
 /** @param {OSECombatant} combatant */
 Hooks.on("createCombatant", (combatant) => {
-  if (game.settings.get(game.system.id, "initiative") !== "group" || !game.user.isGM) {
+  if (game.settings.get(game.system.id, "initiative") !== "group" || !game.users.activeGM?.isSelf) {
     return;
   }
   combatant.assignGroup();
