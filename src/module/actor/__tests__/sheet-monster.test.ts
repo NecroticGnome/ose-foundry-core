@@ -114,7 +114,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
     it("Can drag testing RollTable to Monster", async () => {
       const actor = await createMockActorKey("monster", {}, key);
       const rollTable = await createMockRollTable();
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await delay(500); // Wait for sheet to render and the roll table to exist in the DOM
 
       // Setup DOM elements
@@ -146,7 +146,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
   describe("_resetAttacks(event)", () => {
     it("resets the counter to max", async () => {
       const actor = await createMockActorKey("monster", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       const [item] = await createActorTestItem(actor, "weapon");
       item.update({
         system: {
@@ -179,7 +179,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
     it("updates counter when rolling", async () => {
       const actor = await createMockActorKey("monster", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       const [item] = await createActorTestItem(actor, "weapon");
       item.update({
         system: {
@@ -211,7 +211,7 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
     before(async () => {
       const actor = await createMockActorKey("monster", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await createActorTestItem(actor, "weapon");
       await delay(300);
     });

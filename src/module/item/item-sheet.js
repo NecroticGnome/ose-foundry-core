@@ -69,17 +69,14 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
     });
   }
 
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onTagDelete(_event, target) {
     return this.item.popManualTag(target.closest("[data-tag]")?.dataset.tag);
   }
 
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onMeleeToggle() {
     return this.item.update({ "system.melee": !this.item.system.melee });
   }
 
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onMissileToggle() {
     return this.item.update({ "system.missile": !this.item.system.missile });
   }

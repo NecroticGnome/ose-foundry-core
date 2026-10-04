@@ -85,7 +85,7 @@ async function drawTreasure(table, data) {
         const text = await r.getHTML();
         data.treasure[r.id] = {
           img: r.img,
-          text: await foundry.applications.ux.TextEditor.implementation.enrichHTML(text, { async: true }),
+          text: await foundry.applications.ux.TextEditor.implementation.enrichHTML(text),
         };
         const parsedUuid = foundry.utils.parseUuid(r.documentUuid);
         const documentCollection = parsedUuid?.collection?.metadata?.id ?? parsedUuid?.documentType ?? "";
@@ -119,16 +119,18 @@ export async function rollTreasure(table, options = {}) {
 
   // Animation
   if (options.event) {
-    const results = $(options.event.currentTarget.parentElement).prev().find(".table-result");
-    results.each((_, item) => {
+    const results =
+      options.event.currentTarget.parentElement.previousElementSibling?.querySelectorAll(".table-result") ?? [];
+    results.forEach((item) => {
       item.classList.remove("active");
       if (data.treasure[item.dataset.resultId]) {
         item.classList.add("active");
       }
     });
+    // Let the active highlight render before the chat card renders.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
   }
 
-  await new Promise((resolve) => requestAnimationFrame(resolve));
   const html = await foundry.applications.handlebars.renderTemplate(
     `${OSE.systemPath()}/templates/chat/roll-treasure.html`,
     templateData,

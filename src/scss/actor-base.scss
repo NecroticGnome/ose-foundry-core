@@ -156,7 +156,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    gap: 7px;
+    gap: 1px;
     .item {
       max-height: 35px; /* tab padding fix */
       padding: 1px 6px 0;
@@ -489,6 +489,11 @@
       button.toggle {
         top: 4px;
         right: 4px;
+      }
+      &:hover > button.toggle:enabled {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

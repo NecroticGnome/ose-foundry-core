@@ -56,7 +56,6 @@ export default class OseCharacterGpCost extends HandlebarsApplicationMixin(Appli
   }
 
   static async #onSubmitForm(_event, _form, _formData) {
-    // biome-ignore lint/complexity/noThisInStatic: V2 form.handler binds `this` to the application instance.
     return this._submit();
   }
 

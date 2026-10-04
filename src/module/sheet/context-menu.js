@@ -2,6 +2,7 @@
  * @file Inventory-row context menu wired from the V2 actor sheet's
  *       `_onFirstRender`.
  */
+import { contextMenuEntry } from "../context-menu-entry";
 import { promptRemoveItemFromActor } from "./dialogs";
 import { toggleItemEquipped } from "./inventory-actions";
 
@@ -26,38 +27,38 @@ const inventoryEntries = (sheet) => {
   const isEditable = () => !!sheet.actor?.sheet?.isEditable;
 
   return [
-    {
-      name: "OSE.Show",
+    contextMenuEntry({
+      label: "OSE.Show",
       icon: "<i class='fas fa-eye'></i>",
-      callback: (element) => itemFromRow(sheet, element)?.show(),
-    },
-    {
-      name: "OSE.items.Equip",
+      onClick: (element) => itemFromRow(sheet, element)?.show(),
+    }),
+    contextMenuEntry({
+      label: "OSE.items.Equip",
       icon: "<i class='fas fa-hand'></i>",
-      condition: (element) => {
+      visible: (element) => {
         if (sheet.actor?.type !== "character" || !isEditable()) return false;
         return EQUIPPABLE_TYPES.includes(itemFromRow(sheet, element)?.type);
       },
-      callback: async (element) => {
+      onClick: async (element) => {
         const item = itemFromRow(sheet, element);
         if (item) await toggleItemEquipped(item);
       },
-    },
-    {
-      name: "OSE.Edit",
+    }),
+    contextMenuEntry({
+      label: "OSE.Edit",
       icon: "<i class='fas fa-edit'></i>",
-      condition: isEditable,
-      callback: (element) => itemFromRow(sheet, element)?.sheet.render(true),
-    },
-    {
-      name: "OSE.Delete",
+      visible: isEditable,
+      onClick: (element) => itemFromRow(sheet, element)?.sheet.render({ force: true }),
+    }),
+    contextMenuEntry({
+      label: "OSE.Delete",
       icon: "<i class='fas fa-trash'></i>",
-      condition: isEditable,
-      callback: (element) => {
+      visible: isEditable,
+      onClick: (element) => {
         const item = itemFromRow(sheet, element);
         if (item) promptRemoveItemFromActor(sheet, item);
       },
-    },
+    }),
   ];
 };
 

@@ -1,7 +1,6 @@
 /**
  * @file The sheet class for Actors of type Monster
  */
-// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import OSE from "../config";
 import OseActorSheet from "./actor-sheet";
 
@@ -128,7 +127,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
           callback: () => {},
         },
       ],
-    }).render(true);
+    }).render({ force: true });
   }
 
   async _onDrop(event) {

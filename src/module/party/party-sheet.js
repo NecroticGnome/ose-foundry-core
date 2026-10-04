@@ -154,15 +154,12 @@ export default class OsePartySheet extends HandlebarsApplicationMixin(Applicatio
     return id ? game.actors.get(id) : undefined;
   }
 
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onDealXP() {
     return this._handleDealXP();
   }
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onOpenActorSheet(_event, target) {
     return this._handleOpenActorSheet(target);
   }
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onRemoveActor(_event, target) {
     return this._handleRemoveActor(target);
   }

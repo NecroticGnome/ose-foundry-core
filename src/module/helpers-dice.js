@@ -428,7 +428,7 @@ const OseDice = {
         submit: () => {
           resolve(rolled ? roll : false);
         },
-      }).render(true);
+      }).render({ force: true });
     });
   },
 
@@ -500,7 +500,7 @@ const OseDice = {
         submit: () => {
           resolve(rolled ? roll : false);
         },
-      }).render(true);
+      }).render({ force: true });
     });
   },
 };

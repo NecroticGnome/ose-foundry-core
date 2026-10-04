@@ -1,4 +1,5 @@
 import { OSE } from "../config";
+import { contextMenuEntry } from "../context-menu-entry";
 import { OSECombatant } from "./combatant";
 
 export default class OSECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
@@ -28,7 +29,6 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
 
   /** @inheritDoc */
   static #onCombatantControl(...args) {
-    // biome-ignore lint/complexity/noThisInStatic: v2 Applications have `this` bound to the instance
     return this._onCombatantControl(...args);
   }
 
@@ -89,15 +89,15 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
   _getEntryContextOptions() {
     const options = super._getEntryContextOptions();
     return [
-      {
-        name: game.i18n.localize("OSE.combat.SetCombatantAsActive"),
+      contextMenuEntry({
+        label: game.i18n.localize("OSE.combat.SetCombatantAsActive"),
         icon: '<i class="fas fa-star-of-life"></i>',
-        callback: (li: HTMLElement) => {
+        onClick: (li: HTMLElement) => {
           const { combatantId } = li.dataset;
           const turnToActivate = this.viewed.turns.findIndex((t: OSECombatant) => t.id === combatantId);
           this.viewed.activateCombatant(turnToActivate);
         },
-      },
+      }),
       ...options,
     ];
   }

@@ -48,7 +48,7 @@ export const chooseItemType = async (choices = ["weapon", "armor", "shield", "ge
           callback: () => {},
         },
       ],
-    }).render(true);
+    }).render({ force: true });
   });
 };
 

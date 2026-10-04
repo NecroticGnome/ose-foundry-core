@@ -165,7 +165,7 @@ Hooks.on("updateActor", party.update);
  * @param {OSECombatTracker} app - The combat tracker application
  * @param {HTMLElement} html - The HTML element of the combat tracker
  */
-Hooks.on("renderCombatTracker", (app, html) => app.renderGroups(html instanceof HTMLElement ? html : html[0]));
+Hooks.on("renderCombatTracker", (app, html) => app.renderGroups(html));
 /**
  * @param {foundry.documents.CombatantGroup} combatantGroup - The combatant group being updated
  */

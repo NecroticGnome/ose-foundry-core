@@ -1,7 +1,6 @@
 /**
  * @file Extend the basic ActorSheet with some very simple modifications
  */
-// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
@@ -140,7 +139,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
             callback: () => {},
           },
         ],
-      }).render(true);
+      }).render({ force: true });
     });
   }
 

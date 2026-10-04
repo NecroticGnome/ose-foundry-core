@@ -298,7 +298,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
           },
         },
       });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
 
       actor?.sheet?.element.querySelector<HTMLElement>(`.profile a[data-action="modifiers"]`)?.click();
@@ -330,7 +330,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
           },
         },
       });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
 
       actor?.sheet?.element.querySelector<HTMLElement>(`.profile a[data-action="gpCost"]`)?.click();

@@ -2,7 +2,6 @@
  * @file System-level modifications to the way combat works
  */
 import { OSE } from "../config";
-import { getRollMode } from "../helpers-message-mode";
 import OSECombatGroupSelector from "./combat-set-groups";
 
 export const actionGroups = {
@@ -97,8 +96,6 @@ export class OSECombat extends foundry.documents.Combat {
       await roll.evaluate();
       updates.push({ _id: group.id, initiative: roll.total });
 
-      const rollMode = getRollMode();
-
       // Construct chat message data
       const messageData = {
         speaker: {
@@ -109,10 +106,7 @@ export class OSECombat extends foundry.documents.Combat {
         }),
         flags: { "core.initiativeRoll": true },
       };
-      const chatData = await roll.toMessage(messageData, {
-        rollMode,
-        create: false,
-      });
+      const chatData = await roll.toMessage(messageData, { create: false });
       messages.push(chatData);
     }
 
@@ -131,7 +125,7 @@ export class OSECombat extends foundry.documents.Combat {
    */
   async onUpdateCombatantGroup() {
     this.setupTurns();
-    await ui.combat.render(true);
+    await ui.combat.render({ force: true });
   }
 
   /** @override */
@@ -148,7 +142,7 @@ export class OSECombat extends foundry.documents.Combat {
     }
     await this.update({ turn });
     this.setupTurns();
-    await ui.combat.render(true);
+    await ui.combat.render({ force: true });
     return this;
   }
 
@@ -273,7 +267,7 @@ export class OSECombat extends foundry.documents.Combat {
    * Prompts to set the combatant groups.
    */
   setCombatantGroups() {
-    new OSECombatGroupSelector().render(true, { focus: true });
+    new OSECombatGroupSelector().render({ force: true, focus: true });
   }
 
   /** @override */

@@ -57,7 +57,6 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
   }
 
   static async #onSubmitForm(_event, _form, formData) {
-    // biome-ignore lint/complexity/noThisInStatic: V2 form.handler binds `this` to the application instance.
     return this._submit(formData.object);
   }
 

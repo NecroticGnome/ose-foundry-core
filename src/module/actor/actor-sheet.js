@@ -1,7 +1,6 @@
 /**
  * @file The base class we use for Character and Monster sheets. Shared behavior goes here!
  */
-// biome-ignore-all lint/complexity/noThisInStatic: V2 actions bind `this` to the sheet instance.
 import { displayItemInChat } from "../sheet/chat-helpers";
 import { bindInventoryContextMenu } from "../sheet/context-menu";
 import { prepareActorContext } from "../sheet/data-context";
@@ -13,7 +12,6 @@ import {
   onDropFolder,
   onDropItem,
   onDropItemCreate,
-  onSortItem,
 } from "../sheet/drag-drop";
 import {
   createItem,
@@ -139,9 +137,6 @@ export default class OseActorSheet extends HandlebarsApplicationMixin(ActorSheet
   _onDragStart(event) {
     return onDragStartItem(this, event);
   }
-  _onSortItem(event, item) {
-    return onSortItem(this, event, item, (ev, data) => super._onSortItem(ev, data));
-  }
 
   async _onFirstRender(context, options) {
     await super._onFirstRender(context, options);
@@ -222,7 +217,7 @@ export default class OseActorSheet extends HandlebarsApplicationMixin(ActorSheet
   }
 
   static _onEditItem(_event, target) {
-    if (this.isEditable) return this._getItemFromActor(target)?.sheet.render(true);
+    if (this.isEditable) return this._getItemFromActor(target)?.sheet.render({ force: true });
   }
 
   static _onDeleteItem(_event, target) {

@@ -112,11 +112,11 @@
   ],
   "background": "systems/ose/assets/ose-system.webp",
   "flags": {
-    "allowBugReporter": true
-  },
-  "hotReload": {
-    "extensions": ["css"],
-    "paths": ["dist/"]
+    "allowBugReporter": true,
+    "hotReload": {
+      "extensions": ["css"],
+      "paths": ["dist/"]
+    }
   },
   "relationships": {
     "recommends": [

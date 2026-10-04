@@ -390,6 +390,17 @@
   }
 }
 
+.ose.chat-card.collapsible :is(.chat-header, .card-header) {
+  cursor: pointer;
+}
+
+.ose.chat-card.collapsed {
+  > :not(.chat-block, .card-header),
+  .chat-block > :not(.chat-header) {
+    display: none;
+  }
+}
+
 .ose.chat-block {
   margin: 0;
 

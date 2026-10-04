@@ -112,15 +112,12 @@ export default class OseCharacterCreator extends HandlebarsApplicationMixin(Appl
     }
   }
 
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onRollScore(event, target) {
     return this._handleRollScore(event, target);
   }
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onRollGold(event, target) {
     return this._handleRollGold(event, target);
   }
-  // biome-ignore lint/complexity/noThisInStatic: V2 actions bind `this` to the application instance.
   static _onAutoRoll(event) {
     return this._handleAutoRoll(event);
   }
@@ -153,7 +150,6 @@ export default class OseCharacterCreator extends HandlebarsApplicationMixin(Appl
   }
 
   static async #onSubmitForm(_event, _form, _formData) {
-    // biome-ignore lint/complexity/noThisInStatic: V2 form.handler binds `this` to the application instance.
     return this._submit();
   }
 

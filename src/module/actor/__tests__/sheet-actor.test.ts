@@ -88,7 +88,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
         // Create item
         const actor = await createMockActorKey("character", {}, key);
         await actor?.update({ system: { spells: { enabled: true } } });
-        actor?.sheet?.render(true);
+        actor?.sheet?.render({ force: true });
         await delay(200);
 
         const item = await createActorTestItem(actor, itemType);
@@ -159,7 +159,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     before(async () => {
       const actor = (await createMockActorKey("character", {}, key)) as OseActor;
       await actor.update({ system: { spells: { enabled: true } } });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       // Wait for the sheet (and the inventory list) to actually render —
       // fixed delays are too short on slow CI runners.
       await waitUntil(
@@ -212,7 +212,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       const weapon = actor?.items.getName("New Actor Test Weapon");
       const container = actor?.items.getName("New Actor Test Container");
       await weapon?.update({ system: { containerId: container?.id } });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       // Wait for the sheet and the container's contained-items list to render.
       await waitUntil(
         () =>
@@ -281,7 +281,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     before(async () => {
       const actor = await createMockActorKey("character", {}, key);
       await actor?.update({ system: { spells: { enabled: true } } });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await delay(220);
     });
 
@@ -421,7 +421,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     before(async () => {
       const actor = await createMockActorKey("character", {}, key);
       await actor?.update({ system: { spells: { enabled: true } } });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await delay(220);
     });
 
@@ -471,7 +471,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     before(async () => {
       const actor = await createMockActorKey("character", {}, key);
       await actor?.update({ system: { spells: { enabled: true } } });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
     });
 
     itemTypes.forEach((itemType) => {
@@ -576,7 +576,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await item?.update({ system: { quantity: { max: 6, value: 3 } } });
       await waitForInput();
 
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await delay(220);
     });
 
@@ -609,7 +609,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await actor?.update({ system: { spells: { enabled: true } } });
       await createActorTestItem(actor, "spell");
       await waitForInput();
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
     });
 
     it("changing the input for cast changes spell cast data", async () => {
@@ -656,7 +656,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await actor?.items.contents[0].update({
         system: { cast: 1, memorized: 3 },
       });
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
     });
 
     it("resetting spells resets the cast field to maximum", async () => {
@@ -704,7 +704,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
         system: { counter: { value: 3, max: 3 } },
       });
       expect(actor?.items.size).equal(1);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
       await mockClickItem("attributes");
 
@@ -727,7 +727,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await createActorTestItem(actor, "weapon");
       await waitForInput();
       expect(actor?.items.size).equal(1);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
       await mockClickItem("inventory");
 
@@ -750,7 +750,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await createActorTestItem(actor, "spell");
       await waitForInput();
       expect(actor?.items.size).equal(1);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
       await mockClickItem("spells");
 
@@ -772,7 +772,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await actor?.items.contents[0].update({ system: { roll: "1d6" } });
       await waitForInput();
       expect(actor?.items.contents[0].system.roll).equal("1d6");
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
       await mockClickItem("abilities");
 
@@ -795,7 +795,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       await createActorTestItem(actor, "spell");
       await waitForInput();
       expect(actor?.items.size).equal(1);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await waitForInput();
       await mockClickItem("inventory");
 
@@ -822,7 +822,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     describe("character can roll", () => {
       before(async () => {
         const actor = await createMockActorKey("character", {}, key);
-        await actor?.sheet?.render(true);
+        await actor?.sheet?.render({ force: true });
         await game.settings.set(game.system.id, "invertedCtrlBehavior", true);
         await trashChat();
         await delay(200);
@@ -853,7 +853,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     describe("monster can roll", () => {
       before(async () => {
         const actor = await createMockActorKey("monster", {}, key);
-        await actor?.sheet?.render(true);
+        await actor?.sheet?.render({ force: true });
       });
 
       saves.forEach((save) => {
@@ -893,7 +893,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     before(async () => {
       await game.settings.set(game.system.id, "invertedCtrlBehavior", true);
       const actor = await createMockActorKey("character", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       await trashChat();
     });
 
@@ -1139,7 +1139,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       it(`can create ${itemType}`, async () => {
         const actor = await createMockActorKey("character", {}, key);
         await actor?.update({ system: { spells: { enabled: true } } });
-        await actor?.sheet?.render(true);
+        await actor?.sheet?.render({ force: true });
         await delay(200);
         expect(actor?.items.size).equal(0);
 
@@ -1177,7 +1177,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
 
     it("can add to the quantity", async () => {
       const actor = await createMockActorKey("character", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       const [item] = (await createActorTestItem(actor, "item")) as unknown as OseItem;
       await item.update({ system: { quantity: { value: 2, max: 4 } } });
       await waitForInput();
@@ -1194,7 +1194,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
 
     it("can subtract from the quantity", async () => {
       const actor = await createMockActorKey("character", {}, key);
-      actor?.sheet?.render(true);
+      actor?.sheet?.render({ force: true });
       const [item] = (await createActorTestItem(actor, "item")) as unknown as OseItem;
       await item.update({ system: { quantity: { value: 2, max: 4 } } });
       await waitForInput();
@@ -1219,7 +1219,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
     it("grows .resizable lists with the window height", async () => {
       const actor = await createMockActorKey("character", {}, key);
       const sheet = actor?.sheet;
-      await sheet?.render(true);
+      await sheet?.render({ force: true });
       await waitUntil(() => !!sheet?.element?.querySelector(".resizable"));
 
       const list = sheet?.element.querySelector<HTMLElement>(".resizable");
@@ -1238,7 +1238,7 @@ export default ({ describe, it, expect, after, afterEach, before, beforeEach }: 
       it(`Entity Tweaks renders for ${actorType}`, async () => {
         const actor = await createMockActorKey(actorType, {}, `${key} ${actorType}`);
         const sheet = actor?.sheet;
-        await sheet?.render(true);
+        await sheet?.render({ force: true });
 
         const control = [...sheet._headerControlButtons()].find((c) => c.action === "configureActor");
         expect(control).not.undefined;

@@ -4,6 +4,7 @@
 
 import type { OseContextMenuEntry } from "../global";
 import OseActor from "./actor/entity";
+import { contextMenuEntry } from "./context-menu-entry";
 
 /**
  * Apply damage to a target actor
@@ -90,24 +91,24 @@ const canApply: OseContextMenuEntry["condition"] = (li) => canApplyDamage(li);
  * This function is used to hook into the Chat Log context menu to add additional options to each message
  * These options make it easy to conveniently apply damage to controlled tokens based on the value of a Roll
  *
- * @param {object} _ - Unused jQuery collection
+ * @param {HTMLElement} _ - Unused chat log element
  * @param {Array} options - The list of context menu options
  * @returns {undefined}
  */
 export const addChatMessageContextOptions = (_: HTMLElement, options: OseContextMenuEntry[]) => {
   options.push(
-    {
-      name: game.i18n.localize("OSE.messages.applyDamage"),
+    contextMenuEntry({
+      label: game.i18n.localize("OSE.messages.applyDamage"),
       icon: '<i class="fas fa-user-minus"></i>',
-      condition: canApply,
-      callback: (li) => applyChatCardDamage(li, 1),
-    },
-    {
-      name: game.i18n.localize("OSE.messages.applyHealing"),
+      visible: canApply,
+      onClick: (li) => applyChatCardDamage(li, 1),
+    }),
+    contextMenuEntry({
+      label: game.i18n.localize("OSE.messages.applyHealing"),
       icon: '<i class="fas fa-user-plus"></i>',
-      condition: canApply,
-      callback: (li) => applyChatCardDamage(li, -1),
-    },
+      visible: canApply,
+      onClick: (li) => applyChatCardDamage(li, -1),
+    }),
   );
   return options;
 };

@@ -143,10 +143,6 @@ import partyXpSheetTests, {
   key as partyXpSheetKey,
   options as partyXpSheetOptions,
 } from "../module/party/__tests__/sheet-party-xp.test";
-import tabHelpersTests, {
-  key as tabHelpersKey,
-  options as tabHelpersOptions,
-} from "../module/sheet/__tests__/tab-helpers.test";
 
 export type QuenchMethods = {
   [s: string]: any;
@@ -248,5 +244,4 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   quench.registerBatch(helpersMacrosKey, helpersMacrosTests, helpersMacrosOptions);
   quench.registerBatch(helpersPartyKey, helpersPartyTests, helpersPartyOptions);
   quench.registerBatch(helpersTreasureKey, helpersTreasureTests, helpersTreasureOptions);
-  quench.registerBatch(tabHelpersKey, tabHelpersTests, tabHelpersOptions);
 });

@@ -140,6 +140,7 @@
   "OSE.AscArmorClassShort": "AAC",
   "OSE.ArmorClassBonus": "Armor Class Bonus",
   "OSE.Thac0": "THAC0",
+  "OSE.Thac0Long": "To Hit Armor Class 0",
   "OSE.ABShort": "AB",
   "OSE.AB": "Attack Bonus",
   "OSE.MeleeShort": "MEL",

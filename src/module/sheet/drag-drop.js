@@ -39,25 +39,6 @@ export const onDragStartItem = (sheet, event) => {
   );
 };
 
-export const onSortItem = (sheet, event, itemData, fallback) => {
-  const source = sheet.actor.items.get(itemData._id);
-  const siblings = sheet.actor.items.filter((i) => i.data._id !== source.data._id);
-  const dropTarget = event.target.closest("[data-item-id]");
-  const targetId = dropTarget ? dropTarget.dataset.itemId : null;
-  const target = siblings.find((s) => s.data._id === targetId);
-  if (!target) throw new Error(`Couldn't drop near ${event.target}`);
-  const targetData = target?.system;
-
-  if ((target?.type === "container" || target?.data?.type === "container") && targetData.containerId === "") {
-    sheet.actor.updateEmbeddedDocuments("Item", [{ _id: source.id, "system.containerId": target.id }]);
-    return;
-  }
-  if (source?.system.containerId !== "") {
-    sheet.actor.updateEmbeddedDocuments("Item", [{ _id: source.id, "system.containerId": "" }]);
-  }
-  return fallback(event, itemData);
-};
-
 export const onDropFolder = async (sheet, _event, folder) => {
   if (!folder || folder.type !== "Item") return;
 
@@ -90,6 +71,7 @@ export const onDropItem = async (sheet, event, item) => {
   if (!exists && !targetIsContainer) return onDropItemCreate(sheet, [itemData]);
   if (isContainer) return onContainerItemRemove(sheet, item, isContainer);
   if (targetIsContainer) return onContainerItemAdd(sheet, item, targetItem);
+  if (item.parent?.uuid === sheet.actor.uuid) return sheet._onSortItem(event, item);
 };
 
 export const onContainerItemRemove = async (sheet, item, container) => {
