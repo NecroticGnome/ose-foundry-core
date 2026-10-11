@@ -6,7 +6,7 @@ import OseDice from "../helpers-dice";
 
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
-const SCORE_KEYS = ["str", "int", "dex", "wis", "con", "cha"];
+const SCORE_KEYS = Object.keys(OSE.scores);
 
 export default class OseCharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(document, options = {}) {

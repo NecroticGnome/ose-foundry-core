@@ -1,25 +1,85 @@
+@use "variables";
+
 .ose.actor.monster {
-  min-height: 565px;
-  min-width: 460px;
+  &:not(.minimized) {
+    min-height: 565px;
+    min-width: 460px;
+  }
+
   .header-details {
     .summary {
       .treasure-table {
         text-align: center;
+
+        .treasure-value {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.25rem;
+        }
+
+        &.linked input {
+          flex: 1 1 3rem;
+          min-width: 0;
+          padding-inline: 2px;
+          text-align: left;
+        }
+
+        // An empty text box only opens to be typed in, so the links stay centred.
+        &.linked:not(.typed) input {
+          flex: 0 0 0;
+          padding: 0;
+        }
+
+        &.linked:not(.typed):is(:hover, :focus-within) input {
+          flex: 1 1 3rem;
+          padding-inline: 2px;
+        }
+
+        // With text, or several tables, the links shrink to icons; names are in the tooltips.
+        &.typed,
+        &.many {
+          .treasure-links a {
+            font-size: 0;
+            padding: 0 2px;
+
+            i {
+              font-size: var(--font-size-12);
+              margin: 0;
+            }
+          }
+        }
+
+        .treasure-links {
+          display: flex;
+          flex: 0 1 auto;
+          min-width: 0;
+          gap: 0.25rem;
+          line-height: 1.5;
+
+          a {
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
       }
       .check-field {
         &:hover {
           .check {
-            display: block;
+            visibility: visible;
           }
         }
         .check {
-          display: none;
-          line-height: 35px;
-          flex: 0 0 20px;
-          position: absolute;
+          visibility: hidden;
+          line-height: 30px;
+          flex: 0 0 16px;
+          margin-left: 2px;
+          text-align: center;
           font-size: var(--font-size-12);
           &:hover {
-            color: $colorDark;
+            color: variables.$colorDark;
           }
         }
       }
@@ -63,7 +123,7 @@
         position: absolute;
         right: 5px;
         top: 5px;
-        color: $colorFaint;
+        color: variables.$colorFaint;
         &:hover {
           color: white;
         }
@@ -76,7 +136,7 @@
       padding: 0;
       text-align: center;
       label {
-        color: $colorTan;
+        color: variables.$colorTan;
         font-size: 10px;
       }
     }

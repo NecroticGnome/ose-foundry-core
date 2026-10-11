@@ -12,6 +12,7 @@ export default class OseDataModelSpell extends foundry.abstract.TypeDataModel<an
   declare save: Save | "";
   declare lvl: number | null;
   declare class: string;
+  declare castAs: string;
   declare duration: string;
   declare range: string;
   declare roll: string;
@@ -26,6 +27,7 @@ export default class OseDataModelSpell extends foundry.abstract.TypeDataModel<an
       save: new StringField(),
       lvl: new NumberField({ integer: true, min: 0 }),
       class: new StringField(),
+      castAs: new StringField(),
       duration: new StringField(),
       range: new StringField(),
       roll: new StringField(),

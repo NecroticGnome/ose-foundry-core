@@ -237,3 +237,443 @@
     }
   }
 }
+
+.ose.sheet.item {
+  .class-sheet,
+  .race-sheet {
+    .sheet-tabs {
+      flex: 0 0 auto;
+    }
+
+    .sheet-body {
+      overflow-y: auto;
+      padding: 0 0.25rem;
+    }
+
+    .sheet-header .charname {
+      min-height: 2.5rem;
+    }
+
+    .mode-toggle {
+      align-self: flex-start;
+      flex: 0 0 auto;
+      padding: 0.25rem 0.5rem;
+      font-size: var(--font-size-16);
+    }
+
+    .class-progress {
+      gap: 0.5rem;
+
+      .form-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .hint {
+      margin: 0.25rem 0;
+      font-size: var(--font-size-12);
+      opacity: 0.8;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0 0.25rem;
+      padding-bottom: 0.15rem;
+      border-bottom: 1px solid var(--color-border);
+      font-size: var(--font-size-16);
+
+      .help {
+        font-size: var(--font-size-14);
+        opacity: 0.8;
+      }
+
+      .key {
+        font-size: var(--font-size-12);
+        font-family: var(--font-mono, monospace);
+        opacity: 0.6;
+      }
+    }
+
+    // Label / value pairs: inputs while editing, text while viewing.
+    .class-fields,
+    .class-summary {
+      display: grid;
+      grid-template-columns: 11rem 1fr;
+      gap: 0.4rem 0.75rem;
+      align-items: center;
+      margin: 0.5rem 0 0;
+    }
+
+    .class-fields {
+      align-items: start;
+
+      > label {
+        padding-top: 0.35rem;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        height: 1.9rem;
+        text-align: left;
+        field-sizing: fixed;
+      }
+
+      input[type="checkbox"] {
+        justify-self: start;
+        margin-top: 0.35rem;
+      }
+
+      input[type="number"] {
+        width: 8rem;
+      }
+
+      .hint {
+        margin-bottom: 0;
+      }
+    }
+
+    .class-summary {
+      dt {
+        font-weight: bold;
+      }
+
+      dd {
+        margin: 0;
+      }
+
+      .key {
+        font-family: var(--font-mono, monospace);
+        opacity: 0.7;
+      }
+    }
+
+    .value-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        height: 1.6rem;
+        padding: 0 0.4rem 0 0.6rem;
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
+        line-height: 1;
+
+        a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+
+      .add-value {
+        gap: 0.5rem;
+        align-items: center;
+
+        a {
+          flex: 0 0 auto;
+        }
+      }
+    }
+
+    .armour-options multi-checkbox {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1rem;
+    }
+
+    // The generic sheet's flex: 1 collapses these inside a scrolling tab; size to the content instead.
+    .description {
+      flex: none;
+
+      prose-mirror,
+      .editor-content {
+        flex: none;
+        height: auto;
+        overflow: visible;
+      }
+
+      // Foundry positions the content absolutely, so it wouldn't grow the editor.
+      prose-mirror .editor-content {
+        position: static;
+      }
+
+      prose-mirror {
+        min-height: 14rem;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .class-table-scroll {
+    overflow-x: auto;
+  }
+
+  .class-table-legend {
+    margin-top: 0.5rem;
+
+    .legend {
+      th,
+      td,
+      input {
+        text-align: left;
+      }
+
+      .value {
+        width: 7rem;
+      }
+    }
+  }
+
+  .class-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.25rem 0;
+
+    th,
+    td {
+      padding: 2px 4px;
+      text-align: center;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      min-width: 2.75rem;
+      text-align: center;
+      field-sizing: fixed;
+    }
+
+    .level {
+      width: 3.5rem;
+      font-weight: bold;
+    }
+
+    .control {
+      width: 1.75rem;
+    }
+
+    th.caption,
+    td.caption {
+      text-align: right;
+      font-size: var(--font-size-12);
+      opacity: 0.8;
+    }
+
+    input[name$=".xp"] {
+      min-width: 6rem;
+    }
+
+    input[name$=".hd"] {
+      min-width: 5.5rem;
+    }
+
+    &.titles, &.prime-reqs {
+      th.title,
+      td.title {
+        text-align: left;
+
+        input {
+          text-align: left;
+        }
+      }
+    }
+
+    &.prime-reqs select {
+      width: 100%;
+    }
+  }
+
+  .class-table-actions {
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .ability-drop {
+    margin-top: 0.25rem;
+
+    .ability-links {
+      td.name,
+      th.name {
+        text-align: left;
+      }
+
+      .level {
+        width: 5rem;
+      }
+
+      .target {
+        width: 9rem;
+      }
+    }
+
+    .drop-hint {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px dashed var(--color-border-light-tertiary, #999);
+      border-radius: 4px;
+      text-align: center;
+      opacity: 0.8;
+    }
+  }
+}
+
+.ose.sheet.item .class-sheet {
+  .class-table-block {
+    margin-bottom: 1.5rem;
+
+    & + .class-table-block {
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .class-table-head {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75rem;
+
+      label {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .control {
+        flex: 0 0 auto;
+        margin-left: auto;
+        padding: 0.25rem;
+      }
+    }
+
+    .caption {
+      font-size: var(--font-size-12);
+      opacity: 0.8;
+    }
+
+    tr.keys input {
+      font-family: var(--font-mono, monospace);
+      font-size: var(--font-size-12);
+    }
+
+    tr.keys .flexrow {
+      align-items: center;
+      gap: 0.15rem;
+
+      a {
+        flex: 0 0 auto;
+      }
+    }
+  }
+}
+
+.ose.sheet.item .class-sheet .prime-req-mode {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0.25rem 0;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+  }
+
+  select {
+    min-width: 6rem;
+  }
+}
+
+.ose.sheet.item .ability-drop .ability-links {
+  tr[draggable="true"] .handle {
+    cursor: grab;
+    opacity: 0.6;
+  }
+}
+
+.ose.sheet.item .class-sheet .class-table-block tr.names input {
+  font-size: var(--font-size-12);
+}
+
+// The book-style summary at the top of class and race sheets.
+.ose.sheet.item .class-summary.stat-block {
+  gap: 0.15rem 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+
+  dt::after {
+    content: ":";
+  }
+}
+
+.ose.sheet.item .class-sheet .class-table .copy-formula {
+  font-size: var(--font-size-11, 11px);
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Inputs with suggestions: Foundry's line-height (the full input height) pushes the arrow to the bottom.
+.ose.sheet.item :is(.class-sheet, .race-sheet) input[list] {
+  line-height: normal;
+
+  &::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+  }
+}
+
+// Prime requisites and level titles sit side by side when they fit, and wrap when they don't.
+.ose.sheet.item .class-sheet .detail-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 2rem;
+
+  .detail-block {
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+}
+
+.ose.sheet.item .class-sheet:not(.editing) .detail-blocks {
+  .detail-block {
+    flex: 0 1 auto;
+  }
+
+  .class-table {
+    width: auto;
+
+    th,
+    td {
+      padding: 2px 0.75rem;
+      text-align: left;
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<div class="class-start">
+  <div class="form-group">
+    <label>{{localize "OSE.classes.StartLevel"}}</label>
+    <div class="form-fields">
+      {{#if options.length}}
+      <select name="level">
+        {{#each options as |o|}}<option value="{{o.value}}">{{o.label}}</option>{{/each}}
+      </select>
+      {{else}}
+      <input type="number" name="level" value="1" min="1" />
+      {{/if}}
+    </div>
+  </div>
+  <div class="form-group">
+    <label>{{localize "OSE.classes.StartRollHp"}}</label>
+    <div class="form-fields"><input type="checkbox" name="rollHp" {{checked rollHp}} /></div>
+    <p class="hint">{{localize "OSE.classes.StartRollHpHint"}}</p>
+  </div>
+  <div class="form-group">
+    <label>{{localize "OSE.classes.StartOffer"}}</label>
+    <div class="form-fields"><input type="checkbox" name="offer" {{checked offer}} /></div>
+    <p class="hint">{{localize "OSE.classes.StartOfferHint"}}</p>
+  </div>
+</div>

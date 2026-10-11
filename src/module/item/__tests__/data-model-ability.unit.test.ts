@@ -76,3 +76,74 @@ describe("OseDataModelAbility", () => {
     });
   });
 });
+
+describe("roll target from a class table", () => {
+  const thief = {
+    type: "class",
+    system: {
+      key: "thief",
+      level: 2,
+      tables: [
+        { key: "skills", label: "Skills", columns: [{ key: "hs", label: "HS" }], rows: [{ hs: 10 }, { hs: 15 }] },
+      ],
+    },
+  };
+  const parentWith = (flag: unknown, items: unknown[] = [thief]) => ({
+    getFlag: () => flag,
+    actor: { items },
+  });
+
+  it("uses the linked cell for the class's level", () => {
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3 },
+      { parent: parentWith({ classKey: "thief", target: "skills.hs" }) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(15);
+    expect(ability.rollTargetFromClass).toBe(true);
+  });
+
+  it("keeps its own target without a link, class or numeric cell", () => {
+    for (const parent of [
+      parentWith(undefined),
+      parentWith({ classKey: "thief", target: "skills.hs" }, []),
+      parentWith({ classKey: "thief", target: "skills.zz" }),
+    ]) {
+      const ability = new OseDataModelAbility({ rollTarget: 3 }, { parent });
+      ability.prepareDerivedData();
+      expect(ability.rollTarget).toBe(3);
+      expect(ability.rollTargetFromClass).toBe(false);
+    }
+  });
+
+  it("follows its own table link on a character whose class has the column", () => {
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3, targetFrom: "skills.hs" },
+      { parent: parentWith(undefined) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(15);
+    expect(ability.rollTargetFromClass).toBe(true);
+  });
+
+  it("prefers the class's own link over the ability's", () => {
+    const tables = [
+      {
+        key: "skills",
+        label: "Skills",
+        columns: [{ key: "hs" }, { key: "ms" }],
+        rows: [
+          { hs: 10, ms: 30 },
+          { hs: 15, ms: 35 },
+        ],
+      },
+    ];
+    const cls = { type: "class", system: { key: "thief", level: 2, tables } };
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3, targetFrom: "skills.hs" },
+      { parent: parentWith({ classKey: "thief", target: "skills.ms" }, [cls]) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(35);
+  });
+});

@@ -1,0 +1,360 @@
+<div class="item-sheet-content class-sheet {{#if editing}}editing{{/if}}">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{img}}" {{#if editing}}data-edit="img"{{/if}} data-tooltip="{{name}}" />
+    <div class="header-col">
+      <h1 class="charname">
+        {{#if editing}}<input name="name" type="text" value="{{name}}" placeholder="{{localize 'OSE.details.name'}}" />{{else}}{{name}}{{/if}}
+      </h1>
+      {{#if embedded}}
+      <div class="class-progress flexrow">
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.details.level'}}</span>
+          {{#if levelOptions}}
+          <select name="system.level" data-dtype="Number">{{selectOptions levelOptions selected=system.level}}</select>
+          {{else}}
+          <input type="number" name="system.level" value="{{system.level}}" min="1" />
+          {{/if}}
+        </label>
+        <label class="form-group">
+          <span class="form-label">{{localize 'OSE.details.experience.base'}}</span>
+          <input type="number" name="system.xp" value="{{system.xp}}" />
+        </label>
+        <label class="form-group" data-tooltip="OSE.classes.XpBonusOverrideHint">
+          <span class="form-label">{{localize 'OSE.classes.XpBonusOverride'}}</span>
+          <input type="number" name="system.xpBonusOverride" value="{{system.xpBonusOverride}}" placeholder="{{computedBonus}}" />
+        </label>
+      </div>
+      {{/if}}
+    </div>
+    {{> (path "/templates/items/partials/mode-toggle.html") }}
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    {{#each tabs as |tab|}}
+    <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}">{{localize tab.label}}</a>
+    {{/each}}
+  </nav>
+
+  <section class="sheet-body">
+    {{!-- Details --}}
+    <div class="tab {{tabs.details.cssClass}}" data-group="primary" data-tab="details">
+      {{#if editing}}
+      <div class="class-fields">
+        <label>{{localize 'OSE.classes.Key'}}</label>
+        <input type="text" name="system.key" value="{{system.key}}" data-tooltip="OSE.classes.KeyHint" />
+        <label>{{localize 'OSE.abilities.Requirements'}}</label>
+        <input type="text" name="system.requirements" value="{{system.requirements}}" />
+        <label>{{localize 'OSE.classes.HitDie'}}</label>
+        <input type="text" name="system.hitDie" value="{{system.hitDie}}" list="ose-hit-dice-{{document.id}}" />
+        <label data-tooltip="OSE.classes.SpellListHint">{{localize 'OSE.classes.SpellList'}}</label>
+        <input type="text" name="system.spellList" value="{{system.spellList}}" list="ose-spell-lists-{{document.id}}" />
+        <label data-tooltip="OSE.classes.MaxLevelHint">{{localize 'OSE.classes.MaxLevel'}}</label>
+        <input type="number" name="system.maxLevel" value="{{system.maxLevel}}" min="1" />
+        <label>{{localize 'OSE.category.languages'}}</label>
+        {{> (path "/templates/items/partials/tag-list.html") field="languages" values=system.languages choices=languageChoices placeholder="OSE.classes.AddLanguage" }}
+        <label data-tooltip="OSE.classes.DemihumanHint">{{localize 'OSE.classes.Demihuman'}}</label>
+        <input type="checkbox" name="system.demihuman" {{checked system.demihuman}} />
+      </div>
+      <datalist id="ose-hit-dice-{{document.id}}">{{#each hitDieChoices as |c|}}<option value="{{c}}"></option>{{/each}}</datalist>
+      <datalist id="ose-spell-lists-{{document.id}}">{{#each spellListChoices as |c|}}<option value="{{c}}"></option>{{/each}}</datalist>
+      {{else}}
+      <dl class="class-summary stat-block">
+        {{#if system.requirements}}<dt>{{localize 'OSE.abilities.Requirements'}}</dt><dd>{{system.requirements}}</dd>{{/if}}
+        {{#if primeReqText}}<dt>{{localize 'OSE.classes.PrimeRequisite'}}</dt><dd>{{primeReqText}}</dd>{{/if}}
+        <dt>{{localize 'OSE.classes.HitDie'}}</dt><dd>{{system.hitDie}}</dd>
+        {{#if system.maxLevel}}<dt>{{localize 'OSE.classes.MaxLevel'}}</dt><dd>{{system.maxLevel}}</dd>{{/if}}
+        {{#if system.armourText}}<dt>{{localize 'OSE.classes.Armour'}}</dt><dd>{{system.armourText}}</dd>{{/if}}
+        {{#if system.weaponsText}}<dt>{{localize 'OSE.classes.Weapons'}}</dt><dd>{{system.weaponsText}}</dd>{{/if}}
+        {{#if languagesText}}<dt>{{localize 'OSE.category.languages'}}</dt><dd>{{languagesText}}</dd>{{/if}}
+        {{#if system.spellList}}<dt>{{localize 'OSE.classes.SpellList'}}</dt><dd>{{system.spellList}}</dd>{{/if}}
+        {{#if system.demihuman}}<dt>{{localize 'TYPES.Item.race'}}</dt><dd data-tooltip="OSE.classes.DemihumanHint">{{localize 'OSE.classes.DemihumanIncluded'}}</dd>{{/if}}
+      </dl>
+      {{/if}}
+
+      <div class="description">
+        {{#if editing}}
+        <h3 class="section-title">{{localize 'OSE.category.description'}}</h3>
+        <prose-mirror name="system.description" toggled="true" button="true" value="{{system.description}}">{{{enriched.description}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enriched.description}}}</div>
+        {{/if}}
+      </div>
+
+      <div class="detail-blocks">
+      <section class="detail-block prime-reqs-block">
+      <h3 class="section-title">
+        {{localize 'OSE.classes.PrimeRequisite'}}
+        <a class="help" {{#if rules.primeRequisites}}data-action="openRules" data-rule="primeRequisites"{{/if}} data-tooltip="OSE.classes.PrimeRequisiteHelp"><i class="fas fa-circle-question"></i></a>
+      </h3>
+      {{#if editing}}
+      <div class="prime-req-mode">
+        {{#unless primeReqCustom}}
+        <label>
+          {{localize 'OSE.classes.Ability'}}
+          <select name="primeReqAbility">{{selectOptions scoreOptions selected=primeReqStandard blank=""}}</select>
+        </label>
+        {{/unless}}
+        <label class="checkbox" data-tooltip="OSE.classes.PrimeRequisiteCustomHint">
+          <input type="checkbox" data-action="togglePrimeReqCustom" {{checked primeReqCustom}} />
+          {{localize 'OSE.classes.Custom'}}
+        </label>
+      </div>
+      {{else if primeReqStandard}}
+      <p>{{lookup scoreOptions primeReqStandard}}</p>
+      {{/if}}
+      {{#if primeReqRows.length}}
+      <table class="class-table prime-reqs">
+        <thead>
+          <tr>
+            {{#if primeReqCustom}}<th>{{localize 'OSE.classes.Ability'}}</th>{{/if}}
+            <th>{{localize 'OSE.classes.MinScore'}}</th>
+            <th>{{localize 'OSE.classes.XpBonus'}}</th>
+            {{#if primeReqCustom}}
+            <th>{{localize 'OSE.classes.Logic'}}</th>
+            <th data-tooltip="OSE.classes.GroupHint">{{localize 'OSE.classes.Group'}}</th>
+            {{#if editing}}<th class="control"><a data-action="addPrimeReq" data-tooltip="OSE.Add"><i class="fas fa-plus"></i></a></th>{{/if}}
+            {{/if}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each primeReqRows as |req|}}
+          <tr>
+            {{#if @root.primeReqEditable}}
+            <td><select name="system.primeReqs.{{req.index}}.ability">{{selectOptions @root.scoreOptions selected=req.ability}}</select></td>
+            <td><input type="number" name="system.primeReqs.{{req.index}}.minScore" value="{{req.minScore}}" /></td>
+            <td><input type="number" name="system.primeReqs.{{req.index}}.percentage" value="{{req.percentage}}" /></td>
+            <td><select name="system.primeReqs.{{req.index}}.concatLogic">{{selectOptions @root.logicOptions selected=req.concatLogic}}</select></td>
+            <td><input type="text" name="system.primeReqs.{{req.index}}.group" value="{{req.group}}" list="ose-groups-{{@root.document.id}}" /></td>
+            <td class="control"><a data-action="removeRow" data-field="primeReqs" data-index="{{req.index}}" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a></td>
+            {{else}}
+            {{#if @root.primeReqCustom}}<td>{{lookup @root.scoreOptions req.ability}}</td>{{/if}}
+            <td>{{req.minScore}}+</td>
+            <td>{{req.percentText}}</td>
+            {{#if @root.primeReqCustom}}
+            <td>{{lookup @root.logicOptions req.concatLogic}}</td>
+            <td>{{req.group}}</td>
+            {{/if}}
+            {{/if}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <datalist id="ose-groups-{{document.id}}"><option value="a"></option><option value="b"></option><option value="c"></option><option value="d"></option></datalist>
+      {{/if}}
+      </section>
+
+      {{#if showTitles}}
+      <section class="detail-block titles-block">
+      <h3 class="section-title">{{localize 'OSE.classes.Titles'}}</h3>
+      {{#if titleRows.length}}
+      <table class="class-table titles">
+        <thead><tr><th class="level">{{localize 'OSE.details.level'}}</th><th class="title">{{localize 'OSE.classes.Title'}}</th></tr></thead>
+        <tbody>
+          {{#each titleRows as |row|}}
+          <tr>
+            <td class="level">{{row.level}}</td>
+            <td class="title">{{#if @root.editing}}<input type="text" name="system.titles.{{row.index}}" value="{{row.title}}" />{{else}}{{row.title}}{{/if}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="hint">{{localize 'OSE.classes.NoTitlesHint'}}</p>
+      {{/if}}
+      </section>
+      {{/if}}
+      </div>
+    </div>
+
+    {{!-- Progression --}}
+    <div class="tab {{tabs.progression.cssClass}}" data-group="primary" data-tab="progression">
+      <div class="class-table-scroll">
+        <table class="class-table progression">
+          <thead>
+            <tr>
+              <th class="level">{{localize 'OSE.details.level'}}</th>
+              <th class="xp">{{localize 'OSE.classes.XpShort'}}</th>
+              <th class="hd">{{localize 'OSE.HitDice'}}</th>
+              <th data-tooltip="OSE.classes.HdConHint">{{localize 'OSE.scores.con.short'}}</th>
+              <th>{{localize 'OSE.Thac0'}}</th>
+              <th>{{localize 'OSE.AB'}}</th>
+              {{#each saveKeys as |s|}}<th data-tooltip="{{lookup @root.config.saves_long s}}">{{lookup @root.config.saves_short s}}</th>{{/each}}
+              {{#each spellLevels as |lvl|}}<th data-tooltip="OSE.classes.SpellSlots">{{lvl}}</th>{{/each}}
+            </tr>
+          </thead>
+          <tbody>
+            {{#each system.levels as |row i|}}
+            <tr>
+              <td class="level">{{add i 1}}</td>
+              {{#if @root.editing}}
+              <td><input type="number" name="system.levels.{{i}}.xp" value="{{row.xp}}" /></td>
+              <td><input type="text" name="system.levels.{{i}}.hd" value="{{row.hd}}" /></td>
+              <td><input type="checkbox" name="system.levels.{{i}}.hdcon" {{checked row.hdcon}} /></td>
+              <td><input type="number" name="system.levels.{{i}}.thac0" value="{{row.thac0}}" /></td>
+              <td><input type="number" name="system.levels.{{i}}.bba" value="{{row.bba}}" /></td>
+              {{#each @root.saveKeys as |s|}}<td><input type="number" name="system.levels.{{i}}.saves.{{s}}" value="{{lookup row.saves s}}" /></td>{{/each}}
+              {{#each @root.spellLevels as |lvl|}}<td><input type="number" name="system.levels.{{i}}.spellSlots.{{lvl}}" value="{{lookup row.spellSlots lvl}}" min="0" /></td>{{/each}}
+              {{else}}
+              <td class="xp">{{lookup @root.xpText i}}</td>
+              <td>{{row.hd}}</td>
+              <td>{{#if row.hdcon}}<i class="fas fa-check"></i>{{/if}}</td>
+              <td>{{row.thac0}}</td>
+              <td>{{row.bba}}</td>
+              {{#each @root.saveKeys as |s|}}<td>{{lookup row.saves s}}</td>{{/each}}
+              {{#each @root.spellLevels as |lvl|}}<td>{{lookup row.spellSlots lvl}}</td>{{/each}}
+              {{/if}}
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      {{#if editing}}
+      <div class="class-table-actions flexrow">
+        <button type="button" data-action="addLevel"><i class="fas fa-plus"></i> {{localize 'OSE.classes.AddLevel'}}</button>
+        <button type="button" data-action="removeLevel" {{#unless system.levels.length}}disabled{{/unless}}><i class="fas fa-minus"></i> {{localize 'OSE.classes.RemoveLevel'}}</button>
+      </div>
+      {{/if}}
+      {{#unless system.levels.length}}<p class="hint">{{localize 'OSE.classes.NoTableHint'}}</p>{{/unless}}
+    </div>
+
+    {{!-- Tables --}}
+    <div class="tab {{tabs.tables.cssClass}}" data-group="primary" data-tab="tables">
+      <p class="hint">{{localize 'OSE.classes.TablesHelp' key=system.key}}</p>
+      {{#each system.tables as |table t|}}
+      <div class="class-table-block">
+        {{#if @root.editing}}
+        <hr>
+        <div class="class-table-head">
+          <label>
+            <span class="caption">{{localize 'OSE.classes.TableLabel'}}</span>
+            <input type="text" name="system.tables.{{t}}.label" value="{{table.label}}" />
+          </label>
+          <label>
+            <span class="caption">{{localize 'OSE.classes.Key'}}</span>
+            <input type="text" name="system.tables.{{t}}.key" value="{{table.key}}" data-tooltip="OSE.classes.TableKeyHint" />
+          </label>
+          <a class="control" data-action="removeTable" data-table="{{t}}" data-tooltip="OSE.classes.DeleteTable"><i class="fas fa-trash"></i></a>
+        </div>
+        {{else}}
+        <h3 class="section-title">{{table.label}} <span class="key">{{table.key}}</span></h3>
+        {{/if}}
+        <div class="class-table-scroll">
+          <table class="class-table">
+            <thead>
+              {{#if @root.editing}}
+              <tr class="names">
+                <th class="caption" data-tooltip="OSE.classes.ColumnNameHint">{{localize 'OSE.classes.ColumnName'}}</th>
+                {{#each table.columns as |col c|}}<th><input type="text" name="system.tables.{{t}}.columns.{{c}}.name" value="{{col.name}}" /></th>{{/each}}
+                <th class="control"><a data-action="addTableColumn" data-table="{{t}}" data-tooltip="OSE.classes.AddColumn"><i class="fas fa-plus"></i></a></th>
+              </tr>
+              <tr class="keys">
+                <th class="caption" data-tooltip="OSE.classes.ColumnKeyHint">{{localize 'OSE.classes.Key'}}</th>
+                {{#each table.columns as |col c|}}
+                <th>
+                  <div class="flexrow">
+                    <input type="text" name="system.tables.{{t}}.columns.{{c}}.key" value="{{col.key}}" data-tooltip="OSE.classes.ColumnKeyHint" />
+                    <a class="control" data-action="removeTableColumn" data-table="{{t}}" data-column="{{c}}" data-tooltip="OSE.classes.DeleteColumn"><i class="fas fa-xmark"></i></a>
+                  </div>
+                </th>
+                {{/each}}
+                <th></th>
+              </tr>
+              {{/if}}
+              <tr>
+                <th class="level">{{localize 'OSE.details.level'}}</th>
+                {{#each table.columns as |col|}}
+                {{#if @root.editing}}<th></th>
+                {{else}}<th {{#if col.name}}data-tooltip="{{col.name}}"{{/if}}>{{lookup (lookup @root.columnHeaders t) col.key}}{{#if (lookup (lookup @root.formulaKeys t) col.key)}} <a class="copy-formula" data-action="copyFormula" data-formula="@classTables.{{@root.system.key}}.{{table.key}}.{{col.key}}" aria-label="{{localize 'OSE.classes.CopyFormula'}}"><i class="far fa-copy"></i></a>{{/if}}</th>{{/if}}
+                {{/each}}
+                {{#if @root.editing}}<th></th>{{/if}}
+              </tr>
+            </thead>
+            <tbody>
+              {{#each table.rows as |row r|}}
+              <tr>
+                <td class="level">{{add r 1}}</td>
+                {{#each ../columns as |col|}}
+                {{#if @root.editing}}<td><input type="text" name="system.tables.{{t}}.rows.{{r}}.{{col.key}}" value="{{lookup row col.key}}" /></td>{{else}}<td data-tooltip="{{lookup (lookup (lookup @root.cellHints t) r) col.key}}">{{lookup row col.key}}</td>{{/if}}
+                {{/each}}
+                {{#if @root.editing}}<td></td>{{/if}}
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{#if @root.editing}}
+        <div class="class-table-legend">
+          <table class="class-table legend">
+            <thead>
+              <tr>
+                <th>{{localize 'OSE.classes.LegendValue'}}</th>
+                <th>{{localize 'OSE.classes.LegendText'}}</th>
+                <th class="control"><a data-action="addLegendRow" data-table="{{t}}" data-tooltip="OSE.classes.AddLegendRow"><i class="fas fa-plus"></i></a></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each table.legend as |l i|}}
+              <tr>
+                <td class="value"><input type="text" name="system.tables.{{t}}.legend.{{i}}.value" value="{{l.value}}" list="ose-legend-{{@root.document.id}}-{{t}}" /></td>
+                <td><input type="text" name="system.tables.{{t}}.legend.{{i}}.text" value="{{l.text}}" /></td>
+                <td class="control"><a data-action="removeLegendRow" data-table="{{t}}" data-index="{{i}}" data-tooltip="OSE.Delete"><i class="fas fa-xmark"></i></a></td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          <p class="hint">{{localize 'OSE.classes.LegendHint'}}</p>
+          <datalist id="ose-legend-{{@root.document.id}}-{{t}}">{{#each (lookup @root.legendChoices t) as |c|}}<option value="{{c}}"></option>{{/each}}</datalist>
+        </div>
+        {{/if}}
+      </div>
+      {{else}}
+      <p class="hint">{{localize 'OSE.classes.NoTablesHint'}}</p>
+      {{/each}}
+      {{#if editing}}<button type="button" data-action="addTable"><i class="fas fa-plus"></i> {{localize 'OSE.classes.AddTable'}}</button>{{/if}}
+    </div>
+
+    {{!-- Abilities --}}
+    <div class="tab {{tabs.abilities.cssClass}}" data-group="primary" data-tab="abilities">
+      {{> (path "/templates/items/partials/ability-links.html") }}
+    </div>
+
+    {{!-- Restrictions --}}
+    <div class="tab {{tabs.restrictions.cssClass}}" data-group="primary" data-tab="restrictions">
+      {{#if editing}}
+      <div class="class-fields">
+        <label>{{localize 'OSE.classes.AllowedArmour'}}</label>
+        <div class="armour-options">
+          <multi-checkbox name="system.armour">
+            {{#each armourOptions as |opt|}}<option value="{{opt.value}}" {{#if opt.selected}}selected{{/if}}>{{opt.label}}</option>{{/each}}
+          </multi-checkbox>
+          <p class="hint">{{localize 'OSE.classes.AllowedArmourHint'}}</p>
+        </div>
+        <label>{{localize 'OSE.classes.ArmourText'}}</label>
+        <input type="text" name="system.armourText" value="{{system.armourText}}" />
+        <label>{{localize 'OSE.classes.WeaponsText'}}</label>
+        <input type="text" name="system.weaponsText" value="{{system.weaponsText}}" />
+        <label>{{localize 'OSE.classes.AllowedWeapons'}}</label>
+        <div>
+          {{> (path "/templates/items/partials/tag-list.html") field="weapons" values=system.weapons choices=weaponChoices placeholder="OSE.classes.AddWeapon" }}
+          <p class="hint">{{localize 'OSE.classes.AllowedWeaponsHint'}}</p>
+        </div>
+        <label>{{localize 'OSE.classes.StealthSkills'}}</label>
+        <div>
+          {{> (path "/templates/items/partials/tag-list.html") field="stealthSkills" values=system.stealthSkills choices=stealthChoices placeholder="OSE.classes.AddSkill" }}
+          <p class="hint">{{localize 'OSE.classes.StealthSkillsHint'}}</p>
+        </div>
+      </div>
+      {{else}}
+      <dl class="class-summary">
+        <dt>{{localize 'OSE.classes.AllowedArmour'}}</dt>
+        <dd>{{#if armourAllowed}}{{armourAllowed}}{{else}}{{localize 'OSE.classes.NoRestriction'}}{{/if}}</dd>
+        {{#if system.armourText}}<dt>{{localize 'OSE.classes.ArmourText'}}</dt><dd>{{system.armourText}}</dd>{{/if}}
+        <dt>{{localize 'OSE.classes.AllowedWeapons'}}</dt>
+        <dd>{{#if weaponsList}}{{weaponsList}}{{else}}{{localize 'OSE.classes.NoRestriction'}}{{/if}}</dd>
+        {{#if system.weaponsText}}<dt>{{localize 'OSE.classes.WeaponsText'}}</dt><dd>{{system.weaponsText}}</dd>{{/if}}
+        {{#if stealthList}}<dt>{{localize 'OSE.classes.StealthSkills'}}</dt><dd>{{stealthList}}</dd>{{/if}}
+      </dl>
+      {{/if}}
+    </div>
+  </section>
+</div>

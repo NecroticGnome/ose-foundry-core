@@ -1,6 +1,8 @@
 /**
  * @file An application used to manage Actor configuration.
  */
+import { saveTweaks, tweakValues } from "../effects/tweak-effects";
+
 const { HandlebarsApplicationMixin, ApplicationV2 } = foundry.applications.api;
 
 export default class OseEntityTweaks extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -48,7 +50,10 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
   async _prepareContext() {
     const context = this.document.toObject();
     context.isCharacter = this.document.type === "character";
+    context.hasClasses = this.document.items.some((i) => i.type === "class");
     context.user = game.user;
+    context.effectsTabWorld = game.settings.get(game.system.id, "effectsTab");
+    context.tweaks = tweakValues(this.document);
     context.config = {
       ...CONFIG.OSE,
       ascendingAC: game.settings.get(game.system.id, "ascendingAC"),
@@ -74,6 +79,8 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
       data[encumbranceMax] = null;
     }
 
-    await this.document.update(data);
+    const { tweaks, ...rest } = foundry.utils.expandObject(data);
+    await this.document.update(rest);
+    if (tweaks) await saveTweaks(this.document, tweaks);
   }
 }

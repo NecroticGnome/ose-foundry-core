@@ -77,6 +77,7 @@
                     data-dtype="Number" placeholder="0" data-tooltip="OSE.Health" />
                 <input class="health-value health-bottom" name="system.hp.max" type="text" value="{{system.hp.max}}"
                     data-dtype="Number" placeholder="0" data-tooltip="OSE.HealthMax" />
+                {{#if system.hp.fraction}}<span class="hp-fraction" data-tooltip="OSE.classes.HpFraction">+{{fraction system.hp.fraction}}</span>{{/if}}
                 <div class="health-empty" style="height:{{counter false system.hp.value system.hp.max}}%"></div>
                 <div class="health-full" style="height:{{counter true system.hp.value system.hp.max}}%"></div>
             </div>
@@ -104,10 +105,16 @@
                     <h4 class="attribute-name box-title" data-tooltip="OSE.HitDice" data-action="rollHitDice">
                         <a>{{ localize "OSE.HitDiceShort" }}</a>
                     </h4>
+                    {{#if hdParts}}
+                    <div class="attribute-value hd-parts">
+                        {{#each hdParts as |p|}}<span data-tooltip="{{p.name}}">{{p.hd}}</span>{{/each}}
+                    </div>
+                    {{else}}
                     <div class="attribute-value">
                         <input name="system.hp.hd" type="text" value="{{system.hp.hd}}" placeholder=""
-                            data-dtype="String" />
+                            data-dtype="String" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.hd}}"{{/if}} />
                     </div>
+                    {{/if}}
                 </li>
                 {{#if config.initiative}}
                 <li class="attribute">
@@ -141,7 +148,7 @@
                     <div class="flexrow">
                         <div class="attribute-value">
                             <input name="system.thac0.bba" type="text" value="{{system.thac0.bba}}" placeholder="0"
-                                data-dtype="Number" />
+                                data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.bba}}"{{/if}} />
                         </div>
                     </div>
                 </li>
@@ -152,7 +159,7 @@
                     <div class="flexrow">
                         <div class="attribute-value">
                             <input name="system.thac0.value" type="text" value="{{system.thac0.value}}" placeholder="0"
-                                data-dtype="Number" />
+                                data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.thac0}}"{{/if}} />
                         </div>
                     </div>
                 </li>
@@ -210,7 +217,7 @@
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.death.value" type="text" value="{{system.saves.death.value}}" placeholder="0"
-                        data-dtype="Number" />
+                        data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.saves.death}}"{{/if}} />
             </li>
             <li class="attribute saving-throw" data-save="wand">
                 <h4 class="attribute-name box-title">
@@ -218,7 +225,7 @@
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.wand.value" type="text" value="{{system.saves.wand.value}}" placeholder="0"
-                        data-dtype="Number" />
+                        data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.saves.wand}}"{{/if}} />
             </li>
             <li class="attribute saving-throw" data-save="paralysis">
                 <h4 class="attribute-name box-title">
@@ -226,7 +233,7 @@
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.paralysis.value" type="text" value="{{system.saves.paralysis.value}}"
-                        placeholder="0" data-dtype="Number" />
+                        placeholder="0" data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.saves.paralysis}}"{{/if}} />
             </li>
             <li class="attribute saving-throw" data-save="breath">
                 <h4 class="attribute-name box-title">
@@ -234,7 +241,7 @@
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.breath.value" type="text" value="{{system.saves.breath.value}}"
-                        placeholder="0" data-dtype="Number" />
+                        placeholder="0" data-dtype="Number" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.saves.breath}}"{{/if}} />
             </li>
             <li class="attribute saving-throw" data-save="spell">
                 <h4 class="attribute-name box-title">
@@ -242,7 +249,7 @@
                 </h4>
                 <div class="attribute-value">
                     <input name="system.saves.spell.value" type="text" value="{{system.saves.spell.value}}"
-                        placeholder="0" />
+                        placeholder="0" {{#if derivedFromClasses}}disabled data-tooltip="{{breakdown.saves.spell}}"{{/if}} />
             </li>
             <li class="attribute saving-throw">
                 <h4 class="attribute-name box-title" data-tooltip="OSE.saves.magic.long">

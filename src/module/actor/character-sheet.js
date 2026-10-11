@@ -1,10 +1,14 @@
 /**
  * @file Extend the basic ActorSheet with some very simple modifications
  */
+import { describeDerivation } from "../classes/derive";
+import { currentRows } from "../classes/tables";
 import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
 import OseCharacterGpCost from "../dialog/character-gp-cost";
 import OseCharacterModifiers from "../dialog/character-modifiers";
+import skipRollDialogCheck from "../helpers-behaviour";
+import { convertSingleActor } from "../migration/convert-actor";
 import { toggleItemEquipped } from "../sheet/inventory-actions";
 import OseActorSheet from "./actor-sheet";
 import { prepareExplorationSkills } from "./exploration-skills";
@@ -24,6 +28,12 @@ export default class OseActorSheetCharacter extends OseActorSheet {
       pushLang: OseActorSheetCharacter._onPushLang,
       popLang: OseActorSheetCharacter._onPopLang,
       toggleEquipped: OseActorSheetCharacter._onToggleEquipped,
+      levelUp: OseActorSheetCharacter._onLevelUp,
+      convertClass: OseActorSheetCharacter._onConvertClass,
+      toggleWarnings: OseActorSheetCharacter._onToggleWarnings,
+      toggleClassTables: OseActorSheetCharacter._onToggleClassTables,
+      rollClassSkill: OseActorSheetCharacter._onRollClassSkill,
+      dismissWarning: OseActorSheetCharacter._onDismissWarning,
     },
   };
 
@@ -45,6 +55,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
         { id: "abilities", label: "OSE.category.abilities" },
         { id: "spells", label: "OSE.category.spells" },
         { id: "inventory", label: "OSE.category.inventory" },
+        { id: "effects", label: "OSE.category.effects" },
         { id: "notes", label: "OSE.category.notes" },
       ],
       initial: "attributes",
@@ -54,6 +65,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   _isTabVisible(tabId) {
     if (tabId === "notes") return true;
     if (!this.actor.isOwnerOrObserver) return false;
+    if (tabId === "effects") return this._effectsTabEnabled();
     return tabId !== "spells" || this.actor.system.spells.enabled;
   }
 
@@ -106,7 +118,80 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
     data.enrichedNotes = await TextEditor.enrichHTML(this.actor.system.details.notes, enrichOptions);
 
+    this._prepareClasses(data);
+
     return data;
+  }
+
+  _prepareClasses(data) {
+    const { system } = this.actor;
+    data.classes = system.classes.map((c) => ({
+      id: c.id,
+      name: c.name,
+      img: c.img,
+      level: c.system.level,
+      xp: c.system.xp,
+      next: c.system.nextRow?.xp ?? null,
+      canLevelUp: c.system.canLevelUp,
+      hasTable: c.system.hasTable,
+      bonus: system.classXpBonus(c) + system.xpBonusFromEffects,
+      tables: this.#classTables(c),
+      collapsed: this.#collapsedClasses.has(c.id),
+    }));
+    data.anyCanLevelUp = data.classes.some((c) => c.canLevelUp);
+    const hdParts = system.classes.flatMap((c) =>
+      c.system.currentRow?.hd ? [{ name: c.name, hd: c.system.currentRow.hd }] : [],
+    );
+    data.hdParts = hdParts.length > 1 ? hdParts : null;
+    const race = system.race;
+    data.race = race ? { id: race.id, name: race.name, img: race.img } : null;
+    data.derivedFromClasses = system.derivedFromClasses;
+    data.slotsEditable = !system.derivedFromClasses;
+    const pooled = system.spellPools?.length > 1 || system.unallocatedSpells?.length > 0;
+    data.spellPools = pooled ? system.spellPools : null;
+    data.otherSpellLevels = pooled ? system.otherSpellLevels : [];
+    data.warnings = (system.warnings ?? []).map((w) => ({ ...w, text: game.i18n.format(w.message, w.data) }));
+    data.warnedItems = {};
+    for (const w of data.warnings) {
+      data.warnedItems[w.itemId] = [data.warnedItems[w.itemId], w.text].filter(Boolean).join(" ");
+    }
+    data.showWarnings = this._showWarnings && data.warnings.length > 0;
+    data.canConvert = !data.classes.length && !!String(this.actor._source.system?.details?.class ?? "").trim();
+    data.breakdown = system.derivedFromClasses
+      ? foundry.utils.expandObject({
+          ...describeDerivation(system.classes, {
+            saves: this.#saveValues(),
+            thac0: system.thac0.value,
+            bba: system.thac0.bba,
+          }),
+          hd: system.hp.hd,
+        })
+      : {};
+  }
+
+  #saveValues() {
+    return Object.fromEntries(Object.entries(this.actor.system.saves).map(([k, s]) => [k, s.value]));
+  }
+
+  _promptRemoveItemFromActor(item) {
+    if (["class", "race"].includes(item.type)) return this.actor.removeGrantingItem(item);
+    return super._promptRemoveItemFromActor(item);
+  }
+
+  _processFormData(event, form, formData) {
+    const data = super._processFormData(event, form, formData);
+    // Prevent the automatic class title from being saved to the character data.
+    const details = data.system?.details;
+    if (!this.actor._source.system.details.title && details?.title === this.actor.system.details.title) {
+      delete details.title;
+    }
+    return data;
+  }
+
+  _onChangeForm(formConfig, event) {
+    const id = event.target.dataset?.classXp;
+    if (!id) return super._onChangeForm(formConfig, event);
+    return this.actor.items.get(id)?.update({ "system.xp": Number(event.target.value) || 0 });
   }
 
   async _chooseLang() {
@@ -242,5 +327,57 @@ export default class OseActorSheetCharacter extends OseActorSheet {
   static _onToggleEquipped(_event, target) {
     const item = this._getItemFromActor(target);
     if (this.isEditable && item) return toggleItemEquipped(item);
+  }
+
+  static _onLevelUp(_event, target) {
+    const item = this._getItemFromActor(target);
+    if (this.isEditable && item) return this.actor.levelUp(item);
+  }
+
+  static async _onConvertClass() {
+    if (!this.isEditable) return;
+    return convertSingleActor(this.actor);
+  }
+
+  // Track which Class rows whose tables are hidden.
+  #collapsedClasses = new Set();
+
+  #classTables(cls) {
+    const scope = game.system.id;
+    const abilities = this.actor.items.filter((i) => i.type === "ability");
+    const linked = (target) =>
+      abilities.find((a) => {
+        const link = a.getFlag(scope, "classTarget");
+        return link ? link.classKey === cls.system.key && link.target === target : a.system.targetFrom === target;
+      });
+    return currentRows(cls.system.tables ?? [], cls.system.level).map((table) => ({
+      ...table,
+      cells: table.cells.map((cell) => {
+        const ability = linked(`${table.key}.${cell.key}`);
+        // Columns without their own name borrow the linked ability's.
+        const name = cell.name !== cell.label ? cell.name : (ability?.name ?? cell.name);
+        return { ...cell, name, abilityId: ability?.id ?? "" };
+      }),
+    }));
+  }
+
+  static _onToggleClassTables(_event, target) {
+    const { classId } = target.dataset;
+    if (!this.#collapsedClasses.delete(classId)) this.#collapsedClasses.add(classId);
+    return this.render();
+  }
+
+  static _onRollClassSkill(event, target) {
+    return this.actor.items.get(target.dataset.abilityId)?.rollFormula({ skipDialog: skipRollDialogCheck(event) });
+  }
+
+  static _onToggleWarnings() {
+    this._showWarnings = !this._showWarnings;
+    return this.render();
+  }
+
+  static _onDismissWarning(_event, target) {
+    const item = this._getItemFromActor(target);
+    if (this.isEditable && item) return item.dismissWarning(target.dataset.key, this.actor.system.warningContext);
   }
 }

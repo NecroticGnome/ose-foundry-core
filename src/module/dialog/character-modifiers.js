@@ -39,8 +39,6 @@ export default class OseCharacterModifiers extends HandlebarsApplicationMixin(Ap
   }
 
   async _prepareContext() {
-    const context = this.document.toObject();
-    context.user = game.user;
-    return context;
+    return { ...this.document.toObject(false), system: this.document.system, user: game.user };
   }
 }

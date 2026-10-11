@@ -28,6 +28,11 @@
     {{> (path "/templates/actors/partials/character-spells-tab.html") }}
   </div>
   {{/if}}
+{{#if effectGroups}}
+  <div class="tab {{tabs.effects.cssClass}}" data-group="primary" data-tab="effects">
+    {{> (path "/templates/actors/partials/actor-effects-tab.html") }}
+  </div>
+{{/if}}
   <div class="tab {{tabs.notes.cssClass}}" data-group="primary" data-tab="notes">
     <div class="inventory">
       <div class="item-category-title">{{localize "OSE.category.notes"}}</div>

@@ -1,0 +1,21 @@
+<div class="inventory character-classes">
+  <div data-action="toggleCategory" class="item-category-title flexrow">
+    <div class="category-name">{{localize 'TYPES.Item.race'}}</div>
+    <div class="item-controls"></div>
+  </div>
+  <ol class="item-list class-list">
+    <li class="item-entry item class-row race-row" data-item-id="{{race.id}}">
+      <div class="item-header flexrow">
+        <div class="item-name flexrow">
+          <div class="item-image" style="background-image: url('{{race.img}}')"></div>
+          <a data-action="editItem">{{race.name}}</a>
+        </div>
+        {{#if @root.owner}}
+        <div class="item-controls">
+          <a class="item-control" data-action="deleteItem" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a>
+        </div>
+        {{/if}}
+      </div>
+    </li>
+  </ol>
+</div>

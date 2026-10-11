@@ -66,6 +66,21 @@
   </ul>
   {{#if isOwnerOrObserver}}
     <ul class="summary flexrow">
+      {{#if race}}
+      <li class="flex1 class-summary">
+        <div class="class-summary-names item-entry" data-item-id="{{race.id}}"><a data-action="editItem">{{race.name}}</a>{{#unless classes.length}}{{#if warnings.length}}<a class="warnings-badge inline" data-action="toggleWarnings" data-tooltip="OSE.warnings.Title"><i class="fas fa-triangle-exclamation"></i> {{warnings.length}}</a>{{/if}}{{/unless}}</div>
+        <label>{{localize 'TYPES.Item.race'}}</label>
+      </li>
+      {{/if}}
+      {{#if classes.length}}
+      <li class="flex3 class-summary {{#if anyCanLevelUp}}notify{{/if}}">
+        <div class="class-summary-names">
+          {{#each classes as |cls|}}<span class="item-entry" data-item-id="{{cls.id}}"><a data-action="editItem" data-tooltip="{{cls.xp}} / {{#if cls.next}}{{cls.next}}{{else}}—{{/if}} XP">{{cls.name}} {{cls.level}}</a>{{#if cls.canLevelUp}} <a data-action="levelUp" data-tooltip="OSE.classes.LevelUp"><i class="fas fa-circle-up"></i></a>{{/if}}</span>{{#unless @last}} / {{/unless}}{{/each}}
+        </div>
+        <label>{{localize 'OSE.details.class'}}</label>
+        {{#if warnings.length}}<a class="warnings-badge" data-action="toggleWarnings" data-tooltip="OSE.warnings.Title"><i class="fas fa-triangle-exclamation"></i> {{warnings.length}}</a>{{/if}}
+      </li>
+      {{else}}
       <li class="flex3">
         <input
           type="text"
@@ -73,7 +88,10 @@
           value="{{system.details.class}}"
           data-dtype="String"
         />
-        <label>{{localize 'OSE.details.class'}}</label>
+        <label>
+          {{localize 'OSE.details.class'}}
+          {{#if canConvert}}<a data-action="convertClass" data-tooltip="OSE.classes.Convert"><i class="fas fa-wand-magic-sparkles"></i></a>{{/if}}
+        </label>
       </li>
       <li
         class="{{#if (gte system.details.xp.value system.details.xp.next)}}notify{{/if}}"
@@ -98,6 +116,8 @@
         <span class="xp-bonus">+{{system.details.xp.bonus}}%</span>
         {{/if}}
       </li>
+      {{/if}}
     </ul>
   {{/if}}
 </section>
+{{#if isOwnerOrObserver}}{{#if showWarnings}}{{> (path "/templates/actors/partials/character-warnings.html") }}{{/if}}{{/if}}

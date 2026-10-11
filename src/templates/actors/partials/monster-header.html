@@ -34,12 +34,13 @@
             type="text"
             name="system.details.appearing.d"
             value="{{system.details.appearing.d}}"
+            data-tooltip="{{localize 'OSE.roll.appearing' type=(localize 'OSE.roll.appearingDungeon')}}"
           />
           <label>{{localize 'OSE.details.appearing'}}</label>
         </div>
         <div
           class="check appearing-check"
-          data-tooltip="OSE.roll.appearing"
+          data-tooltip="{{localize 'OSE.roll.appearingRoll' type=(localize 'OSE.roll.appearingDungeon')}}"
         >
           <a data-action="rollAppearing"><i class="fas fa-dice"></i></a>
         </div>
@@ -51,12 +52,13 @@
             type="text"
             name="system.details.appearing.w"
             value="{{system.details.appearing.w}}"
+            data-tooltip="{{localize 'OSE.roll.appearing' type=(localize 'OSE.roll.appearingWilderness')}}"
           />
         </div>
         )
         <div
           class="check appearing-check"
-          data-tooltip="OSE.roll.appearing"
+          data-tooltip="{{localize 'OSE.roll.appearingRoll' type=(localize 'OSE.roll.appearingWilderness')}}"
         >
           <a data-action="rollAppearing"><i class="fas fa-dice"></i></a>
         </div>
@@ -95,11 +97,11 @@
         <label data-tooltip="Special Abilities"
           >{{localize 'OSE.details.special.abilities'}}</label>
       </li>
-      <li
-        class="treasure-table"
-        data-tooltip="OSE.details.treasureTableHint"
-      >
-        <div>{{{treasureLink}}}</div>
+      <li class="treasure-table {{#if treasureLink}}linked{{/if}} {{#if system.details.treasure.type}}typed{{/if}} {{#if treasureMany}}many{{/if}}" data-tooltip="OSE.details.treasure">
+        <div class="treasure-value">
+          {{#if treasureLink}}<div class="treasure-links">{{{treasureLink}}}</div>{{/if}}
+          <input type="text" name="system.details.treasure.type" value="{{system.details.treasure.type}}" />
+        </div>
         <label>{{localize 'OSE.details.treasure'}}</label>
       </li>
     </ul>

@@ -1,0 +1,9 @@
+<ul class="warnings-panel">
+  {{#each warnings as |w|}}
+  <li class="warning flexrow item-entry" data-item-id="{{w.itemId}}">
+    <i class="fas fa-triangle-exclamation"></i>
+    <span class="warning-text">{{w.text}}</span>
+    {{#if @root.owner}}<a data-action="dismissWarning" data-key="{{w.key}}" data-tooltip="OSE.warnings.Dismiss"><i class="fas fa-eye-slash"></i></a>{{/if}}
+  </li>
+  {{/each}}
+</ul>

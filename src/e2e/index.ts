@@ -58,6 +58,10 @@ import actorSheetCharacterTests, {
   key as actorSheetCharacterKey,
   options as actorSheetCharacterOptions,
 } from "../module/actor/__tests__/sheet-character.test";
+import actorSheetEffectsTests, {
+  key as actorSheetEffectsKey,
+  options as actorSheetEffectsOptions,
+} from "../module/actor/__tests__/sheet-effects.test";
 import actorSheetMonsterTests, {
   key as actorSheetMonsterKey,
   options as actorSheetMonsterOptions,
@@ -98,6 +102,10 @@ import actorSheetDialogEntityTweaksTests, {
   options as actorSheetDialogEntityTweaksOptions,
 } from "../module/dialog/__tests__/sheet-entity-tweaks.test";
 // ITEM TESTING IMPORTS
+import effectCoverageTests, {
+  key as effectCoverageKey,
+  options as effectCoverageOptions,
+} from "../module/effects/__tests__/effect-coverage.test";
 import itemDataModelAbilityTests, {
   key as itemDataModelAbilityKey,
   options as itemDataModelAbilityOptions,
@@ -186,6 +194,8 @@ Hooks.on("quenchReady", async (quench: Quench) => {
   quench.registerBatch(actorSheetDragNDropKey, actorSheetDragNDropTests, actorSheetDragNDropOptions);
   quench.registerBatch(actorSheetCharacterKey, actorSheetCharacterTests, actorSheetCharacterOptions);
   quench.registerBatch(actorSheetMonsterKey, actorSheetMonsterTests, actorSheetMonsterOptions);
+  quench.registerBatch(actorSheetEffectsKey, actorSheetEffectsTests, actorSheetEffectsOptions);
+  quench.registerBatch(effectCoverageKey, effectCoverageTests, effectCoverageOptions);
 
   quench.registerBatch(actorTrackableAttributesKey, actorTrackableAttributesTests, actorTrackableAttributesOptions);
 

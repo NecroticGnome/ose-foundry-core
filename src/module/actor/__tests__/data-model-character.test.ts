@@ -781,4 +781,88 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       });
     });
   });
+
+  describe("class items", () => {
+    const saves = (n: number) => ({ death: n, wand: n + 1, paralysis: n + 2, breath: n + 3, spell: n + 4 });
+    const fighter = {
+      name: "Fighter",
+      type: "class",
+      system: {
+        level: 2,
+        levels: [
+          { xp: 0, hd: "1d8", hdcon: true, thac0: 19, bba: 0, saves: saves(12), spellSlots: {} },
+          { xp: 2000, hd: "2d8", hdcon: true, thac0: 17, bba: 2, saves: saves(10), spellSlots: {} },
+          { xp: 4000, hd: "3d8", hdcon: true, thac0: 17, bba: 2, saves: saves(10), spellSlots: {} },
+        ],
+      },
+    };
+
+    const classActor = async () => {
+      const actor = await createMockActorKey("character", { system: { thac0: { value: 15, bba: 4 } } }, `${key}-cls`);
+      return actor as Actor;
+    };
+
+    after(async () => {
+      await cleanUpActorsByKey(`${key}-cls`);
+    });
+
+    it("keeps stored values without class items", async () => {
+      const actor = await classActor();
+      expect(actor.system.thac0.value).equal(15);
+      expect(actor.system.derivedFromClasses).equal(false);
+      await actor.delete();
+    });
+
+    it("gives a caster's level 0 spells the character's level 0 maximum", async () => {
+      const actor = await classActor();
+      const magicUser = {
+        name: "Magic-User",
+        type: "class",
+        system: {
+          level: 1,
+          levels: [{ xp: 0, hd: "1d4", hdcon: true, thac0: 19, bba: 0, saves: saves(13), spellSlots: { 1: 1 } }],
+        },
+      };
+      await actor.createEmbeddedDocuments("Item", [magicUser, { name: "Spark", type: "spell", system: { lvl: 0 } }]);
+      await actor.update({ "system.spells.0.max": 3 });
+      const cantrips = actor.system.spellPools[0].levels.find((l: { lvl: string }) => l.lvl === "0");
+      expect(cantrips.slots.max).equal(3);
+      await actor.delete();
+    });
+
+    it("derives saves, THAC0 and level from a class table", async () => {
+      const actor = await classActor();
+      await actor.createEmbeddedDocuments("Item", [fighter]);
+      expect(actor.system.derivedFromClasses).equal(true);
+      expect(actor.system.thac0.value).equal(17);
+      expect(actor.system.thac0.bba).equal(2);
+      expect(actor.system.saves.death.value).equal(10);
+      expect(actor.system.details.class).equal("Fighter");
+      expect(actor.system.details.level).equal(2);
+      expect(actor.system.details.xp.next).equal(4000);
+      expect(actor.system.hp.hd).equal("2d8");
+      await actor.delete();
+    });
+
+    it("applies Active Effects on top of the table", async () => {
+      const actor = await classActor();
+      await actor.createEmbeddedDocuments("Item", [fighter]);
+      const changes = [{ key: "system.saves.death.value", type: "add", value: -1 }];
+      const effect =
+        game.release.generation >= 14
+          ? { name: "Test", system: { changes } }
+          : { name: "Test", changes: [{ key: "system.saves.death.value", mode: 2, value: "-1" }] };
+      await actor.createEmbeddedDocuments("ActiveEffect", [effect]);
+      expect(actor.system.saves.death.value).equal(9);
+      await actor.delete();
+    });
+
+    it("returns to stored values when the class is removed", async () => {
+      const actor = await classActor();
+      const [cls] = await actor.createEmbeddedDocuments("Item", [fighter]);
+      await cls?.delete();
+      expect(actor.system.thac0.value).equal(15);
+      await actor.delete();
+    });
+  });
 };

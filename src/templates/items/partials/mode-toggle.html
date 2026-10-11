@@ -1,0 +1,5 @@
+{{#if editable}}
+<a class="mode-toggle" data-action="toggleMode" data-tooltip="{{#if editing}}OSE.classes.ViewMode{{else}}OSE.classes.EditMode{{/if}}" aria-label="{{#if editing}}{{localize 'OSE.classes.ViewMode'}}{{else}}{{localize 'OSE.classes.EditMode'}}{{/if}}">
+  <i class="fas {{#if editing}}fa-eye{{else}}fa-pen{{/if}}"></i>
+</a>
+{{/if}}

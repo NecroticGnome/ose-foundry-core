@@ -1,3 +1,5 @@
+@use "variables";
+
 .ose .window-content {
   // Utils
   .collapsed {
@@ -24,11 +26,11 @@
     background: none;
     border: none;
     border-radius: 0;
-    border-bottom: 1px solid $colorTan;
+    border-bottom: 1px solid variables.$colorTan;
     box-shadow: none;
     &:hover:not(:disabled),
     &:focus:not(:disabled) {
-      background: $inputBackground;
+      background: variables.$inputBackground;
     }
   }
   a:hover {

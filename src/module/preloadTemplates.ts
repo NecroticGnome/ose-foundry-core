@@ -10,10 +10,15 @@ const preloadHandlebarsTemplates = async () => {
     `${OSE.systemPath()}/templates/actors/monster-sheet.html`,
     // Character Sheets Partials
     `${OSE.systemPath()}/templates/actors/partials/character-header.html`,
+    `${OSE.systemPath()}/templates/actors/partials/character-classes.html`,
+    `${OSE.systemPath()}/templates/actors/partials/character-race.html`,
+    `${OSE.systemPath()}/templates/actors/partials/character-warnings.html`,
+    `${OSE.systemPath()}/templates/actors/partials/actor-effects-tab.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-attributes-tab.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-encumbrance.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-abilities-tab.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-spells-tab.html`,
+    `${OSE.systemPath()}/templates/actors/partials/character-spell-level.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-inventory-tab.html`,
     `${OSE.systemPath()}/templates/actors/partials/actor-item-summary.html`,
     `${OSE.systemPath()}/templates/actors/partials/character-notes-tab.html`,
@@ -21,6 +26,9 @@ const preloadHandlebarsTemplates = async () => {
     `${OSE.systemPath()}/templates/actors/partials/monster-attributes-tab.html`,
     // Item Display
     `${OSE.systemPath()}/templates/actors/partials/item-auto-tags-partial.html`,
+    `${OSE.systemPath()}/templates/items/partials/ability-links.html`,
+    `${OSE.systemPath()}/templates/items/partials/tag-list.html`,
+    `${OSE.systemPath()}/templates/items/partials/mode-toggle.html`,
     // Party Sheet
     `${OSE.systemPath()}/templates/apps/party-sheet.html`,
     // `${OSE.systemPath()}/templates/apps/party-xp.html`,

@@ -6,6 +6,8 @@
  * named portably) that break the declaration build behind
  * `@ose-foundry-core/types`. Interfaces here have none.
  */
+import type { ClassLevelRow, PrimeReq } from "../classes/progression";
+import type { ClassTable } from "../classes/tables";
 import type { InventoryItemTagValue, RollType, Save } from "../config";
 
 /**
@@ -141,14 +143,57 @@ export interface AbilityItemData extends NonPhysicalItemData {
   requirements: string;
   rollType: RollType | "";
   rollTarget: number | null;
+  targetFrom: string;
   blindroll: boolean;
 }
 
 export interface SpellItemData extends NonPhysicalItemData {
   lvl: number | null;
   class: string;
+  /** Key of the class whose spell slots this spell uses - "none" sets it aside. */
+  castAs: string;
   duration: string;
   range: string;
   memorized: number | null;
   cast: number | null;
+}
+
+/** A class: rule tables plus the character's progress in it. */
+export interface ClassItemData {
+  key: string;
+  description: string;
+  requirements: string;
+  primeReqs: PrimeReq[];
+  maxLevel: number;
+  hitDie: string;
+  spellList: string;
+  languages: string[];
+  titles: string[];
+  levels: ClassLevelRow[];
+  tables: ClassTable[];
+  abilities: { uuid: string; level: number; target?: string }[];
+  armour: string[];
+  armourText: string;
+  weapons: string[];
+  weaponsText: string;
+  stealthSkills: string[];
+  demihuman: boolean;
+  level: number;
+  xp: number;
+  xpBonusOverride: number | null;
+  readonly hasTable: boolean;
+  readonly currentRow: ClassLevelRow | null;
+  readonly nextRow: ClassLevelRow | null;
+  readonly canLevelUp: boolean;
+  readonly title: string;
+}
+
+/** A race; ability modifiers live in a transferred Active Effect on the item. */
+export interface RaceItemData {
+  key: string;
+  description: string;
+  requirements: Record<string, { min: number | null; max: number | null }>;
+  languages: string[];
+  classLimits: { classKey: string; maxLevel: number }[];
+  abilities: { uuid: string; level: number }[];
 }

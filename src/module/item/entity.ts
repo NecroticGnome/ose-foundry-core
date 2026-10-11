@@ -4,6 +4,8 @@
 import OSE from "../config";
 import OseDice from "../helpers-dice";
 import { getRollMode } from "../helpers-message-mode";
+import type OseDataModelClass from "./data-model-class";
+import type OseDataModelRace from "./data-model-race";
 import type { ITEM_DATA_MODELS } from "./data-models";
 import type { DisplayTag, ItemTag } from "./item-types";
 
@@ -17,8 +19,9 @@ type OseItemType = keyof typeof ITEM_DATA_MODELS;
  * but TypeScript cannot narrow `this.system` from `this.type` — `this` is not a
  * discriminated union — so those reads assert the shape the switch guarantees.
  */
+// Class and race items never reach the inventory code paths below.
 // biome-ignore lint/suspicious/noExplicitAny: the union is read field-by-field after a type switch
-type AnyItemSystem = Item["system"] & Record<string, any>;
+type AnyItemSystem = Exclude<Item["system"], OseDataModelClass | OseDataModelRace> & Record<string, any>;
 
 /**
  * The owning Actor, as this file needs it. The actor entity is still JavaScript
@@ -41,6 +44,8 @@ export default class OseItem extends Item {
       weapon: `${OSE.assetsPath}/default/weapon.png`,
       item: `${OSE.assetsPath}/default/item.png`,
       container: `${OSE.assetsPath}/default/bag.png`,
+      class: "icons/sundries/books/book-red-exclamation.webp",
+      race: "icons/environment/people/group.webp",
     };
   }
 
@@ -220,11 +225,10 @@ export default class OseItem extends Item {
     if (this.type !== "spell") throw new Error("Trying to spend a spell on an item that is not a spell.");
 
     const itemData = this.system;
-    await this.update({
-      system: {
-        cast: (itemData.cast ?? 0) - 1,
-      },
-    });
+    // Modules can cancel the cast, or keep the spell memorised with consume: false.
+    const config = { consume: true };
+    if (Hooks.call("ose.preSpendSpell", this, config) === false) return;
+    if (config.consume) await this.update({ system: { cast: (itemData.cast ?? 0) - 1 } });
 
     if (itemData.roll) {
       await this.rollFormula();
@@ -376,6 +380,15 @@ export default class OseItem extends Item {
     });
     newData.tags = update;
     return this.update({ system: newData });
+  }
+
+  /** Hide a rule warning for this item until the character's classes or race change. */
+  dismissWarning(key: string, context: string) {
+    const current = (this.getFlag(game.system.id as never, "dismissedWarnings" as never) ?? {}) as Record<
+      string,
+      string
+    >;
+    return this.setFlag(game.system.id as never, "dismissedWarnings" as never, { ...current, [key]: context } as never);
   }
 
   /**

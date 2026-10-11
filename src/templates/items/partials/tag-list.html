@@ -1,0 +1,15 @@
+{{!-- A string array edited as removable tags, with suggestions. Params: field, values, choices, placeholder. --}}
+<div class="value-list" data-field="{{field}}">
+  <ul class="tags">
+    {{#each values as |value i|}}
+    <li class="tag">{{value}} <a data-action="removeListValue" data-field="{{../field}}" data-index="{{i}}" data-tooltip="OSE.Delete" aria-label="{{localize 'OSE.Delete'}}"><i class="fas fa-xmark"></i></a></li>
+    {{/each}}
+  </ul>
+  <div class="flexrow add-value">
+    <input type="text" list="ose-choices-{{@root.document.id}}-{{field}}" data-list-input="{{field}}" placeholder="{{localize placeholder}}" />
+    <a data-action="addListValue" data-field="{{field}}" data-tooltip="OSE.Add" aria-label="{{localize 'OSE.Add'}}"><i class="fas fa-plus"></i></a>
+  </div>
+  <datalist id="ose-choices-{{@root.document.id}}-{{field}}">
+    {{#each choices as |choice|}}<option value="{{choice}}"></option>{{/each}}
+  </datalist>
+</div>

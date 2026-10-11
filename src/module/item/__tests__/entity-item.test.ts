@@ -35,7 +35,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
   });
 
   describe("defaultIcons()", () => {
-    it("There are 6 default icons", () => expect(Object.keys(defaultIcons).length).equal(6));
+    it("There are 8 default icons", () => expect(Object.keys(defaultIcons).length).equal(8));
 
     itemTypes.forEach((type: string) => {
       it(`Has ${type} icon`, () => expect(defaultIcons[type]).is.not.undefined);
@@ -205,6 +205,28 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
       await item.update({ system: { cast: initialSlots } });
       await item.spendSpell();
       expect(item?.system?.cast).equal(initialSlots - 1);
+    });
+  });
+
+  describe("ose.preSpendSpell hook", () => {
+    it("can keep the memorised spell", async () => {
+      const item: OseItem = await createWorldTestItem("spell");
+      await item.update({ system: { cast: 2 } });
+      const id = Hooks.on("ose.preSpendSpell", (_spell: OseItem, config: { consume: boolean }) => {
+        config.consume = false;
+      });
+      await item.spendSpell();
+      Hooks.off("ose.preSpendSpell", id);
+      expect(item.system.cast).equal(2);
+    });
+
+    it("can cancel the cast", async () => {
+      const item: OseItem = await createWorldTestItem("spell");
+      await item.update({ system: { cast: 2 } });
+      const id = Hooks.on("ose.preSpendSpell", () => false);
+      await item.spendSpell();
+      Hooks.off("ose.preSpendSpell", id);
+      expect(item.system.cast).equal(2);
     });
   });
 

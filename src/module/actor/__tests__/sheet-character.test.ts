@@ -48,6 +48,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         "abilities",
         "spells",
         "inventory",
+        "effects",
         "notes",
       ]);
     });
@@ -195,6 +196,54 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       expect(data?.system.meleeMod).not.undefined;
       expect(data?.system.rangedMod).not.undefined;
       expect(data?.system.init).not.undefined;
+    });
+
+    it("lets the level 0 spell maximum be set with class items", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const row = { xp: 0, hd: "1d4", hdcon: true, thac0: 19, bba: 0, saves: {}, spellSlots: { 1: 1 } };
+      const caster = (name: string, sort: number) => ({
+        name,
+        type: "class",
+        sort,
+        system: { key: name, level: 1, levels: [row] },
+      });
+      await actor?.createEmbeddedDocuments("Item", [
+        caster("Magic-User", 1),
+        caster("Illusionist", 2),
+        { name: "Spark", type: "spell", system: { lvl: 0, class: "Magic-User" } },
+      ]);
+      for (const pooled of [true, false]) {
+        await actor?.sheet?.render({ force: true });
+        await waitForInput();
+        const selector = `${pooled ? ".spell-pool " : ""}input[name="system.spells.0.max"]`;
+        expect(actor?.sheet?.element.querySelector(selector), pooled ? "pools" : "single class").not.null;
+        await actor?.items.getName("Illusionist")?.delete();
+      }
+      await actor?.sheet?.close();
+    });
+
+    it("uses the class level titles until a title is set, without storing them", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const cls = (name: string, titles: string[], sort: number) => ({
+        name,
+        type: "class",
+        sort,
+        system: { titles, level: 2 },
+      });
+      await actor?.createEmbeddedDocuments("Item", [
+        cls("Fighter", ["Veteran", "Warrior"], 1),
+        cls("Magic-User", ["Medium", "Seer"], 2),
+      ]);
+      expect(actor?.system.details.title).equal("Warrior / Seer");
+
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector('[name="system.details.alignment"]'));
+      await actor?.sheet?.submit();
+      expect(actor?._source.system.details.title).equal("");
+
+      await actor?.update({ "system.details.title": "Lord" });
+      expect(actor?.system.details.title).equal("Lord");
+      await actor?.sheet?.close();
     });
 
     after(async () => {

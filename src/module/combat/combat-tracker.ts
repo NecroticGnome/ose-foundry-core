@@ -117,7 +117,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       // Replace the buttons with the OSE versions
       const reRollButton = document.createElement("button");
       reRollButton.type = "button";
-      reRollButton.classList.add("inline-control", "combat-control", "combat-button", "icon", "fa-solid", "fa-dice");
+      reRollButton.classList.add("inline-control", "combat-control", "combat-button", "icon", "fa-solid", "fa-users");
       reRollButton.dataset.action = "smartRerollInitiative";
       reRollButton.dataset.tooltip = game.i18n.localize("OSE.Reroll");
       reRollButton.ariaLabel = game.i18n.localize("OSE.Reroll");

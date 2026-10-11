@@ -32,6 +32,14 @@
             />
           </div>
         </label>
+        {{#if castAsOptions}}
+        <label class="form-group block-input">
+          <span class="form-label" data-tooltip="OSE.spells.CastAsHint">{{localize 'OSE.spells.CastAs'}}</span>
+          <div class="form-fields">
+            <select name="system.castAs">{{selectOptions castAsOptions selected=system.castAs}}</select>
+          </div>
+        </label>
+        {{/if}}
         <label class="form-group block-input">
           <span class="form-label">{{localize 'OSE.spells.Duration'}}</span>
           <div class="form-fields">

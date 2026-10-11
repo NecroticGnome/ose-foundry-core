@@ -1,6 +1,7 @@
 /**
  * @file A place to store Handlebars helpers for our templates
  */
+import { formatFraction } from "./classes/progression";
 import OSE, { type InventoryItemTag } from "./config";
 
 const registerHelpers = async () => {
@@ -16,6 +17,8 @@ const registerHelpers = async () => {
     }
     return "0";
   });
+
+  Handlebars.registerHelper("fraction", (n) => formatFraction(Number(n)));
 
   Handlebars.registerHelper("add", (lh, rh) => Number.parseInt(lh, 10) + Number.parseInt(rh, 10));
 

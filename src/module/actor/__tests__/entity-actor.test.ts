@@ -163,6 +163,145 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
     });
   });
 
+  describe("class items: getExperience, levelUp", () => {
+    const saves = { death: 12, wand: 13, paralysis: 14, breath: 15, spell: 16 };
+    const row = (xp: number, hd: string, hdcon = true) => ({ xp, hd, hdcon, thac0: 19, bba: 0, saves, spellSlots: {} });
+    const cls = (name: string, system: object) => ({ name, type: "class", system });
+    let multipleClasses: boolean;
+
+    before(() => {
+      multipleClasses = game.settings.get(game.system.id, "multipleClasses");
+    });
+
+    afterEach(async () => {
+      await trashChat();
+      await game.settings.set(game.system.id, "multipleClasses", multipleClasses);
+    });
+
+    it("adds XP to the class with its own bonus", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { levels: [row(0, "1d8"), row(2000, "2d8")], xpBonusOverride: 10 }),
+      ]);
+      await actor.getExperience(1000);
+      expect(fighter?.system.xp).equal(1100);
+      expect(actor.system.details.xp.value).equal(1100);
+      await actor.delete();
+    });
+
+    it("splits XP between classes, remainder to the first", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.createEmbeddedDocuments("Item", [
+        { ...cls("Fighter", { levels: [row(0, "1d8")], xpBonusOverride: 10 }), sort: 1 },
+        { ...cls("Magic-User", { levels: [row(0, "1d4")], xpBonusOverride: 0 }), sort: 2 },
+      ]);
+      // Creation order isn't guaranteed; look items up by name.
+      const [a, b] = [actor.items.getName("Fighter"), actor.items.getName("Magic-User")];
+      await actor.getExperience(1001);
+      expect(a?.system.xp).equal(551);
+      expect(b?.system.xp).equal(500);
+      await actor.delete();
+    });
+
+    it("levels up with a fixed hit point gain", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 40, "system.hp.value": 40 });
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { level: 1, xp: 600, levels: [row(0, "9d8"), row(500, "9d8+2", false)] }),
+      ]);
+      await actor.levelUp(fighter);
+      expect(fighter?.system.level).equal(2);
+      expect(actor.system.hp.max).equal(42);
+      expect(actor.system.hp.value).equal(42);
+      const card = game.messages?.contents.at(-1);
+      expect(card?.content).contain("40 → 42");
+      await card?.delete();
+      await actor.delete();
+    });
+
+    it("divides level-up hit points between classes and keeps the fraction", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 10, "system.hp.value": 10 });
+      await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { level: 1, xp: 600, levels: [row(0, "9d8"), row(500, "9d8+3", false)] }),
+        cls("Thief", { level: 1, xp: 600, levels: [row(0, "9d4"), row(500, "9d4+1", false)] }),
+      ]);
+      const [fighter, thief] = [actor.items.getName("Fighter"), actor.items.getName("Thief")];
+      await actor.levelUp(fighter);
+      expect(actor.system.hp.max).equal(11);
+      expect(actor.system.hp.fraction).equal(0.5);
+      await actor.levelUp(thief);
+      expect(actor.system.hp.max).equal(12);
+      expect(actor.system.hp.fraction).equal(0);
+      await actor.delete();
+    });
+
+    it("replaces default hit points with the first class's roll", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 20, "system.hp.value": 20 });
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { hitDie: "1d1", levels: [row(0, "1d1")] }),
+      ]);
+      await actor.rollStartingHp(fighter, 1);
+      expect(actor.system.hp.max).equal(1);
+      expect(actor.system.hp.value).equal(1);
+      await actor.delete();
+    });
+
+    it("lets modules adjust starting hit points before they apply", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 4, "system.hp.value": 4 });
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { hitDie: "1d1", levels: [row(0, "1d1")] }),
+      ]);
+      const id = Hooks.on("ose.preApplyStartingHp", (_actor: OseActor, _cls: Item, update: Record<string, number>) => {
+        update["system.hp.max"] = 4;
+        update["system.hp.value"] = 4;
+      });
+      await actor.rollStartingHp(fighter, 1);
+      Hooks.off("ose.preApplyStartingHp", id);
+      expect(actor.system.hp.max).equal(4);
+      await actor.delete();
+    });
+
+    it("posts the stats a new class changed", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 6, "system.hp.value": 6 });
+      const before = actor.classStats();
+      await actor.createEmbeddedDocuments("Item", [cls("Thief", { hitDie: "1d1", levels: [row(0, "1d4")] })]);
+      const thief = actor.items.getName("Thief");
+      const hp = await actor.rollStartingHp(thief, 1);
+      const message = await actor.postClassChanges(thief, before, hp);
+      expect(message?.content).contain("6 → 1");
+      expect(message?.content).contain("0 → 12");
+      await message?.delete();
+      await actor.delete();
+    });
+
+    it("divides starting hit points for an added class", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 6, "system.hp.value": 6 });
+      await actor.createEmbeddedDocuments("Item", [
+        cls("Fighter", { levels: [row(0, "1d8")] }),
+        cls("Thief", { hitDie: "1d1", levels: [row(0, "1d4")] }),
+      ]);
+      const thief = actor.items.getName("Thief");
+      await actor.rollStartingHp(thief, 1);
+      // (6 + 1) / 2
+      expect(actor.system.hp.max).equal(3);
+      expect(actor.system.hp.fraction).equal(0.5);
+      await actor.delete();
+    });
+
+    it("does nothing at the top of the table", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [cls("Fighter", { levels: [row(0, "1d8")] })]);
+      await actor.levelUp(fighter);
+      expect(fighter?.system.level).equal(1);
+      await actor.delete();
+    });
+  });
+
   describe("_preCreate(data, options, user)", () => {
     it("New character's prototypeToken actorLink defaults to true", async () => {
       const actor = (await createMockActor("character")) as OseActor;
@@ -566,7 +705,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
         await actor.rollAppearing({ check: "wilderness" });
         await waitUntil(() => game.messages?.size === 1);
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0].content).contain(game.i18n.format("OSE.roll.appearing", { type: "2" }));
+        expect(game.messages?.contents[0].content).contain(
+          game.i18n.format("OSE.roll.appearing", { type: game.i18n.localize("OSE.roll.appearingWilderness") }),
+        );
         await actor.delete();
       });
 
@@ -576,7 +717,9 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
         await actor.rollAppearing({ check: "other" });
         await waitUntil(() => game.messages?.size === 1);
         expect(game.messages?.size).equal(1);
-        expect(game.messages?.contents[0].content).contain(game.i18n.format("OSE.roll.appearing", { type: "1" }));
+        expect(game.messages?.contents[0].content).contain(
+          game.i18n.format("OSE.roll.appearing", { type: game.i18n.localize("OSE.roll.appearingDungeon") }),
+        );
         await actor.delete();
       });
     });

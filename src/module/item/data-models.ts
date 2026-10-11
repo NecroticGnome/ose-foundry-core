@@ -10,16 +10,20 @@
  */
 import OseDataModelAbility from "./data-model-ability";
 import OseDataModelArmor from "./data-model-armor";
+import OseDataModelClass from "./data-model-class";
 import OseDataModelContainer from "./data-model-container";
 import OseDataModelItem from "./data-model-item";
+import OseDataModelRace from "./data-model-race";
 import OseDataModelSpell from "./data-model-spell";
 import OseDataModelWeapon from "./data-model-weapon";
 
 export const ITEM_DATA_MODELS = {
   ability: OseDataModelAbility,
   armor: OseDataModelArmor,
+  class: OseDataModelClass,
   container: OseDataModelContainer,
   item: OseDataModelItem,
+  race: OseDataModelRace,
   spell: OseDataModelSpell,
   weapon: OseDataModelWeapon,
 } as const;

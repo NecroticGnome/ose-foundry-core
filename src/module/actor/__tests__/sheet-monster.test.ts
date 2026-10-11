@@ -45,7 +45,13 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(sheet.options.window.resizable).is.true;
 
       expect(Sheet.TABS.primary.initial).equal("attributes");
-      expect(Sheet.TABS.primary.tabs.map((t) => t.id)).deep.equal(["attributes", "inventory", "spells", "notes"]);
+      expect(Sheet.TABS.primary.tabs.map((t) => t.id)).deep.equal([
+        "attributes",
+        "inventory",
+        "spells",
+        "effects",
+        "notes",
+      ]);
     });
 
     after(async () => {
@@ -112,7 +118,11 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
     });
 
     it("Can drag testing RollTable to Monster", async () => {
-      const actor = await createMockActorKey("monster", {}, key);
+      const actor = await createMockActorKey(
+        "monster",
+        { system: { details: { treasure: { type: "+ 100gp" } } } },
+        key,
+      );
       const rollTable = await createMockRollTable();
       actor?.sheet?.render({ force: true });
       await delay(500); // Wait for sheet to render and the roll table to exist in the DOM
@@ -140,6 +150,31 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
 
       // Verify
       expect(actor?.system.details.treasure.table).equal(`@UUID[RollTable.${rollTable?.id}]`);
+      expect(actor?.system.details.treasure.type).equal("+ 100gp");
+    });
+
+    it("shows linked tables alongside typed treasure", async () => {
+      const actor = await createMockActorKey(
+        "monster",
+        { system: { details: { treasure: { type: "C + 100gp" } } } },
+        key,
+      );
+      await actor?.sheet?.render({ force: true });
+      await waitForInput();
+      const typed = actor?.sheet?.element.querySelector<HTMLInputElement>('input[name="system.details.treasure.type"]');
+      expect(typed?.value).equal("C + 100gp");
+
+      const tables = await RollTable.create([{ name: `Treasure A ${key}` }, { name: `Treasure B ${key}` }]);
+      const links = tables.map((t) => `@UUID[RollTable.${t.id}]`).join(" ");
+      await actor?.update({ "system.details.treasure.table": links });
+      await actor?.sheet?.render({ force: true });
+      await waitForInput();
+      const field = actor?.sheet?.element.querySelector(".treasure-table");
+      expect(field?.querySelectorAll(".treasure-links a").length).equal(2);
+      expect(field?.querySelector<HTMLInputElement>('input[name="system.details.treasure.type"]')?.value).equal(
+        "C + 100gp",
+      );
+      await RollTable.deleteDocuments(tables.map((t) => t.id as string));
     });
   });
 

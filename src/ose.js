@@ -22,6 +22,7 @@ import * as treasure from "./module/helpers-treasure";
 import { ITEM_DATA_MODELS } from "./module/item/data-models";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
+import { promptClassMigration } from "./module/migration";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
@@ -29,6 +30,8 @@ import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
 
 import "./e2e";
+import { augmentEffectConfig } from "./module/effects/effect-config";
+import { migrateTweaks } from "./module/effects/tweak-effects";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -139,6 +142,8 @@ Hooks.once("ready", async () => {
   });
 
   await promptTokenRingSelection();
+  await migrateTweaks();
+  await promptClassMigration();
 });
 
 // Party sheet control
@@ -160,6 +165,7 @@ Hooks.on("getChatLogEntryContext", chat.addChatMessageContextOptions);
 Hooks.on("getChatMessageContextOptions", chat.addChatMessageContextOptions);
 Hooks.on("renderChatMessageHTML", chat.addChatMessageButtons);
 Hooks.on("renderRollTableSheet", treasure.augmentTable);
+Hooks.on("renderActiveEffectConfig", augmentEffectConfig);
 Hooks.on("updateActor", party.update);
 /**
  * @param {OSECombatTracker} app - The combat tracker application

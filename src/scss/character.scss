@@ -1,11 +1,14 @@
-@import "./variables.scss";
+@use "variables.scss";
 
 /* ----------------------------------------- */
 /*  Basic Structure                          */
 /* ----------------------------------------- */
 .ose.sheet.actor.character {
-  min-width: 450px;
-  min-height: 550px;
+  &:not(.minimized) {
+    min-width: 450px;
+    min-height: 550px;
+  }
+
 
   /* ----------------------------------------- */
   /*  Sheet Header                             */
@@ -16,11 +19,14 @@
     .xp-bonus {
       top: -15px;
       right: 3px;
-      color: $colorTan;
+      color: variables.$colorTan;
       font-size: 10px;
       position: absolute;
     }
     .profile {
+      position: relative;
+      align-self: flex-start;
+
       .modifiers-btn {
         opacity: 0;
         position: absolute;
@@ -30,14 +36,18 @@
         width: 145px;
         padding: 2px 5px;
         color: whitesmoke;
-        background: $colorDark;
+        background: variables.$colorDark;
       }
       &:hover .modifiers-btn {
         opacity: 1;
       }
       &:hover .profile-img {
-        box-shadow: 0 0 2px $colorDark;
+        box-shadow: 0 0 2px variables.$colorDark;
       }
+    }
+
+    .header-details {
+      margin-left: 0.5rem;
     }
   }
 
@@ -190,8 +200,8 @@
   }
   .encumbrance {
     height: 12px;
-    background: $darkBackground;
-    border: 1px solid $colorDark;
+    background: variables.$darkBackground;
+    border: 1px solid variables.$colorDark;
     border-radius: 3px;
     position: relative;
 
@@ -214,7 +224,7 @@
       height: 0;
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
-      border-bottom: 4px solid $colorFaint;
+      border-bottom: 4px solid variables.$colorFaint;
     }
 
     .arrow-down {
@@ -223,15 +233,15 @@
       height: 0;
       border-left: 4px solid transparent;
       border-right: 4px solid transparent;
-      border-top: 4px solid $colorFaint;
+      border-top: 4px solid variables.$colorFaint;
     }
 
     &.encumbered {
       .arrow-up {
-        border-bottom: 4px solid $colorDark;
+        border-bottom: 4px solid variables.$colorDark;
       }
       .arrow-down {
-        border-top: 4px solid $colorDark;
+        border-top: 4px solid variables.$colorDark;
       }
     }
   }
@@ -243,4 +253,184 @@
   /* ----------------------------------------- */
   /*  Item Controls                            */
   /* ----------------------------------------- */
+}
+
+.ose.sheet.actor.character {
+  .class-summary {
+    position: relative;
+
+    .class-summary-names {
+      line-height: 26px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .warnings-badge {
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      color: var(--color-level-warning, #c68e00);
+
+      &.inline {
+        position: static;
+        margin-left: 0.35rem;
+      }
+    }
+  }
+
+  .character-classes {
+    .class-row.notify {
+      background: rgba(255, 215, 0, 0.2);
+    }
+
+    .class-xp {
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 2px;
+
+      input {
+        flex: 0 0 3.5rem;
+        height: 20px;
+      }
+
+      span {
+        flex: 0 0 auto;
+        font-size: var(--font-size-11, 11px);
+      }
+    }
+  }
+}
+
+.ose.sheet.actor.character .health .hp-fraction {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  font-size: var(--font-size-11, 11px);
+  opacity: 0.8;
+}
+
+.ose.sheet.actor.character {
+  .warnings-panel {
+    list-style: none;
+    margin: 0.25rem 0;
+    padding: 0.25rem;
+    flex: 0 0 100%;
+    border: 1px solid var(--color-level-warning, #c68e00);
+    background: rgba(255, 215, 0, 0.15);
+    max-height: 10rem;
+    overflow-y: auto;
+
+    .warning {
+      align-items: center;
+      gap: 0.25rem;
+
+      > i,
+      > a {
+        flex: 0 0 auto;
+      }
+
+      > i {
+        align-self: baseline;
+      }
+
+      .warning-text {
+        flex: 1;
+        text-align: left;
+      }
+    }
+  }
+
+  .item-warning {
+    flex: 0 0 1rem;
+    color: var(--color-level-warning, #c68e00);
+  }
+}
+
+.ose.sheet.actor.character .spell-pool {
+  margin-bottom: 0.25rem;
+
+  .spell-pool-title {
+    font-weight: bold;
+  }
+
+  &.spell-pool-other .spell-pool-title {
+    color: var(--color-level-warning, #c68e00);
+  }
+}
+
+.ose.sheet.actor.character .character-classes {
+  .item-category-title .field-long,
+  .item-header .field-long {
+    flex: 0 0 9.5rem;
+  }
+
+  .class-xp {
+    justify-content: center;
+  }
+
+  .xp-bonus {
+    opacity: 0.8;
+  }
+
+  .class-tables-toggle {
+    flex: 0 0 auto;
+    padding: 0 0.35rem;
+  }
+
+  // A class's table values at its level, e.g. thief skills; linked ones roll when clicked.
+  .class-table-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.1rem 0.25rem 0.35rem 2rem;
+    font-size: var(--font-size-11, 11px);
+  }
+
+  .class-table-label {
+    flex: 0 0 auto;
+    font-weight: bold;
+  }
+
+  .class-table-cells {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .class-table-cell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 2.25rem;
+    padding: 1px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    line-height: 1.15;
+
+    .cell-label {
+      font-size: var(--font-size-10, 10px);
+      opacity: 0.7;
+    }
+
+    .cell-value {
+      font-weight: bold;
+    }
+
+    &.rollable {
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+}
+
+.ose.sheet.actor.character .hit-dice .hd-parts {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+  font-size: var(--font-size-12, 12px);
 }
