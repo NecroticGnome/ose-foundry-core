@@ -48,8 +48,8 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         "abilities",
         "spells",
         "inventory",
-        "effects",
         "notes",
+        "effects",
       ]);
     });
 
@@ -243,6 +243,51 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
 
       await actor?.update({ "system.details.title": "Lord" });
       expect(actor?.system.details.title).equal("Lord");
+      await actor?.sheet?.close();
+    });
+
+    it("shows exploration skills raised by abilities without storing them", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      await actor?.createEmbeddedDocuments("Item", [
+        {
+          name: "Keen Hearing",
+          type: "ability",
+          system: { roll: "1d6", rollType: "below", rollTarget: 3, exploration: "ld" },
+        },
+      ]);
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector('[name="system.exploration.ld"]'));
+      const input = actor?.sheet?.element?.querySelector('[name="system.exploration.ld"]') as HTMLInputElement;
+      expect(input.value).equal("3");
+      expect(input.dataset.tooltip).contain("Keen Hearing");
+      await actor?.sheet?.submit();
+      expect(actor?._source.system.exploration.ld).equal(1);
+      await actor?.sheet?.close();
+    });
+
+    it("shows a class table column's final value and where it comes from", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      await actor?.createEmbeddedDocuments("Item", [
+        {
+          name: "Thief",
+          type: "class",
+          system: {
+            key: "thief",
+            level: 1,
+            tables: [
+              { key: "skills", label: "Skills", columns: [{ key: "hn", name: "Hear noise" }], rows: [{ hn: "1-2" }] },
+            ],
+          },
+        },
+      ]);
+      await actor?.createEmbeddedDocuments("ActiveEffect", [
+        { name: "Keen Ears", changes: [{ key: "system.tables.skills.hn.current", mode: 2, value: "1" }] },
+      ]);
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector(".class-table-cell"));
+      const cell = actor?.sheet?.element?.querySelector(".class-table-cell") as HTMLElement;
+      expect(cell.querySelector(".cell-value")?.textContent).equal("1-3");
+      expect(cell.dataset.tooltip).equal("Hear noise: Thief 2, Keen Ears +1");
       await actor?.sheet?.close();
     });
 

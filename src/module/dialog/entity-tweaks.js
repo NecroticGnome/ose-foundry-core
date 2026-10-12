@@ -52,7 +52,6 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
     context.isCharacter = this.document.type === "character";
     context.hasClasses = this.document.items.some((i) => i.type === "class");
     context.user = game.user;
-    context.effectsTabWorld = game.settings.get(game.system.id, "effectsTab");
     context.tweaks = tweakValues(this.document);
     context.config = {
       ...CONFIG.OSE,

@@ -13,6 +13,14 @@ const actorType = (parent: any): ActorType | null => {
   return TYPES.includes(actor?.type) ? actor.type : null;
 };
 
+// The character's class table columns, e.g. system.tables.skills.hs.current.
+// biome-ignore lint/suspicious/noExplicitAny: the effect's parent, as above
+const tableKeys = (parent: any): EffectKey[] => {
+  const actor = parent?.documentName === "Actor" ? parent : parent?.parent;
+  const from: Record<string, { name: string }> = actor?.system?.tablesFrom ?? {};
+  return Object.entries(from).map(([path, { name }]) => ({ key: `system.tables.${path}.current`, label: name }));
+};
+
 // biome-ignore lint/suspicious/noExplicitAny: Foundry application and document
 export const augmentEffectConfig = (app: any, element: HTMLElement | JQuery) => {
   const root = element instanceof HTMLElement ? element : element[0];
@@ -21,6 +29,7 @@ export const augmentEffectConfig = (app: any, element: HTMLElement | JQuery) => 
   const type = actorType(app.document?.parent);
   const keys = new Map<string, EffectKey>();
   for (const t of type ? [type] : TYPES) for (const k of effectKeys(t)) keys.set(k.key, k);
+  for (const k of tableKeys(app.document?.parent)) keys.set(k.key, k);
 
   const id = `ose-effect-keys-${app.id}`;
   const list = document.createElement("datalist");
@@ -32,7 +41,10 @@ export const augmentEffectConfig = (app: any, element: HTMLElement | JQuery) => 
     list.append(new Option(text, key));
   }
   section.append(list);
-  for (const input of section.querySelectorAll<HTMLInputElement>('input[name$=".key"]')) input.setAttribute("list", id);
+  for (const input of section.querySelectorAll<HTMLInputElement>('input[name$=".key"]')) {
+    input.setAttribute("list", id);
+    input.classList.add("ose-effect-key");
+  }
 
   const heading = section.querySelector("header .key");
   if (heading && !heading.querySelector(".ose-effects-help")) {

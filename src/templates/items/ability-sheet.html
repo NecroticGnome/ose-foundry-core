@@ -45,6 +45,9 @@
         <label class="form-group">
           <span class="form-label">{{localize 'OSE.items.RollTarget'}}</span>
           <div class="form-fields">
+            {{#if ownedTarget}}
+            <input type="text" value="{{ownedTarget.value}}" disabled data-tooltip="{{ownedTarget.tooltip}}" />
+            {{else}}
             <input
               type="text"
               name="system.rollTarget"
@@ -52,6 +55,7 @@
               {{#if system.rollTargetFromClass}}disabled data-tooltip="OSE.classes.TargetFromClass"{{/if}}
               data-dtype="Number"
             />
+            {{/if}}
           </div>
         </label>
         <label class="form-group block-input" data-tooltip="OSE.abilities.TargetFromHint">
@@ -63,6 +67,14 @@
         <datalist id="ose-target-from-{{document.id}}">
           {{#each targetFromChoices as |c|}}<option value="{{c.value}}">{{c.label}}</option>{{/each}}
         </datalist>
+        <label class="form-group block-input" data-tooltip="OSE.abilities.ExplorationHint">
+          <span class="form-label">{{localize 'OSE.abilities.Exploration'}}</span>
+          <div class="form-fields">
+            <select name="system.exploration">
+              {{selectOptions config.exploration_skills selected=system.exploration localize=true blank=""}}
+            </select>
+          </div>
+        </label>
         <label class="form-group">
           <span class="form-label">{{localize 'OSE.items.BlindRoll'}}</span>
           <div class="form-fields">

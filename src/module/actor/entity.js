@@ -43,6 +43,11 @@ export default class OseActor extends Actor {
     return source;
   }
 
+  applyActiveEffects(phase) {
+    if (phase !== "final") this.system.prepareTables?.();
+    return super.applyActiveEffects(phase);
+  }
+
   // Class table values for formulas, e.g. @classTables.thief.skills.hs.
   getRollData() {
     const data = super.getRollData();

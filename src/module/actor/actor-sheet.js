@@ -6,7 +6,7 @@ import { withoutOverrides } from "../effects/form-overrides";
 import { displayItemInChat } from "../sheet/chat-helpers";
 import { bindInventoryContextMenu } from "../sheet/context-menu";
 import { prepareActorContext } from "../sheet/data-context";
-import { chooseItemType, openEntityTweaksFor, promptRemoveItemFromActor } from "../sheet/dialogs";
+import { chooseItemType, openEntityTweaksFor } from "../sheet/dialogs";
 import {
   onContainerItemAdd,
   onContainerItemRemove,
@@ -83,7 +83,7 @@ export default class OseActorSheet extends HandlebarsApplicationMixin(ActorSheet
   }
 
   _effectsTabEnabled() {
-    return game.settings.get(game.system.id, "effectsTab") || !!this.actor.system.config?.enableEffects;
+    return game.settings.get(game.system.id, "effectsTab");
   }
 
   #effectGroups() {

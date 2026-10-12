@@ -148,7 +148,7 @@ const registerSettings = () => {
   game.settings.register(game.system.id, "effectsTab", {
     name: game.i18n.localize("OSE.Setting.EffectsTab"),
     hint: game.i18n.localize("OSE.Setting.EffectsTabHint"),
-    default: false,
+    default: true,
     scope: "world",
     type: Boolean,
     config: true,

@@ -64,7 +64,6 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
       expect(tweak(actor, "ac")).undefined;
       expect([actor.system.initiative.mod, actor._source.system.initiative.mod]).deep.equal([2, 0]);
       expect(actor.system.thac0.mod.melee).equal(1);
-      expect(actor.system.config.enableEffects).equal(true);
     });
 
     it("removes a modifier's effect when set to 0", async () => {
@@ -101,7 +100,6 @@ export default ({ describe, it, expect, assert, after }: QuenchMethods) => {
         actor._source.system.aac.mod,
       ]).deep.equal([0, 0, 0]);
       expect([actor.system.init, actor.system.rangedMod, actor.system.ac.value]).deep.equal(before);
-      expect(actor.system.config.enableEffects).equal(true);
       expect(await migrateActorTweaks(actor)).equal(false);
       expect(actor.effects.size).equal(3);
     });

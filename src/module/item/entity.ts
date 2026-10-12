@@ -199,7 +199,7 @@ export default class OseItem extends Item {
       properties: this.system.autoTags,
       roll: {
         type,
-        target: itemData.rollTarget,
+        target: itemData.effectiveTarget ?? itemData.rollTarget,
         blindroll: itemData.blindroll,
       },
     };
@@ -239,9 +239,10 @@ export default class OseItem extends Item {
 
   _getRollTag(data: AnyItemSystem): DisplayTag | undefined {
     if (data.roll) {
+      const target = data.effectiveTarget ?? data.rollTarget;
       const roll = `${data.roll}${
-        data.rollTarget ? CONFIG.OSE.roll_type[data.rollType as keyof typeof CONFIG.OSE.roll_type] : ""
-      }${data.rollTarget ? data.rollTarget : ""}`;
+        target ? CONFIG.OSE.roll_type[data.rollType as keyof typeof CONFIG.OSE.roll_type] : ""
+      }${target || ""}`;
       return {
         label: `${game.i18n.localize("OSE.items.Roll")} ${roll}`,
       };

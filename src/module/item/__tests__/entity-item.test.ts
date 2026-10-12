@@ -212,7 +212,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     it("can keep the memorised spell", async () => {
       const item: OseItem = await createWorldTestItem("spell");
       await item.update({ system: { cast: 2 } });
-      const id = Hooks.on("ose.preSpendSpell", (_spell: OseItem, config: { consume: boolean }) => {
+      const id = Hooks.on("ose.preSpendSpell", (_spell, config) => {
         config.consume = false;
       });
       await item.spendSpell();
@@ -585,6 +585,27 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
       header.click();
       await waitUntil(() => !isHidden(content));
       expect(isHidden(content)).is.false;
+    });
+
+    it("shows the item's image and the speaker's portrait (issue #165)", async () => {
+      const actor = (await createMockActorKey("character", { img: "icons/svg/mystery-man.svg" }, key)) as OseActor;
+      const [item] = (await actor.createEmbeddedDocuments("Item", [
+        { name: "Sword", type: "weapon", img: "icons/svg/sword.svg" },
+      ])) as OseItem[];
+      await item.show();
+      const card = await lastCard();
+      expect(card.querySelector(".chat-item-img")?.getAttribute("src")).equal("icons/svg/sword.svg");
+      const portrait = card.querySelector(".chat-img") as HTMLElement;
+      expect(portrait.style.backgroundImage).contain("mystery-man.svg");
+      expect(portrait.getBoundingClientRect().height).greaterThan(0);
+    });
+
+    it("shows the speaker's portrait on a roll card without an item", async () => {
+      const actor = (await createMockActorKey("character", { img: "icons/svg/mystery-man.svg" }, key)) as OseActor;
+      await actor.rollSave("death", { fastForward: true });
+      const card = await lastCard();
+      expect(card.querySelector(".chat-item-img")).null;
+      expect((card.querySelector(".chat-img") as HTMLElement).getBoundingClientRect().height).greaterThan(0);
     });
 
     it("clicking a roll card header does not collapse it", async () => {

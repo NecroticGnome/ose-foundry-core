@@ -254,7 +254,7 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       const [fighter] = await actor.createEmbeddedDocuments("Item", [
         cls("Fighter", { hitDie: "1d1", levels: [row(0, "1d1")] }),
       ]);
-      const id = Hooks.on("ose.preApplyStartingHp", (_actor: OseActor, _cls: Item, update: Record<string, number>) => {
+      const id = Hooks.on("ose.preApplyStartingHp", (_actor, _cls, update) => {
         update["system.hp.max"] = 4;
         update["system.hp.value"] = 4;
       });
@@ -752,6 +752,112 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await actor.rollExploration("ld", { fastForward: true });
       await waitForInput();
       expect(game.messages?.size).equal(0);
+      await actor.delete();
+    });
+  });
+
+  describe("exploration skills from abilities", () => {
+    const listening = (rollTarget: number) => ({
+      name: "Listening at Doors",
+      type: "ability",
+      system: { roll: "1d6", rollType: "below", rollTarget, exploration: "ld" },
+    });
+
+    it("raises the skill to the ability's target and follows edits", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      const [ability] = await actor.createEmbeddedDocuments("Item", [listening(2)]);
+      expect(actor.system.exploration.ld).equal(2);
+      expect(actor.system.explorationFrom.ld).equal("Listening at Doors");
+      await ability.update({ "system.rollTarget": 3 });
+      expect(actor.system.exploration.ld).equal(3);
+      expect(actor._source.system.exploration.ld).equal(1);
+      await actor.delete();
+    });
+
+    it("applies Active Effects on top of the raised value", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.createEmbeddedDocuments("Item", [listening(2)]);
+      await actor.createEmbeddedDocuments("ActiveEffect", [
+        { name: "Keen Ears", changes: [{ key: "system.exploration.ld", mode: 2, value: "1" }] },
+      ]);
+      expect(actor.system.exploration.ld).equal(3);
+      await actor.delete();
+    });
+
+    it("rolls every flagged ability against the character's skill", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.createEmbeddedDocuments("Item", [listening(2), { ...listening(1), name: "Keen Hearing" }]);
+      const keenHearing = actor.items.getName("Keen Hearing") as OseItem;
+      expect(keenHearing.system.effectiveTarget).equal(2);
+      await keenHearing.rollFormula();
+      await waitUntil(() => (game.messages?.size ?? 0) >= 1);
+      expect(game.messages?.contents.at(-1)?.content).contain(
+        game.i18n.format("OSE.roll.direction.orLower", { target: 2 }),
+      );
+      await trashChat();
+      await actor.delete();
+    });
+  });
+
+  describe("class tables on the character", () => {
+    const thief = (level: number) => ({
+      name: "Thief",
+      type: "class",
+      system: {
+        key: "thief",
+        level,
+        tables: [
+          {
+            key: "skills",
+            label: "Thief Skills",
+            columns: [
+              { key: "hs", name: "Hide in shadows" },
+              { key: "hn", name: "Hear noise" },
+            ],
+            rows: [
+              { hs: 10, hn: "1-2" },
+              { hs: 15, hn: "1-2" },
+              { hs: 20, hn: "1-3" },
+            ],
+          },
+        ],
+      },
+    });
+    const hide = {
+      name: "Hide in Shadows",
+      type: "ability",
+      system: { roll: "1d100", rollType: "below", targetFrom: "skills.hs" },
+    };
+
+    afterEach(async () => {
+      await trashChat();
+    });
+
+    it("lists each column's current value and levels, separate from Listen at Door", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      expect(actor.system.tables).deep.equal({});
+      await actor.createEmbeddedDocuments("Item", [thief(3)]);
+      expect(actor.system.tables.skills.hs).deep.equal({ current: 20, levels: [10, 15, 20] });
+      expect(actor.system.tables.skills.hn.current).equal(3);
+      expect(actor.system.exploration.ld).equal(1);
+      await actor.delete();
+    });
+
+    it("applies Active Effects to a column, and linked abilities roll the final value", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.createEmbeddedDocuments("Item", [thief(3), hide]);
+      const ability = actor.items.getName("Hide in Shadows") as OseItem;
+      await actor.createEmbeddedDocuments("ActiveEffect", [
+        { name: "Cloak of Elvenkind", changes: [{ key: "system.tables.skills.hs.current", mode: 2, value: "10" }] },
+      ]);
+      expect(actor.system.tables.skills.hs.current).equal(30);
+      expect(ability.system.effectiveTarget).equal(30);
+      expect(actor.system.tableSources("skills.hs")).equal("Thief 20, Cloak of Elvenkind +10");
+      await ability.rollFormula();
+      await waitUntil(() => (game.messages?.size ?? 0) >= 1);
+      expect(game.messages?.contents.at(-1)?.content).contain(
+        game.i18n.format("OSE.roll.direction.orLower", { target: 30 }),
+      );
       await actor.delete();
     });
   });

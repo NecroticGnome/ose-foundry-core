@@ -505,7 +505,7 @@
 
 .ose.sheet.actor .effects-list {
   .effect-entry {
-    &.disabled .item-name {
+    &.inactive .item-name {
       opacity: 0.6;
     }
 

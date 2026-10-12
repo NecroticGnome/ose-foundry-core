@@ -48,7 +48,6 @@ export const saveTweaks = async (actor: Any, values: Record<string, unknown>) =>
   }
   if (remove.length) await actor.deleteEmbeddedDocuments("ActiveEffect", remove);
   if (create.length) await actor.createEmbeddedDocuments("ActiveEffect", create);
-  if (create.length && actor.type === "character") update["system.config.enableEffects"] = true;
   await actor.update(update);
 };
 
@@ -66,7 +65,7 @@ export const migrateActorTweaks = async (actor: Any) => {
     "ActiveEffect",
     plan.effects.map((e) => effectData(fields.find((t) => t.id === e.id) as TweakField, e.value)),
   );
-  await actor.update({ ...plan.update, "system.config.enableEffects": true });
+  await actor.update(plan.update);
   return true;
 };
 

@@ -195,9 +195,12 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("shows each class's XP adjustment in the Effects tab", async () => {
-      const a = await character({ system: { scores: { str: { value: 16 } }, config: { enableEffects: true } } });
+      const shown = game.settings.get(game.system.id, "effectsTab");
+      await game.settings.set(game.system.id, "effectsTab", true);
+      const a = await character({ system: { scores: { str: { value: 16 } } } });
       await a.createEmbeddedDocuments("Item", [fighter("str")]);
       const context = await a.sheet._prepareContext({ parts: [] });
+      await game.settings.set(game.system.id, "effectsTab", shown);
       const rows = context.effectGroups.flatMap((g: Any) => g.effects);
       expect(rows.find((r: Any) => r.fixed)?.name).contain("+10");
     });

@@ -1,6 +1,6 @@
 <div class="item-sheet-content race-sheet {{#if editing}}editing{{/if}}">
   <header class="sheet-header">
-    <img class="profile-img" src="{{img}}" {{#if editing}}data-edit="img"{{/if}} data-tooltip="{{name}}" />
+    <img class="profile-img" src="{{img}}" {{#if editing}}data-action="editImage" data-edit="img"{{/if}} data-tooltip="{{name}}" />
     <div class="header-col">
       <h1 class="charname">
         {{#if editing}}<input name="name" type="text" value="{{name}}" placeholder="{{localize 'OSE.details.name'}}" />{{else}}{{name}}{{/if}}

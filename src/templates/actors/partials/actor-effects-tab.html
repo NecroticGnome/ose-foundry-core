@@ -10,7 +10,7 @@
   </div>
   <ol class="item-list">
     {{#each group.effects as |e|}}
-    <li class="item-entry effect-entry {{#if e.disabled}}disabled{{/if}}" data-effect-uuid="{{e.uuid}}">
+    <li class="item-entry effect-entry {{#if e.disabled}}inactive{{/if}}" data-effect-uuid="{{e.uuid}}">
       <div class="item-header flexrow">
         <div class="item-name flexrow">
           <div class="item-image" style="background-image: url('{{e.img}}')"></div>

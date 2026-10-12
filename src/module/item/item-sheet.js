@@ -204,7 +204,23 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
 
   async #prepareAbilityContext() {
     suggestions ??= this.isEditable ? loadSuggestions() : null;
-    return { targetFromChoices: (await suggestions)?.tableColumns ?? [] };
+    return { targetFromChoices: (await suggestions)?.tableColumns ?? [], ownedTarget: this.#ownedTarget() };
+  }
+
+  // On a character, the final skill or exploration value the ability rolls against.
+  #ownedTarget() {
+    const { actor, system } = this.item;
+    if (actor?.type !== "character") return null;
+    const [table, column] = system.tablePath.split(".");
+    if (typeof actor.system.tables?.[table]?.[column]?.current === "number") {
+      return { value: system.effectiveTarget, tooltip: actor.system.tableSources(system.tablePath) };
+    }
+    if (system.effectiveTarget === system.rollTarget) return null;
+    const skill = game.i18n.localize(CONFIG.OSE.exploration_skills[system.exploration]);
+    return {
+      value: system.effectiveTarget,
+      tooltip: game.i18n.format("OSE.abilities.TargetFromExploration", { skill }),
+    };
   }
 
   // Which class's slots an embedded spell uses, when there's a choice.

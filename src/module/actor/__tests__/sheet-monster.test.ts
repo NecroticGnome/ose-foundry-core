@@ -49,8 +49,8 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
         "attributes",
         "inventory",
         "spells",
-        "effects",
         "notes",
+        "effects",
       ]);
     });
 

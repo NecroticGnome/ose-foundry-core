@@ -3,8 +3,7 @@
  *       `_onFirstRender`.
  */
 import { contextMenuEntry } from "../context-menu-entry";
-import { promptRemoveItemFromActor } from "./dialogs";
-import { toggleItemEquipped } from "./inventory-actions";
+import { promptRemoveItemFromActor, toggleItemEquipped } from "./inventory-actions";
 
 const EQUIPPABLE_TYPES = ["item", "armor", "weapon", "treasure", "container"];
 

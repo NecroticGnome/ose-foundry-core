@@ -68,15 +68,6 @@
       data-dtype="Boolean" {{#unless user.isGM}}disabled{{/unless}} />
   </div>
   {{/if}}
-  <div class="form-group">
-    <label for="enableEffects">{{localize "OSE.Tweaks.EnableEffects"}}</label>
-    {{#if effectsTabWorld}}
-    <input type="checkbox" id="enableEffects" checked disabled data-tooltip="OSE.Tweaks.EnableEffectsWorld" />
-    {{else}}
-    <input type="checkbox" name="system.config.enableEffects" id="enableEffects" {{checked system.config.enableEffects}}
-      data-dtype="Boolean" />
-    {{/if}}
-  </div>
   <footer class="sheet-footer">
     <button type="submit">
       <i class="fas fa-save"></i>{{localize "Save Changes"}}

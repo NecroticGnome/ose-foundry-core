@@ -436,7 +436,21 @@
 
     .chat-img {
       flex: 0 0 42px;
+      height: 42px;
+      margin: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
       background-size: cover;
+      background-position: center top;
+    }
+
+    .chat-item-img {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      margin-left: 4px;
+      border: none;
+      object-fit: cover;
     }
   }
 

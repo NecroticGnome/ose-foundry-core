@@ -372,8 +372,6 @@
   "OSE.CombatFlag.RetreatFromMeleeDeclared": "Retreat From Melee Declared",
 
   "OSE.Tweaks.DontApplyWeaponBonusToDamageRoll": "Don't apply weapon bonus to damage roll",
-  "OSE.Tweaks.EnableEffects": "Show Active Effects tab",
-  "OSE.Tweaks.EnableEffectsWorld": "On for all actors in this world's settings.",
 
   "OSE.warn.moreThanOneItemWithName": "Your controlled Actor {actorName} has more than one Item with name {itemName}. The first matched Item will be chosen.",
   "OSE.warn.macrosOnlyForOwnedItems": "Only Items owned by Actor may be used to create macros.",
@@ -399,8 +397,8 @@
   "TYPES.Item.weapon": "Weapon",
   "OSE.Setting.MultipleClasses": "Multiple Classes (Optional Rule)",
   "OSE.Setting.MultipleClassesHint": "Using this optional rule, players may choose more than one class when creating a demihuman character. This is known as multi-classing.",
-  "OSE.Setting.EffectsTab": "Show Active Effects tab on all actors",
-  "OSE.Setting.EffectsTabHint": "Adds an Effects tab to every character and monster sheet. When off, it can be turned on per actor in Tweaks.",
+  "OSE.Setting.EffectsTab": "Show Active Effects tab",
+  "OSE.Setting.EffectsTabHint": "Adds an Effects tab to every character and monster sheet.",
   "OSE.Setting.PromptAddClassAbilities": "Offer Class Abilities",
   "OSE.Setting.PromptAddClassAbilitiesHint": "When a class or race is added, or a class gains a level, offer to add the abilities gained.",
   "TYPES.Item.class": "Class",
@@ -586,10 +584,15 @@
   "OSE.classes.CopyFormula": "Copy roll formula",
   "OSE.classes.CopiedFormula": "Copied {formula}",
   "OSE.classes.MaxLevelHint": "Sets how many levels this class can advance to.",
+  "OSE.warnings.sharedTableColumn": "{cls} and {other} both have the {key} table column, so the character uses the value from {used} (the higher level). If they should be different, rename one of the keys.",
   "OSE.warnings.abilityRequirement": "{item} requires {requirement}, which this character doesn't meet.",
   "OSE.abilities.RequirementsHint": "Who can use this ability, e.g. thief or \"Thief, Level 4\". Drop a class or race here to add it. Characters without a named class or race get a warning.",
   "OSE.abilities.TargetFrom": "Target From Class Table",
   "OSE.abilities.TargetFromHint": "A class table column, e.g. skills.cs. On a character with a class that has this column, the roll target follows it for the character's level. A class's own roll target setting takes priority.",
+  "OSE.abilities.Exploration": "Exploration Skill",
+  "OSE.abilities.ExplorationHint": "On a character, raises this exploration skill to the ability's chance.",
+  "OSE.abilities.TargetFromExploration": "The character's {skill} chance.",
+  "OSE.exploration.FromAbility": "Raised by {ability}",
   "OSE.classes.ShowTables": "Show tables",
   "OSE.classes.HideTables": "Hide tables"
 }

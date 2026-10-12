@@ -267,6 +267,9 @@
 </tbody>
 </table>
 <p><code>exploration.od</code> is unrelated to the derived <code>scores.str.od</code>.</p>
+<h3 id="class-tables">Class tables</h3>
+<p>Each column of a class's tables is at <code>system.tables.&lt;table&gt;.&lt;column&gt;</code>, with <code>current</code> (the value at the class's level) and <code>levels</code> (the whole column), e.g. <code>system.tables.skills.hs.current</code> and <code>system.tables.skills.hs.levels</code> for Hide in Shadows. The upper value of a range is stored (e.g. <code>1-3</code> becomes <code>3</code>). Two classes with the same column use the higher-level class's value. In cases where this doesn't make sense, a Player or GM should rename the unwanted column.</p>
+<p>Active Effects can change any <code>current</code> value (e.g. <code>system.tables.skills.hs.current</code> ADD <code>10</code>).</p>
 <h3 id="details">Details</h3>
 <table>
 <thead>
@@ -409,11 +412,6 @@
 <td><code>system.config.ignoreBonusDamage</code></td>
 <td>unset</td>
 <td>Leave weapon bonus out of damage rolls</td>
-</tr>
-<tr>
-<td><code>system.config.enableEffects</code></td>
-<td>unset</td>
-<td>Show the Effects tab (the <code>effectsTab</code> world setting shows it for every actor)</td>
 </tr>
 </tbody>
 </table>

@@ -641,7 +641,8 @@
 }
 
 // Inputs with suggestions: Foundry's line-height (the full input height) pushes the arrow to the bottom.
-.ose.sheet.item :is(.class-sheet, .race-sheet) input[list] {
+.ose.sheet input[list],
+.application input[list].ose-effect-key {
   line-height: normal;
 
   &::-webkit-calendar-picker-indicator {

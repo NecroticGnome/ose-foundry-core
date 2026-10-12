@@ -1,6 +1,7 @@
 /**
  * @file Utilities for our Quench tests
  */
+import type OseActor from "../module/actor/entity";
 
 const inputDelay = 120;
 
@@ -133,12 +134,13 @@ export const rollSpecificNumber = (requiredResult: number, diceFaces: number) =>
  * MOCKING HELPERS
  */
 
-export const createMockActorKey = async (type: string, data: object = {}, key = "") =>
-  CONFIG.Actor.documentClass.create({
+// A created actor is never undefined here, and tests use the system's actor class.
+export const createMockActorKey = async (type: "character" | "monster", data: object = {}, key = "") =>
+  (await CONFIG.Actor.documentClass.create({
     ...data,
     name: `Test Actor ${key}`,
     type,
-  });
+  })) as OseActor;
 
 export const createWorldTestItem = async (type: string, name = `New World Test ${type.capitalize()}`) =>
   CONFIG.Item.documentClass.create({

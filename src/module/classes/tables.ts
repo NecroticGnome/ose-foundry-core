@@ -14,7 +14,7 @@ export interface ClassTable {
   rows: Record<string, Cell>[];
 }
 
-const rowFor = (table: ClassTable, level: number) =>
+export const rowFor = (table: ClassTable, level: number) =>
   table.rows.length ? table.rows[Math.min(Math.max(Math.trunc(level) || 1, 1), table.rows.length) - 1] : undefined;
 
 // `target` is "<tableKey>.<columnKey>", e.g. "skills.hs".

@@ -95,6 +95,25 @@ export default ({ describe, it, expect, after, assert }: QuenchMethods) => {
     });
   });
 
+  describe("class and race image", () => {
+    const filePickers = () =>
+      [...foundry.applications.instances.values()].filter((a) => a instanceof foundry.applications.apps.FilePicker);
+
+    for (const type of ["class", "race"]) {
+      it(`opens the image picker when editing a ${type} (issue #189)`, async () => {
+        const item = (await Item.create({ name: `Image ${type}`, type })) as Item;
+        await item.sheet?.render(true);
+        await waitFor(() => !!item.sheet?.element?.querySelector(".profile-img"));
+        item.sheet?.element.querySelector<HTMLElement>(".profile-img")?.click();
+        await waitFor(() => filePickers().length > 0);
+        expect(filePickers().length).greaterThan(0);
+        for (const picker of filePickers()) await picker.close();
+        await item.sheet?.close();
+        await item.delete();
+      });
+    }
+  });
+
   describe("table legend", () => {
     it("adds, saves, shows and deletes legend entries", async () => {
       const item = (await Item.create({

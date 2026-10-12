@@ -55,8 +55,8 @@ export default class OseActorSheetCharacter extends OseActorSheet {
         { id: "abilities", label: "OSE.category.abilities" },
         { id: "spells", label: "OSE.category.spells" },
         { id: "inventory", label: "OSE.category.inventory" },
-        { id: "effects", label: "OSE.category.effects" },
         { id: "notes", label: "OSE.category.notes" },
+        { id: "effects", label: "OSE.category.effects" },
       ],
       initial: "attributes",
     },
@@ -112,7 +112,7 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     // Prepare owned items
     this._prepareItems(data);
 
-    data.explorationSkills = prepareExplorationSkills(this.actor.system.exploration);
+    data.explorationSkills = prepareExplorationSkills(this.actor.system.exploration, this.actor.system.explorationFrom);
 
     const enrichOptions = { relativeTo: this.actor, secrets: game.user.isGM };
     data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
@@ -184,6 +184,11 @@ export default class OseActorSheetCharacter extends OseActorSheet {
     const details = data.system?.details;
     if (!this.actor._source.system.details.title && details?.title === this.actor.system.details.title) {
       delete details.title;
+    }
+    // Likewise skills raised by abilities.
+    const exploration = data.system?.exploration ?? {};
+    for (const key of Object.keys(this.actor.system.explorationFrom ?? {})) {
+      if (Number(exploration[key]) === this.actor.system.exploration[key]) delete exploration[key];
     }
     return data;
   }
@@ -350,13 +355,19 @@ export default class OseActorSheetCharacter extends OseActorSheet {
         const link = a.getFlag(scope, "classTarget");
         return link ? link.classKey === cls.system.key && link.target === target : a.system.targetFrom === target;
       });
+    const tables = this.actor.system.tables ?? {};
     return currentRows(cls.system.tables ?? [], cls.system.level).map((table) => ({
       ...table,
       cells: table.cells.map((cell) => {
         const ability = linked(`${table.key}.${cell.key}`);
         // Columns without their own name borrow the linked ability's.
         const name = cell.name !== cell.label ? cell.name : (ability?.name ?? cell.name);
-        return { ...cell, name, abilityId: ability?.id ?? "" };
+        const current = tables[table.key]?.[cell.key]?.current;
+        const sources = this.actor.system.tableSources(`${table.key}.${cell.key}`);
+        if (current === undefined || !sources) return { ...cell, name, abilityId: ability?.id ?? "" };
+        // A number replaces the cell's own (keeping a range such as "1-3"). Other values show as they are.
+        const value = typeof current === "number" ? String(cell.value).replace(/\d+\s*$/, String(current)) : current;
+        return { ...cell, value, name: `${name}: ${sources}`, abilityId: ability?.id ?? "" };
       }),
     }));
   }

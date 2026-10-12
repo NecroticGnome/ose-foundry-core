@@ -144,6 +144,7 @@ export interface AbilityItemData extends NonPhysicalItemData {
   rollType: RollType | "";
   rollTarget: number | null;
   targetFrom: string;
+  exploration: string;
   blindroll: boolean;
 }
 

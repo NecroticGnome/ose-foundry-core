@@ -1,6 +1,7 @@
 /**
  * @file The data model for Actors of type Character.
  */
+import { deriveTables } from "../classes/actor-tables";
 import { deriveFromClasses, summariseClasses } from "../classes/derive";
 import { clampRaceModifier, readChanges } from "../classes/effects";
 import { primeReqBonus, scoreValues } from "../classes/progression";
@@ -10,6 +11,7 @@ import OseDataModelCharacterAC from "./data-model-classes/data-model-character-a
 import OseDataModelCharacterMove from "./data-model-classes/data-model-character-move";
 import OseDataModelCharacterScores from "./data-model-classes/data-model-character-scores";
 import OseDataModelCharacterSpells from "./data-model-classes/data-model-character-spells";
+import { raiseFromAbilities } from "./exploration-skills";
 
 const getItemsOfActorOfType = (actor, filterType, filterFn = null) =>
   actor.items.filter(({ type }) => type === filterType).filter(filterFn || (() => true));
@@ -43,6 +45,31 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
     }
     if (Object.values(derived.spellSlots).some((n) => n > 0)) this.spells.enabled = true;
     this.hp.hd = derived.hd;
+  }
+
+  // Class tables and the exploration skills abilities raise. Runs before Active Effects.
+  prepareTables() {
+    const { tables, from, shared } = deriveTables(
+      this.classes.map((c) => ({ id: c.id, name: c.name, level: c.system.level, tables: c.system.tables ?? [] })),
+    );
+    this.tables = tables;
+    this.tablesFrom = from;
+    this.tablesBase = Object.fromEntries(
+      Object.keys(from).map((path) => [path, foundry.utils.getProperty(tables, `${path}.current`)]),
+    );
+    this.sharedColumns = shared;
+    this.explorationFrom = raiseFromAbilities(this.exploration, this.parent.items);
+  }
+
+  // Where a table column's current value comes from, e.g. "Thief 20, Cloak of Elvenkind +10".
+  tableSources(path) {
+    const from = this.tablesFrom?.[path];
+    const effects = (this.parent.appliedEffects ?? []).flatMap((e) =>
+      readChanges(e)
+        .filter((c) => c.key === `system.tables.${path}.current`)
+        .map((c) => `${e.name} ${c.type === "add" && Number(c.value) >= 0 ? "+" : ""}${c.value}`),
+    );
+    return [from && `${from.cls} ${this.tablesBase[path]}`, ...effects].filter(Boolean).join(", ");
   }
 
   prepareDerivedData() {
@@ -202,6 +229,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
         name: a.name,
         requirements: a.system.requirements ?? "",
       })),
+      sharedColumns: this.sharedColumns ?? [],
     };
     this.warningContext = contextKey(input);
     this.warnings = computeWarnings(input).filter(

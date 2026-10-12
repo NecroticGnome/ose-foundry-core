@@ -42,6 +42,7 @@ export interface WarningInput {
   scores: Record<string, number>;
   unallocatedSpells: { id: string; name: string }[];
   abilities: { id: string; name: string; requirements: string }[];
+  sharedColumns?: { id: string; key: string; cls: string; other: string; used: string }[];
 }
 
 export interface Warning {
@@ -214,6 +215,9 @@ export const computeWarnings = (input: WarningInput): Warning[] => {
   }
   if (classes.some((c) => c.hasTable)) {
     for (const cls of classes.filter((c) => !c.hasTable)) out.push(warn("customMix", cls.id, { cls: cls.name }));
+  }
+  for (const { id, ...data } of input.sharedColumns ?? []) {
+    out.push({ ...warn("sharedTableColumn", id, data), key: `sharedTableColumn.${data.key}` });
   }
   const who = { classes: classes.map((c) => ({ key: c.key, name: c.name, level: c.level })), race: input.race };
   for (const ability of input.abilities ?? []) {
