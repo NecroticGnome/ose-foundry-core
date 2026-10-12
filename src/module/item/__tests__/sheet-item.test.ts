@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line prettier/prettier, import/no-cycle
 import type { QuenchMethods } from "../../../e2e";
-import { cleanUpWorldItems, createWorldTestItem } from "../../../e2e/testUtils";
+import { cleanUpWorldItems, createWorldTestItem, waitUntil } from "../../../e2e/testUtils";
 import OseItemSheet from "../item-sheet";
 
 export const key = "ose.item.sheet";
@@ -59,5 +59,24 @@ export default ({ describe, it, expect, after, assert }: QuenchMethods) => {
       expect(data.config.encumbrance).is.not.undefined;
       await item?.delete();
     });
+  });
+
+  describe("profile image", () => {
+    const filePickers = () =>
+      [...foundry.applications.instances.values()].filter((a) => a instanceof foundry.applications.apps.FilePicker);
+
+    for (const type of ["ability", "armor", "container", "item", "spell", "weapon"]) {
+      it(`opens the image picker when the ${type} image is clicked (issue #189)`, async () => {
+        const item = await createWorldTestItem(type);
+        await item?.sheet?.render(true);
+        await waitUntil(() => !!item?.sheet?.element?.querySelector(".profile-img"));
+        (item?.sheet?.element?.querySelector(".profile-img") as HTMLElement).click();
+        await waitUntil(() => filePickers().length > 0);
+        expect(filePickers().length).greaterThan(0);
+        for (const picker of filePickers()) await picker.close();
+        await item?.sheet?.close();
+        await item?.delete();
+      });
+    }
   });
 };
