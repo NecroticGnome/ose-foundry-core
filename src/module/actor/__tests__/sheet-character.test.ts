@@ -296,6 +296,28 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
     });
   });
 
+  describe("layout", () => {
+    it("keeps the tab body inside the window when warnings are shown", async () => {
+      const actor = await createMockActorKey("character", { system: { scores: { con: { value: 8 } } } }, key);
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Hardy", type: "class", system: { key: "hardy", requirements: "Minimum CON 9", level: 1 } },
+      ]);
+      expect(actor.system.warnings.length).greaterThan(0);
+      const sheet = actor.sheet as unknown as OseActorSheetCharacter & { _showWarnings: boolean };
+      sheet._showWarnings = true;
+      await sheet.render(true);
+      await waitUntil(() => !!sheet.element?.querySelector(".sheet-body"));
+      const body = (sheet.element.querySelector(".sheet-body") as HTMLElement).getBoundingClientRect();
+      const content = (sheet.element.querySelector(".window-content") as HTMLElement).getBoundingClientRect();
+      expect(body.bottom).at.most(content.bottom + 1);
+      await sheet.close();
+    });
+
+    after(async () => {
+      await cleanUpActorsByKey(key);
+    });
+  });
+
   describe("_chooseLang()", () => {
     it("renders a dialog", async () => {
       const actor = await createMockActorKey("character", {}, key);
