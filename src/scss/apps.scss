@@ -1,3 +1,5 @@
+@use "variables";
+
 .ose.roll-dialog {
   .roll-details {
     font-weight: bold;
@@ -186,8 +188,11 @@
 }
 
 .ose.dialog.party-sheet {
-  min-width: 250px;
-  min-height: 250px;
+  &:not(.minimized) {
+    min-width: 250px;
+    min-height: 250px;
+  }
+
 
   .window-content {
     padding: 0;
@@ -403,9 +408,9 @@
   margin: 0;
 
   .chat-header {
-    height: 46px;
+    min-height: 46px;
     margin: 4px 0;
-    background: $darkBackground;
+    background: variables.$darkBackground;
     border: 1px solid black;
     border-radius: 3px;
     color: white;
@@ -413,24 +418,39 @@
     box-shadow: 0 0 2px #fff inset;
 
     .chat-title {
+      display: flex;
+      align-items: center;
       margin: 4px 0;
-      height: 30px;
-      overflow: hidden;
+      min-height: 30px;
 
       h2 {
         border: none;
-        line-height: 34px;
+        line-height: 1.25;
         margin: 0;
-        text-indent: 10px;
+        padding: 2px 10px;
         font-size: var(--font-size-16);
-        word-break: break-all;
+        overflow-wrap: anywhere;
         color: white;
       }
     }
 
     .chat-img {
       flex: 0 0 42px;
+      height: 42px;
+      margin: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
       background-size: cover;
+      background-position: center top;
+    }
+
+    .chat-item-img {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      margin-left: 4px;
+      border: none;
+      object-fit: cover;
     }
   }
 
@@ -508,7 +528,7 @@
       flex: 1;
       margin: 0;
       line-height: 36px;
-      color: $colorOlive;
+      color: variables.$colorOlive;
 
       &:hover {
         color: #111;
@@ -562,15 +582,15 @@
             display: flex;
             flex-wrap: wrap;
             .tag {
-              background: $colorOlive;
+              background: variables.$colorOlive;
               border-radius: 5px;
               color: whitesmoke;
               padding: 1px 5px;
-              box-shadow: 0 0 3px $colorFaint;
+              box-shadow: 0 0 3px variables.$colorFaint;
               margin: 0 2px;
               i {
                 font-size: 8px;
-                color: $colorFaint;
+                color: variables.$colorFaint;
               }
             }
           }
@@ -596,6 +616,11 @@
           text-indent: 10px;
           font-size: var(--font-size-14);
           font-weight: bold;
+        }
+
+        // text-indent is inherited into inline-block rolls and links, pushing their text under the icon.
+        a {
+          text-indent: 0;
         }
 
         line-height: 36px;
@@ -638,7 +663,7 @@
       display: block;
       line-height: 28px;
       text-align: center;
-      border: 1px solid $colorTan;
+      border: 1px solid variables.$colorTan;
     }
 
     button {
@@ -708,11 +733,11 @@
       margin: 1px;
       font-size: var(--font-size-10);
       line-height: 12px;
-      background: $colorOlive;
+      background: variables.$colorOlive;
       padding: 1px 3px;
       color: whitesmoke;
       border-radius: 3px;
-      box-shadow: 0 0 1px $colorFaint;
+      box-shadow: 0 0 1px variables.$colorFaint;
     }
   }
 }
@@ -737,7 +762,7 @@
         margin: 0 1px;
         font-size: var(--font-size-10);
         line-height: 12px;
-        background: $colorOlive;
+        background: variables.$colorOlive;
         padding: 1px 3px;
         color: whitesmoke;
         border-radius: 3px;

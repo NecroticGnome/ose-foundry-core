@@ -1,0 +1,35 @@
+<div class="ability-drop" data-drop="abilities">
+<table class="class-table ability-links">
+  <thead>
+    <tr>
+      {{#if @root.editing}}<th class="control"><a data-action="sortAbilities" data-tooltip="OSE.classes.SortByLevel" aria-label="{{localize 'OSE.classes.SortByLevel'}}"><i class="fas fa-arrow-down-1-9"></i></a></th>{{/if}}
+      <th class="name">{{localize 'OSE.classes.Ability'}}</th>
+      <th class="level" data-tooltip="OSE.classes.ReceiveAbilityLevel">{{localize 'OSE.details.level'}}</th>
+      {{#if @root.isClass}}<th class="target" data-tooltip="OSE.classes.TargetHint">{{localize 'OSE.classes.RollTarget'}}</th>{{/if}}
+      {{#if @root.editing}}<th class="control"></th>{{/if}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#each abilityLinks as |link i|}}
+    <tr {{#if @root.editing}}draggable="true" data-link-index="{{i}}"{{/if}}>
+      {{#if @root.editing}}<td class="control handle" data-tooltip="OSE.classes.DragToReorder"><i class="fas fa-grip-vertical"></i></td>{{/if}}
+      <td class="name">
+        <a data-action="openUuid" data-uuid="{{link.uuid}}">{{#if link.missing}}<i class="fas fa-triangle-exclamation" data-tooltip="OSE.classes.MissingAbility"></i> {{/if}}{{link.name}}</a>
+        <input type="hidden" name="system.abilities.{{i}}.uuid" value="{{link.uuid}}" />
+      </td>
+      <td class="level">{{#if @root.editing}}<input type="number" name="system.abilities.{{i}}.level" value="{{link.level}}" min="1" />{{else}}{{link.level}}{{/if}}</td>
+      {{#if @root.isClass}}
+      <td class="target">{{#if @root.editing}}<input type="text" name="system.abilities.{{i}}.target" value="{{link.target}}" placeholder="{{link.defaultTarget}}" list="ose-targets-{{@root.document.id}}" />{{else}}<span {{#if link.targetName}}data-tooltip="{{link.targetName}}"{{/if}}>{{#if link.target}}{{link.target}}{{else}}<span class="hint">{{link.defaultTarget}}</span>{{/if}}</span>{{/if}}</td>
+      {{/if}}
+      {{#if @root.editing}}<td class="control"><a data-action="removeRow" data-field="abilities" data-index="{{i}}" data-name="{{link.name}}" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a></td>{{/if}}
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{#if @root.isClass}}
+<datalist id="ose-targets-{{@root.document.id}}">
+  {{#each @root.targetChoices as |c|}}<option value="{{c.value}}">{{c.label}}</option>{{/each}}
+</datalist>
+{{/if}}
+{{#if @root.editable}}<p class="drop-hint"><i class="fas fa-arrow-down-to-bracket"></i> {{localize 'OSE.classes.DropAbilitiesHint'}}</p>{{/if}}
+</div>

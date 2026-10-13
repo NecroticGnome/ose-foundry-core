@@ -1,0 +1,114 @@
+<div class="item-sheet-content race-sheet {{#if editing}}editing{{/if}}">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{img}}" {{#if editing}}data-action="editImage" data-edit="img"{{/if}} data-tooltip="{{name}}" />
+    <div class="header-col">
+      <h1 class="charname">
+        {{#if editing}}<input name="name" type="text" value="{{name}}" placeholder="{{localize 'OSE.details.name'}}" />{{else}}{{name}}{{/if}}
+      </h1>
+    </div>
+    {{> (path "/templates/items/partials/mode-toggle.html") }}
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    {{#each tabs as |tab|}}
+    <a class="item {{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}">{{localize tab.label}}</a>
+    {{/each}}
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab {{tabs.details.cssClass}}" data-group="primary" data-tab="details">
+      {{#if editing}}
+      <div class="class-fields">
+        <label>{{localize 'OSE.classes.Key'}}</label>
+        <input type="text" name="system.key" value="{{system.key}}" data-tooltip="OSE.classes.KeyHint" />
+        <label>{{localize 'OSE.category.languages'}}</label>
+        {{> (path "/templates/items/partials/tag-list.html") field="languages" values=system.languages choices=languageChoices placeholder="OSE.classes.AddLanguage" }}
+      </div>
+      {{else}}
+      <dl class="class-summary stat-block">
+        {{#if requirementsText}}<dt>{{localize 'OSE.abilities.Requirements'}}</dt><dd>{{requirementsText}}</dd>{{/if}}
+        <dt>{{localize 'OSE.race.AbilityModifiers'}}</dt><dd>{{modifiersText}}</dd>
+        {{#if languagesText}}<dt>{{localize 'OSE.category.languages'}}</dt><dd>{{languagesText}}</dd>{{/if}}
+      </dl>
+      {{/if}}
+
+      <div class="description">
+        {{#if editing}}
+        <h3 class="section-title">{{localize 'OSE.category.description'}}</h3>
+        <prose-mirror name="system.description" toggled="true" button="true" value="{{system.description}}">{{{enriched.description}}}</prose-mirror>
+        {{else}}
+        <div class="editor-content">{{{enriched.description}}}</div>
+        {{/if}}
+      </div>
+
+      <h3 class="section-title">{{localize 'OSE.abilities.Requirements'}}</h3>
+      <table class="class-table requirements">
+        <thead>
+          <tr>
+            <th></th>
+            {{#each scoreKeys as |k|}}<th>{{lookup @root.config.scores k}}</th>{{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each requirementRows as |row|}}
+          <tr>
+            <td class="caption">{{localize row.label}}</td>
+            {{#each row.values as |v|}}
+            <td>{{#if @root.editing}}<input type="number" name="system.requirements.{{v.score}}.{{row.bound}}" value="{{v.value}}" />{{else}}{{v.value}}{{/if}}</td>
+            {{/each}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    </div>
+
+    <div class="tab {{tabs.limits.cssClass}}" data-group="primary" data-tab="limits">
+      <p class="hint">{{localize 'OSE.race.LimitsHint'}}</p>
+      <table class="class-table limits">
+        <thead>
+          <tr>
+            <th data-tooltip="OSE.race.ClassKeyHint">{{localize 'OSE.race.ClassKey'}}</th>
+            <th>{{localize 'OSE.classes.MaxLevel'}}</th>
+            {{#if editing}}<th class="control"><a data-action="addClassLimit" data-tooltip="OSE.Add"><i class="fas fa-plus"></i></a></th>{{/if}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each system.classLimits as |limit i|}}
+          <tr>
+            {{#if @root.editing}}
+            <td><input type="text" name="system.classLimits.{{i}}.classKey" value="{{limit.classKey}}" list="ose-class-keys-{{@root.document.id}}" /></td>
+            <td><input type="number" name="system.classLimits.{{i}}.maxLevel" value="{{limit.maxLevel}}" /></td>
+            <td class="control"><a data-action="removeRow" data-field="classLimits" data-index="{{i}}" data-name="{{limit.classKey}}" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a></td>
+            {{else}}
+            <td>{{limit.classKey}}</td>
+            <td>{{limit.maxLevel}}</td>
+            {{/if}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <datalist id="ose-class-keys-{{document.id}}">{{#each classKeyChoices as |c|}}<option value="{{c}}"></option>{{/each}}</datalist>
+    </div>
+
+    <div class="tab {{tabs.abilities.cssClass}}" data-group="primary" data-tab="abilities">
+      {{> (path "/templates/items/partials/ability-links.html") }}
+    </div>
+
+    <div class="tab {{tabs.modifiers.cssClass}}" data-group="primary" data-tab="modifiers">
+      <p class="hint">{{localize 'OSE.race.ModifiersHint'}}</p>
+      <table class="class-table modifiers">
+        <thead>
+          <tr>{{#each scoreKeys as |k|}}<th>{{lookup @root.config.scores k}}</th>{{/each}}</tr>
+        </thead>
+        <tbody>
+          <tr>
+            {{#each scoreKeys as |k|}}
+            <td>{{#if @root.editing}}<input type="number" data-modifier="{{k}}" value="{{lookup @root.modifiers k}}" />{{else}}{{lookup @root.modifiers k}}{{/if}}</td>
+            {{/each}}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

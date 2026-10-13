@@ -88,10 +88,6 @@
       </p>
     </div>
   </div>
-  <div id="demo" class="row" style="text-align: center;">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/xKFuPXfyMoE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
-          picture-in-picture" allowfullscreen></iframe>
-  </div>
   <div id="setup" class="row">
     <h4>Installation</h4>
     <p>
@@ -225,6 +221,26 @@
         dialog box can be skipped by holding Ctrl (on Windows) or Meta (on Mac). Checking this box
         will make the dialog boxes skip automatically, but show when the Ctrl/Meta key is held down.
       </li>
+      <li>
+        <strong>Enable Strength Modifier for Item-based Encumbrance:</strong> With the Item-based
+        encumbrance option, a positive Strength modifier lets a character carry more items.
+      </li>
+      <li>
+        <strong>Globally Ignore Attack Bonus For Damage Rolls:</strong> Damage rolls leave out the
+        weapon's attack bonus for every actor. It can also be set per actor in Tweaks.
+      </li>
+      <li>
+        <strong>Multiple Classes (Optional Rule):</strong> Demihuman characters may take more than one
+        class when they are created. See <a href="#classes">Classes and races</a>.
+      </li>
+      <li>
+        <strong>Offer Class Abilities:</strong> When a class or race is added, or a class gains a level,
+        offer to add the abilities gained.
+      </li>
+      <li>
+        <strong>Show Active Effects tab:</strong> Adds the
+        <a href="#effects">Effects</a> tab to every character and monster sheet. On by default.
+      </li>
     </ul>
   </div>
   <hr />
@@ -252,18 +268,20 @@
           </li>
           <li><strong>Next Level:</strong> The threshold at which the
             level field in the header section of the character sheet will
-            glow to notify players that the character may level up.
+            glow to notify players that the character may level up. Characters with a class item
+            use the class's level table instead.
           </li>
         </ul>
       </div>
       <div class="three columns">
-        <img src="./images/tweaks.png" width="320" height="300" />
+        <img src="./images/tweaks.png" width="320" />
       </div>
     </div>
     <div class="row">
       <ul>
         <li><strong>Bonus experience:</strong> The percentage of XP to add to the
-          experience gained while using the Party Sheet XP tool.
+          experience gained while using the Party Sheet XP tool. With class items, it adds to each
+          class's prime requisite bonus.
         </li>
         <li><strong>Experience share:</strong> The share of the party
           XP you will get from the experience dealt (e.g. 50% for Retainers).
@@ -273,6 +291,8 @@
         </li>
         <li><strong>Missile Bonus:</strong> A bonus to the Attack roll
           only for missile weapons, in addition to other modifiers.
+        </li>
+        <li><strong>Magic Resist Bonus:</strong> Added to saves against magic.
         </li>
         <li><strong>Armor Class:</strong> This value will be added
           (ascending) or subtracted (default) to the Armor class value,
@@ -287,13 +307,17 @@
           set movement rates for this character.
         </li>
       </ul>
+      <p>The bonuses (initiative, bonus experience, magic resist, melee, missile and armor class) are
+        saved as Active Effects and listed on the Effects tab.</p>
     </div>
     <h6 class="docs-header">Header</h6>
     <p style="text-align: center;">
       <img src="./images/header.png" />
     </p>
     <p>The Character sheet header contains text fields you can edit
-      directly. There is no automation done with the header fields.</p>
+      directly. Class and race items (see below) can be dropped onto
+      the character sheet to automate a lot of the level up and bonuses
+      processes. A warning icon appears when a rule isn't met but can be dismissed.</p>
     <p>The greyed text on top of the experience field is the XP prime
       requisites bonus that can be set in the Tweaks dialog box. It is used
       when experience is dealt automatically via the party sheet.</p>
@@ -301,6 +325,18 @@
       glow as soon when the character has enough experience to level up.
       This experience threshold is also set in the Tweaks dialog box.
     </p>
+    <h6 id="classes" class="docs-header">Classes and races</h6>
+    <p>Drag a class from a compendium onto a character, such as the classes available
+      in the <a href="https://foundryvtt.com/packages/classicfantasycompendium" target="_blank">
+      Classic Fantasy
+      Compendium</a> or <a href="https://www.foundryvtt.store/products/ose-advancedfantasytome" target="_blank">
+      Premium Game module</a>. The class item sets the character's level, THAC0, saves,
+      hit dice and spell slots. Change your XP on the Abilities tab and a level up icon appears when there is
+      enough.</p>
+    <p>Races work the same way, adding their ability score modifiers as an Active Effect.</p>
+    <p>With the Multiple Classes setting, a demihuman character can take two or three classes.</p>
+    <p>Warnings appear when a requirement, class limit, armour, or weapon restriction isn't met.
+      Click the warning icon to see them and each can be dismissed.</p>
     <h6 id="character-attributes" class="docs-header">Combat</h6>
     <p>The Default tab is dedicated to the combat statistics of the actor.</p>
     <p style="text-align: center;">
@@ -424,7 +460,8 @@
       Spell slot counters have two values. The first one is the number
       of spells you have memorized, which can't be edited. The second
       is the total number of spell slots you have. Edit this value as
-      the character levels up.
+      the character levels up. With class items, the slots come from the class details.
+      A character with more than one casting class has a section for each.
     </p>
     <p>
       Spells themselves have counters. The first is the remaining
@@ -513,6 +550,12 @@
     <p>You can add known language by clicking on the plus next to the
       language header. The number of languages you can speak can be found
       in the View Modifiers dialog box.</p>
+    <h4 id="effects" class="docs-header">Effects</h4>
+    <p>Shown unless the Show Active Effects tab world setting is off. It lists the actor's
+      Active Effects and those its items grant. Effects can be created, edited, toggled and deleted here.</p>
+    <p>A field changed by an effect is locked on the sheet. Click it to disable the effect and edit
+      the value. The effect editor suggests attribute keys - see the
+      <a href="actor-attributes.html">Actor Attributes</a> reference.</p>
   </div>
   <div id="monsters" class="docs-section">
     <h4>Monsters</h4>
@@ -536,7 +579,7 @@
         the damage input box instead.
       </li>
       <li><strong>Initiative Bonus:</strong> Will add this value to
-        initiative in addition to the Dexterity modifier.
+        initiative.
       </li>
       <li><strong>Enable inventory:</strong> See the same inventory tab as characters have.
       </li>
@@ -547,10 +590,10 @@
     </p>
     <p>The first row below the name contains rollable fields.
       The alignment roll icon rolls a plain 2d6 on the
-      reaction table. Numb appearing (NA) can be rolled and
+      reaction table. Number appearing (NA) can be rolled and
       morale (optional) as well. XP award is just plain text.</p>
-    <p>The Treasure type can show a link to a rollable table. You may drop a
-      rollable table onto a monster sheet to show it here. Right clicking the
+    <p>The Treasure type is free text, or one or more rollable tables. Drop a
+      rollable table onto a monster sheet to add it here. Right clicking a
       treasure table link removes it.
     </p>
     <h4 class="docs-header">Abilities</h4>
@@ -687,6 +730,10 @@
       Don't forget to set the experience share to 50% for retainers!
     </p>
   </div>
+  <p class="credits">
+    Screenshots use art from Rogues Gallery 1 (illustrations © Sam Mameli 2026) and the
+    Advanced Fantasy Tome (Manticore by Frank Scacalossi © 2021 Necrotic Gnome).
+  </p>
 </div>
 </div>
 <!-- End Document

@@ -9,6 +9,7 @@ describe("OseDataModelSpell", () => {
       expect(spell.save).toBe("");
       expect(spell.lvl).toBeNull();
       expect(spell.class).toBe("");
+      expect(spell.castAs).toBe("");
       expect(spell.duration).toBe("");
       expect(spell.range).toBe("");
       expect(spell.roll).toBe("");

@@ -16,19 +16,19 @@
   </div>
   <div class="form-group">
     <label for="initiative">{{localize "OSE.InitiativeBonus"}}</label>
-    <input type="text" name="system.initiative.mod" id="initiative" value="{{@root.system.initiative.mod}}"
-      data-dtype="Number" />
+    <input type="text" name="tweaks.initiative" value="{{lookup @root.tweaks 'initiative'}}" data-dtype="Number" id="initiative" />
   </div>
   {{#if (eq this.type 'character')}}
+  {{#unless hasClasses}}
   <div class="form-group">
     <label for="experiencenext">{{localize "OSE.details.experience.next"}}</label>
     <input type="text" name="system.details.xp.next" id="experiencenext" value="{{@root.system.details.xp.next}}"
       data-dtype="Number" />
   </div>
+  {{/unless}}
   <div class="form-group">
     <label for="experience">{{localize "OSE.details.experience.bonus"}} (%)</label>
-    <input type="text" name="system.details.xp.bonus" id="experience" value="{{@root.system.details.xp.bonus}}"
-      data-dtype="Number" />
+    <input type="text" name="tweaks.xp" value="{{lookup @root.tweaks 'xp'}}" data-dtype="Number" id="experience" />
   </div>
   <div class="form-group">
     <label for="experience-share">{{localize "OSE.details.experience.share"}} (%)</label>
@@ -37,26 +37,19 @@
   </div>
   <div class="form-group">
     <label for="magic">{{localize "OSE.details.magic.bonus"}}</label>
-    <input type="text" name="system.details.magic.bonus" id="magic" value="{{@root.system.details.magic.bonus}}"
-      data-dtype="Number" />
+    <input type="text" name="tweaks.magic" value="{{lookup @root.tweaks 'magic'}}" data-dtype="Number" id="magic" />
   </div>
   <div class="form-group">
     <label for="melee">{{localize "OSE.MeleeBonus"}}</label>
-    <input type="text" name="system.thac0.mod.melee" id="melee" value="{{@root.system.thac0.mod.melee}}"
-      data-dtype="Number" />
+    <input type="text" name="tweaks.melee" value="{{lookup @root.tweaks 'melee'}}" data-dtype="Number" id="melee" />
   </div>
   <div class="form-group">
     <label for="missile">{{localize "OSE.MissileBonus"}}</label>
-    <input type="text" name="system.thac0.mod.missile" id="missile" value="{{@root.system.thac0.mod.missile}}"
-      data-dtype="Number" />
+    <input type="text" name="tweaks.missile" value="{{lookup @root.tweaks 'missile'}}" data-dtype="Number" id="missile" />
   </div>
   <div class="form-group">
     <label for="ac">{{localize "OSE.ArmorClassBonus"}}</label>
-    {{#if config.ascendingAC}}
-    <input type="text" name="system.aac.mod" id="ac" value="{{@root.system.aac.mod}}" data-dtype="Number" />
-    {{else}}
-    <input type="text" name="system.ac.mod" id="ac" value="{{@root.system.ac.mod}}" data-dtype="Number" />
-    {{/if}}
+    <input type="text" name="tweaks.ac" value="{{lookup @root.tweaks 'ac'}}" data-dtype="Number" id="ac" />
   </div>
   <div class="form-group">
     <label for="encumbrance">{{localize "OSE.Encumbrance"}}</label>

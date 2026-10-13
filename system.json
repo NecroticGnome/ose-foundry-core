@@ -7,6 +7,12 @@
     "minimum": "13",
     "verified": "14"
   },
+  "documentTypes": {
+    "Item": {
+      "class": { "htmlFields": ["description"] },
+      "race": { "htmlFields": ["description"] }
+    }
+  },
   "authors": [
     {
       "name": "Necrotic Gnome",

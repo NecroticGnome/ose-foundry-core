@@ -34,6 +34,11 @@
     {{> (path "/templates/actors/partials/character-inventory-tab.html") }}
   </div>
   {{/if}}
+{{#if effectGroups}}
+  <div class="tab {{tabs.effects.cssClass}}" data-group="primary" data-tab="effects">
+    {{> (path "/templates/actors/partials/actor-effects-tab.html") }}
+  </div>
+{{/if}}
   <div class="tab {{tabs.notes.cssClass}}" data-group="primary" data-tab="notes">
     {{> (path "/templates/actors/partials/character-notes-tab.html") }}
   </div>

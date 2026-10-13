@@ -1,0 +1,29 @@
+<section class="ose chat-card class-changes">
+  <div class="ose chat-block">
+    <div class="flexrow chat-header">
+      <div class="chat-title"><h2>{{title}}</h2></div>
+      {{#if img}}<div class="chat-img" style="background-image:url('{{img}}')"></div>{{/if}}
+    </div>
+    {{#if rolled}}<p>{{rolled}}</p>{{/if}}
+    {{#each dice as |html|}}<div class="class-changes-roll">{{{html}}}</div>{{/each}}
+    {{#if split}}<p>{{split}}</p>{{/if}}
+    {{#each lines as |line|}}<p>{{line}}</p>{{/each}}
+    {{#if kept.length}}
+    <p>{{keptTitle}}</p>
+    <ol class="class-changes-list">
+      {{#each kept as |k|}}
+      <li class="flexrow"><span class="flex2">{{k.label}}</span><span>{{k.value}}</span></li>
+      {{/each}}
+    </ol>
+    {{/if}}
+    {{#if changes.length}}
+    <ol class="class-changes-list">
+      {{#each changes as |c|}}
+      <li class="flexrow"><span class="flex2">{{c.label}}</span><span>{{c.from}} → {{c.to}}</span></li>
+      {{/each}}
+    </ol>
+    {{else}}
+    <p>{{localize "OSE.classes.changes.None"}}</p>
+    {{/if}}
+  </div>
+</section>

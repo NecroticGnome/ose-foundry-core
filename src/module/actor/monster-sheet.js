@@ -3,6 +3,7 @@
  */
 import OSE from "../config";
 import OseActorSheet from "./actor-sheet";
+import { addTreasureTable, removeTreasureTable } from "./treasure-links";
 
 const TextEditor = foundry.applications.ux.TextEditor.implementation;
 
@@ -39,6 +40,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
         { id: "inventory", label: "OSE.category.inventory" },
         { id: "spells", label: "OSE.category.spells" },
         { id: "notes", label: "OSE.category.notes" },
+        { id: "effects", label: "OSE.category.effects" },
       ],
       initial: "attributes",
     },
@@ -49,6 +51,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
     if (!this.actor.isOwnerOrObserver) return false;
     if (tabId === "inventory") return this.actor.system.config.enableInventory;
     if (tabId === "spells") return this.actor.system.spells.enabled;
+    if (tabId === "effects") return this._effectsTabEnabled();
     return true;
   }
 
@@ -81,6 +84,7 @@ export default class OseActorSheetMonster extends OseActorSheet {
     data.config.morale = game.settings.get(game.system.id, "morale");
     const enrichOptions = { relativeTo: this.actor, secrets: game.user.isGM };
     data.treasureLink = await TextEditor.enrichHTML(this.actor.system.details.treasure.table, enrichOptions);
+    data.treasureMany = (this.actor.system.details.treasure.table?.match(/@UUID\[/g)?.length ?? 0) > 2;
     data.isNew = this.actor.isNew();
 
     data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
@@ -142,7 +146,8 @@ export default class OseActorSheetMonster extends OseActorSheet {
     } else {
       link = `@UUID[${data.uuid}]`;
     }
-    this.actor.update({ "system.details.treasure.table": link });
+    const table = addTreasureTable(this.actor.system.details.treasure.table, link);
+    this.actor.update({ "system.details.treasure.table": table });
   }
 
   /* -------------------------------------------- */
@@ -192,8 +197,13 @@ export default class OseActorSheetMonster extends OseActorSheet {
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    for (const link of this.element.querySelectorAll(".treasure-links a"))
+      link.dataset.tooltip = link.textContent.trim();
     this.element.querySelector(".treasure-table")?.addEventListener("contextmenu", (event) => {
-      if (event.target.closest("a") && this.isEditable) this.actor.update({ "system.details.treasure.table": null });
+      const uuid = event.target.closest("a[data-uuid]")?.dataset.uuid;
+      if (!uuid || !this.isEditable) return;
+      const table = removeTreasureTable(this.actor.system.details.treasure.table, uuid);
+      this.actor.update({ "system.details.treasure.table": table });
     });
   }
 

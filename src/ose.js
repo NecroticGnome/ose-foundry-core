@@ -3,8 +3,7 @@
  *       We should handle most of our setup here.
  */
 import OseActorSheetCharacter from "./module/actor/character-sheet";
-import OseDataModelCharacter from "./module/actor/data-model-character";
-import OseDataModelMonster from "./module/actor/data-model-monster";
+import { ACTOR_DATA_MODELS } from "./module/actor/data-models";
 import OseActor from "./module/actor/entity";
 import OseActorSheetMonster from "./module/actor/monster-sheet";
 import TokenRulerOSE from "./module/actor/token-ruler";
@@ -22,6 +21,7 @@ import * as treasure from "./module/helpers-treasure";
 import { ITEM_DATA_MODELS } from "./module/item/data-models";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
+import { promptClassMigration } from "./module/migration";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
@@ -29,6 +29,8 @@ import { initializeTokenRing, promptTokenRingSelection } from "./module/rings";
 import registerSettings from "./module/settings";
 
 import "./e2e";
+import { augmentEffectConfig } from "./module/effects/effect-config";
+import { migrateTweaks } from "./module/effects/tweak-effects";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -80,10 +82,7 @@ Hooks.once("init", async () => {
   CONFIG.Actor.documentClass = OseActor;
   CONFIG.Item.documentClass = OseItem;
 
-  CONFIG.Actor.dataModels = {
-    character: OseDataModelCharacter,
-    monster: OseDataModelMonster,
-  };
+  CONFIG.Actor.dataModels = ACTOR_DATA_MODELS;
   CONFIG.Actor.trackableAttributes = trackableAttributes;
   CONFIG.Item.dataModels = ITEM_DATA_MODELS;
 
@@ -139,6 +138,8 @@ Hooks.once("ready", async () => {
   });
 
   await promptTokenRingSelection();
+  await migrateTweaks();
+  await promptClassMigration();
 });
 
 // Party sheet control
@@ -160,6 +161,7 @@ Hooks.on("getChatLogEntryContext", chat.addChatMessageContextOptions);
 Hooks.on("getChatMessageContextOptions", chat.addChatMessageContextOptions);
 Hooks.on("renderChatMessageHTML", chat.addChatMessageButtons);
 Hooks.on("renderRollTableSheet", treasure.augmentTable);
+Hooks.on("renderActiveEffectConfig", augmentEffectConfig);
 Hooks.on("updateActor", party.update);
 /**
  * @param {OSECombatTracker} app - The combat tracker application

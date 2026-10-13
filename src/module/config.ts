@@ -161,6 +161,10 @@ export const OSE = {
     orange: "OSE.colors.orange",
     white: "OSE.colors.white",
   },
+  /** Spell lists a class can cast from, as named on spells. Content modules can add their own. */
+  spellLists: ["Cleric", "Magic-User"],
+  /** Rules journal pages sheets link to, set by content modules: a page UUID with an optional `#heading` anchor. */
+  rulesReferences: {} as Record<string, string>,
   /** The languages a character may know, as display names. */
   languages: [
     "Common",

@@ -40,6 +40,15 @@ declare global {
   }
 }
 
+declare module "@league-of-foundry-developers/foundry-vtt-types/configuration" {
+  namespace Hooks {
+    interface HookConfig {
+      "ose.preSpendSpell": (item: Item.Implementation, config: { consume: boolean }) => boolean | void;
+      "ose.preApplyStartingHp": (actor: Actor.Implementation, classItem: Item.Implementation, update: Record<string, number>) => void;
+    }
+  }
+}
+
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<Type, keyof NewType> & NewType;
 
 type OseContextMenuEntry = Override<ContextMenuEntry, {

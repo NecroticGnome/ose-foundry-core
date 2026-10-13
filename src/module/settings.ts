@@ -128,6 +128,43 @@ const registerSettings = () => {
     scope: "world",
     type: Boolean,
   });
+  game.settings.register(game.system.id, "multipleClasses", {
+    name: game.i18n.localize("OSE.Setting.MultipleClasses"),
+    hint: game.i18n.localize("OSE.Setting.MultipleClassesHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+  game.settings.register(game.system.id, "promptAddClassAbilities", {
+    name: game.i18n.localize("OSE.Setting.PromptAddClassAbilities"),
+    hint: game.i18n.localize("OSE.Setting.PromptAddClassAbilitiesHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+  });
+  game.settings.register(game.system.id, "effectsTab", {
+    name: game.i18n.localize("OSE.Setting.EffectsTab"),
+    hint: game.i18n.localize("OSE.Setting.EffectsTabHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+  });
+  game.settings.register(game.system.id, "tweaksMigrated", {
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: false,
+  });
+  game.settings.register(game.system.id, "systemMigrationVersion", {
+    default: "",
+    scope: "world",
+    type: String,
+    config: false,
+  });
 };
 
 declare global {
@@ -143,6 +180,11 @@ declare global {
       "ose.languages": string;
       "ose.applyDamageOption": ApplyDamageOption;
       "ose.ignoreAttackBonusOnDamageRoll": boolean;
+      "ose.multipleClasses": boolean;
+      "ose.promptAddClassAbilities": boolean;
+      "ose.effectsTab": boolean;
+      "ose.tweaksMigrated": boolean;
+      "ose.systemMigrationVersion": string;
     }
   }
 }

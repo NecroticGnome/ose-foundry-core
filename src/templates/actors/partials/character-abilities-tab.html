@@ -11,6 +11,7 @@
         value="{{value}}"
         placeholder="0"
         data-dtype="Number"
+        {{#if from}}data-tooltip="{{from}}"{{/if}}
       />
     </div>
   </li>
@@ -30,7 +31,7 @@
       {{/if}}
     </div>
   </div>
-  <ol class="item-list resizable" data-base-size="230">
+  <ol class="item-list">
     {{#each abilities as |item|}}
     <li class="item-entry item draggable" data-item-id="{{item.id}}">
       <div
@@ -63,3 +64,5 @@
     {{/each}}
   </ol>
 </div>
+{{#if classes.length}}{{> (path "/templates/actors/partials/character-classes.html") }}{{/if}}
+{{#if race}}{{> (path "/templates/actors/partials/character-race.html") }}{{/if}}

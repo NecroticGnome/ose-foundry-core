@@ -27,6 +27,8 @@
 <li><a href="#character">Character</a></li>
 <li><a href="#monster">Monster</a></li>
 <li><a href="#items-that-affect-actors">Items that affect actors</a></li>
+<li><a href="#active-effects">Active Effects</a></li>
+<li><a href="#hooks">Hooks</a></li>
 </ul>
 <hr />
 <h2 id="reading-this-reference">Reading this reference</h2>
@@ -146,9 +148,9 @@
 <p>The attack roll is <code>1d20 [+ bba if ascending] + str.mod or dex.mod + thac0.mod.&lt;melee|missile&gt; + weapon bonus</code>. Melee damage adds <code>str.mod</code> and <code>thac0.mod.melee</code>; missile damage doesn't.</p>
 <p><code>meleeMod</code> and <code>rangedMod</code> are derived display values for the sheet only - the roll doesn't read them.</p>
 <h3 id="saving-throws">Saving throws</h3>
-<p><code>system.saves.&lt;death|wand|paralysis|breath|spell&gt;.value</code> - integer, unset (<code>null</code>) until a class is applied. Roll <code>1d20</code> at or above. Magic-based saves add <code>scores.wis.mod</code> and <code>details.magic.bonus</code>.</p>
+<p><code>system.saves.&lt;death|wand|paralysis|breath|spell&gt;.value</code> - integer, unset (<code>null</code>) until a class is applied. With class items, set from the class table. Roll <code>1d20</code> at or above. Magic-based saves add <code>scores.wis.mod</code> and <code>details.magic.bonus</code>.</p>
 <h3 id="ability-scores">Ability scores</h3>
-<p><code>system.scores.&lt;str|int|wis|dex|con|cha&gt;.value</code> - default <code>0</code> (so a blank character has <code>-3</code> modifiers). Each also has a <code>.bonus</code> field that is stored but not used by the system. Scores aren't type-checked on write.</p>
+<p><code>system.scores.&lt;str|int|wis|dex|con|cha&gt;.value</code> - default <code>0</code> (so a blank character has <code>-3</code> modifiers). Each also has a <code>.bonus</code> field that is stored but not used by the system. Scores aren't type-checked on write. A race item's modifiers can't take a score above 18 or below 3.</p>
 <p>Derived per score:</p>
 <table>
 <thead>
@@ -265,6 +267,9 @@
 </tbody>
 </table>
 <p><code>exploration.od</code> is unrelated to the derived <code>scores.str.od</code>.</p>
+<h3 id="class-tables">Class tables</h3>
+<p>Each column of a class's tables is at <code>system.tables.&lt;table&gt;.&lt;column&gt;</code>, with <code>current</code> (the value at the class's level) and <code>levels</code> (the whole column), e.g. <code>system.tables.skills.hs.current</code> and <code>system.tables.skills.hs.levels</code> for Hide in Shadows. The upper value of a range is stored (e.g. <code>1-3</code> becomes <code>3</code>). Two classes with the same column use the higher-level class's value. In cases where this doesn't make sense, a Player or GM should rename the unwanted column.</p>
+<p>Active Effects can change any <code>current</code> value (e.g. <code>system.tables.skills.hs.current</code> ADD <code>10</code>).</p>
 <h3 id="details">Details</h3>
 <table>
 <thead>
@@ -278,7 +283,7 @@
 <tr>
 <td><code>system.details.class</code></td>
 <td><code>""</code></td>
-<td>Free text</td>
+<td>Free text. From class items when present</td>
 </tr>
 <tr>
 <td><code>system.details.title</code></td>
@@ -293,12 +298,12 @@
 <tr>
 <td><code>system.details.level</code></td>
 <td><code>1</code></td>
-<td></td>
+<td>Highest class level when class items are present</td>
 </tr>
 <tr>
 <td><code>system.details.xp.value</code></td>
 <td><code>0</code></td>
-<td></td>
+<td>First class's XP when class items are present</td>
 </tr>
 <tr>
 <td><code>system.details.xp.next</code></td>
@@ -308,7 +313,7 @@
 <tr>
 <td><code>system.details.xp.bonus</code></td>
 <td><code>0</code></td>
-<td>% bonus on earned XP</td>
+<td>% bonus on earned XP. With class items, effects add to each class's prime requisite bonus</td>
 </tr>
 <tr>
 <td><code>system.details.xp.share</code></td>
@@ -419,7 +424,11 @@
 <li><code>isSlow</code> - any equipped weapon is slow</li>
 <li><code>carriedTreasure</code> - total value of treasure carried</li>
 <li>Item lists: <code>weapons</code>, <code>armor</code>, <code>abilities</code>, <code>items</code>, <code>treasures</code>, <code>containers</code>, <code>spellList</code></li>
+<li><code>classes</code>, <code>race</code> - class and race items; <code>derivedFromClasses</code> - class items set THAC0, saves, hit dice, and spell slots</li>
+<li><code>spellPools</code> - spells and slots per casting class; <code>warnings</code> - rule warnings shown on the sheet</li>
+<li><code>xpBonusFromEffects</code> - XP bonus added by effects; <code>classXpBonus(cls)</code> - a class's prime requisite bonus</li>
 </ul>
+<p>With class items, roll data adds <code>@classTables.&lt;class key&gt;.&lt;table&gt;.&lt;column&gt;</code> - the class's table values at its level.</p>
 <hr />
 <h2 id="monster">Monster</h2>
 <p>Monsters use a smaller model. <strong>They have no <code>system.scores</code></strong> (<code>scores.str.mod</code> throws), <strong>no derived AC</strong>, and no <code>exploration</code>, <code>meleeMod</code>, <code>rangedMod</code>, <code>details.class</code>, <code>details.title</code>, <code>details.level</code>, or <code>details.magic.bonus</code>.</p>
@@ -461,12 +470,12 @@
 <tr>
 <td><code>system.details.treasure.table</code></td>
 <td><code>""</code></td>
-<td>RollTable UUID or name</td>
+<td>One or more RollTable <code>@UUID</code> links, space-separated</td>
 </tr>
 <tr>
 <td><code>system.details.treasure.type</code></td>
 <td><code>""</code></td>
-<td>Free text</td>
+<td>Free text, shown when no table is linked</td>
 </tr>
 <tr>
 <td><code>system.details.appearing.d</code></td>
@@ -529,7 +538,22 @@
 </tr>
 </tbody>
 </table>
-<p><strong><code>system.itemslots</code></strong> drives item-based encumbrance. Default <code>1</code> on weapons, armour, and containers; <code>0</code> on plain items. Slots used are <code>ceil(itemslots * quantity)</code>.</p>  </div>
+<p><strong><code>system.itemslots</code></strong> drives item-based encumbrance. Default <code>1</code> on weapons, armour, and containers; <code>0</code> on plain items. Slots used are <code>ceil(itemslots * quantity)</code>.</p>
+<p><strong>Class</strong> items set a character's level, XP, THAC0, saves, hit dice, and spell slots from their level table (<code>system.levels</code>) at <code>system.level</code>. With several classes, the best THAC0 and saves apply and hit points are shared. <code>system.xpBonusOverride</code> replaces the prime requisite bonus; <code>system.demihuman</code> marks a class that includes its race.</p>
+<p><strong>Race</strong> items apply their ability score modifiers as an effect (flagged <code>flags.ose.raceModifiers</code>) and add warnings for score requirements and class limits.</p>
+<hr />
+<h2 id="active-effects">Active Effects</h2>
+<p>Effects apply on top of the stored values each time the actor data is prepared. On the sheet, a field an effect changes is locked - click it to disable the effect and edit the value.</p>
+<p>The effect editor suggests keys for the actor type.</p>
+<p>Tweaks modifiers (initiative, melee, missile, AC, magic resist, and XP bonus) are saved as one effect each, flagged <code>flags.ose.tweak</code>.</p>
+<h2 id="hooks">Hooks</h2>
+<p>Hooks the system calls for modules.</p>
+<ul>
+<li><code>ose.preSpendSpell(item, config)</code> - before casting a memorised spell uses it up. Return <code>false</code> to cancel the cast, or set <code>config.consume = false</code> to keep the spell memorised.</li>
+<li><code>ose.preApplyStartingHp(actor, classItem, update)</code> - after a new class's starting hit points are rolled, before they are saved. Change <code>update["system.hp.max"]</code> and <code>update["system.hp.value"]</code> to adjust them.</li>
+<li><code>ose-setup-encumbrance</code> - during setup; add encumbrance schemes to <code>CONFIG.OSE.encumbranceOptions</code>.</li>
+<li><code>OSE.Party.showSheet</code> - run <code>Hooks.call("OSE.Party.showSheet");</code> to trigger the party sheet to render.</li>
+</ul>  </div>
 </div>
 </body>
 

@@ -1,3 +1,18 @@
+import { isAbilityOwned } from "../classes/abilities";
+import { statChanges } from "../classes/changes";
+import { abilitiesGrantedBy } from "../classes/granted";
+import {
+  applyXpBonus,
+  divideHp,
+  formatHp,
+  hdFlatBonus,
+  rollableHd,
+  SAVE_KEYS,
+  splitStartingHp,
+  splitXp,
+} from "../classes/progression";
+import { tableRowValues } from "../classes/tables";
+import OSE from "../config";
 import skipRollDialogCheck from "../helpers-behaviour";
 import OseDice from "../helpers-dice";
 import OseItem from "../item/entity";
@@ -26,6 +41,24 @@ export default class OseActor extends Actor {
     }
 
     return source;
+  }
+
+  applyActiveEffects(phase) {
+    if (phase !== "final") this.system.prepareTables?.();
+    return super.applyActiveEffects(phase);
+  }
+
+  // Class table values for formulas, e.g. @classTables.thief.skills.hs.
+  getRollData() {
+    const data = super.getRollData();
+    if (this.type !== "character") return data;
+    const classes = this.system.classes ?? [];
+    if (classes.length) {
+      data.classTables = Object.fromEntries(
+        classes.map((c) => [c.system.key || c.id, tableRowValues(c.system.tables ?? [], c.system.level)]),
+      );
+    }
+    return data;
   }
 
   async update(data, options = {}) {
@@ -74,28 +107,260 @@ export default class OseActor extends Actor {
   /* -------------------------------------------- */
   /*  Socket Listeners and Handlers
     /* -------------------------------------------- */
-  getExperience(value, _options = {}) {
-    const actorData = this.system;
-    const actorType = this.type;
-    // @TODO this seems like not the best spot for defining the xpKey const
-    const xpKey = "system.details.xp.value";
-
-    if (actorType !== "character") {
-      return;
-    }
-    const modified = Math.floor(value + (actorData.details.xp.bonus * value) / 100);
-    return this.update({
-      [xpKey]: modified + actorData.details.xp.value,
-    }).then(() => {
-      const speaker = ChatMessage.getSpeaker({ actor: this });
-      ChatMessage.create({
-        content: game.i18n.format("OSE.messages.GetExperience", {
-          name: this.name,
-          value: modified,
-        }),
-        speaker,
+  async getExperience(value, _options = {}) {
+    if (this.type !== "character") return;
+    const classes = this.system.classes;
+    let gained;
+    if (classes.length) {
+      const shares = splitXp(value, classes.length).map((share, i) => {
+        return applyXpBonus(share, this.system.classXpBonus(classes[i]) + this.system.xpBonusFromEffects);
       });
+      await this.updateEmbeddedDocuments(
+        "Item",
+        classes.map((c, i) => ({ _id: c.id, "system.xp": c.system.xp + shares[i] })),
+      );
+      gained = shares.reduce((sum, n) => sum + n, 0);
+    } else {
+      gained = Math.floor(value + (this.system.details.xp.bonus * value) / 100);
+      await this.update({ "system.details.xp.value": gained + this.system.details.xp.value });
+    }
+    ChatMessage.create({
+      content: game.i18n.format("OSE.messages.GetExperience", { name: this.name, value: gained }),
+      speaker: ChatMessage.getSpeaker({ actor: this }),
     });
+  }
+
+  /**
+   * Advance a class one level.
+   *
+   * @param {Item} classItem - An embedded class item
+   */
+  async levelUp(classItem) {
+    const { system } = classItem;
+    if (!system.nextRow) return;
+    const before = this.classStats();
+    const { gain, formula, fixed, roll } = await this.#rollLevelHp(classItem, system.level + 1);
+    const count = this.system.classes.length || 1;
+    const { whole, fraction } = divideHp(gain, count, this.system.hp.fraction ?? 0);
+    await classItem.update({ "system.level": system.level + 1 });
+    await this.update({
+      "system.hp.max": (this.system.hp.max || 0) + whole,
+      "system.hp.value": (this.system.hp.value || 0) + whole,
+      "system.hp.fraction": fraction,
+    });
+    await this.postClassChanges(
+      classItem,
+      before,
+      { rolls: [formula], gain, count, fixed, dice: roll ? [roll] : [] },
+      { levelUp: true },
+    );
+    await this.offerAbilities(classItem, classItem.system.level);
+  }
+
+  // HP for reaching a level.
+  async #rollLevelHp(classItem, level) {
+    const { levels, hitDie } = classItem.system;
+    const row = levels[level - 1];
+    if (row && !row.hdcon) {
+      const gain = hdFlatBonus(row.hd) - hdFlatBonus(levels[level - 2]?.hd ?? "");
+      return { gain, formula: String(gain), fixed: true };
+    }
+    const die = hitDie || "1d6";
+    const con = this.system.scores.con.mod || 0;
+    // At least 1 HP per level, regardless of CON penalty.
+    const formula = con ? `max(${die} ${con > 0 ? "+" : "-"} ${Math.abs(con)}, 1)` : die;
+    const roll = await new Roll(formula).evaluate();
+    return { gain: roll.total, formula, roll };
+  }
+
+  /**
+   * Roll hit points for each level of a class added above 1st level.
+   *
+   * @param {Item} classItem - An embedded class item
+   * @param {number} toLevel - The level the class starts at
+   */
+  async rollStartingHp(classItem, toLevel) {
+    const rolls = [];
+    for (let level = 1; level <= toLevel; level++) rolls.push(await this.#rollLevelHp(classItem, level));
+    const gain = rolls.reduce((sum, r) => sum + r.gain, 0);
+    const prevCount = Math.max(0, this.system.classes.length - 1);
+    const { max = 0, value = 0, fraction: prevFraction = 0 } = this.system.hp;
+    const { whole, fraction } = splitStartingHp({ max, fraction: prevFraction }, prevCount, gain);
+    const update = {
+      "system.hp.max": whole,
+      "system.hp.value": prevCount ? (value || 0) + whole - (max || 0) : whole,
+      "system.hp.fraction": fraction,
+    };
+    Hooks.callAll("ose.preApplyStartingHp", this, classItem, update);
+    await this.update(update);
+    return {
+      rolls: rolls.map((r) => r.gain),
+      gain,
+      prevTotal: (max + prevFraction) * prevCount,
+      count: prevCount + 1,
+      dice: rolls.map((r) => r.roll).filter(Boolean),
+    };
+  }
+
+  // The stats a class drives, for before/after comparison.
+  classStats() {
+    const { hp, thac0, saves, spells } = this.system;
+    return {
+      hp: (hp.max ?? 0) + (hp.fraction ?? 0),
+      thac0: thac0.value ?? 0,
+      saves: Object.fromEntries(SAVE_KEYS.map((k) => [k, saves[k]?.value ?? 0])),
+      spells: Object.fromEntries([1, 2, 3, 4, 5, 6].map((l) => [l, spells?.slots?.[l]?.max ?? 0])),
+    };
+  }
+
+  /**
+   * Post a chat card describing what adding a class or levelling one up changed.
+   *
+   * @param {Item} classItem - The class just added or levelled up
+   * @param {object} before - {@link classStats} from before the change
+   * @param {object} [hp] - The hit points gained: { rolls, gain, count, prevTotal?, fixed? }
+   * @param {object} [options]
+   * @param {boolean} [options.levelUp] - Whether this was a level-up rather than a new class
+   * @param {string} [options.title] - Replaces the default title
+   * @param {string[]} [options.lines] - Extra paragraphs, before the stat changes
+   * @param {{key: string, value: string}[]} [options.kept] - Adjustments kept from before a conversion
+   */
+  async postClassChanges(classItem, before, hp, { levelUp = false, title, lines = [], kept = [] } = {}) {
+    const i18n = game.i18n;
+    const key = (k) => `OSE.classes.changes.${k}`;
+    const labels = {
+      hp: i18n.localize("OSE.Health"),
+      thac0: i18n.localize("OSE.Thac0"),
+      ...Object.fromEntries(SAVE_KEYS.map((k) => [`saves.${k}`, i18n.localize(`OSE.saves.${k}.long`)])),
+      ...Object.fromEntries(
+        [1, 2, 3, 4, 5, 6].map((l) => [`spells.${l}`, i18n.format(key("SpellSlots"), { level: l })]),
+      ),
+      hd: i18n.localize("OSE.HitDice"),
+    };
+    const show = (k, v) => (k === "hp" ? formatHp(v) : v);
+    const changes = statChanges(before, this.classStats()).map((c) => ({
+      label: labels[c.key],
+      from: show(c.key, c.from),
+      to: show(c.key, c.to),
+    }));
+    const { max, fraction } = this.system.hp;
+    const split = () =>
+      levelUp
+        ? i18n.format(key("LevelSplit"), { gain: hp.gain, count: hp.count, share: formatHp(hp.gain / hp.count) })
+        : i18n.format(key("Split"), {
+            prev: formatHp(hp.prevTotal),
+            gain: hp.gain,
+            count: hp.count,
+            result: formatHp(max + (fraction || 0)),
+          });
+    const content = await foundry.applications.handlebars.renderTemplate(
+      `${OSE.systemPath()}/templates/chat/class-changes.html`,
+      {
+        img: classItem.img,
+        title:
+          title ??
+          i18n.format(key(levelUp ? "LevelTitle" : "Title"), {
+            cls: classItem.name,
+            level: classItem.system.level,
+          }),
+        lines,
+        kept: kept.map((k) => ({ label: labels[k.key] ?? k.key, value: k.value })),
+        keptTitle: kept.length && i18n.format(key("Kept"), { effect: i18n.localize("OSE.migration.EffectName") }),
+        rolled:
+          hp &&
+          (hp.fixed
+            ? i18n.format(key("Fixed"), { gain: hp.gain })
+            : i18n.format(key("Rolled"), { rolls: hp.rolls.join(" + "), gain: hp.gain })),
+        split: hp?.count > 1 && split(),
+        changes,
+        dice: await Promise.all((hp?.dice ?? []).map((r) => r.render())),
+      },
+    );
+    return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this }), content });
+  }
+
+  /**
+   * Offer the abilities an item grants at a level.
+   *
+   * @param {Item} item - An embedded class or race item
+   * @param {number} level - The level just reached
+   */
+  async offerAbilities(item, level, { upTo = false } = {}) {
+    if (!game.settings.get(game.system.id, "promptAddClassAbilities")) return;
+    const owned = this.items
+      .filter((i) => i.type === "ability")
+      .map((i) => ({
+        name: i.name,
+        requirements: i.system.requirements ?? "",
+        source: i._stats?.compendiumSource ?? i.flags?.core?.sourceId ?? "",
+      }));
+    const entries = [];
+    for (const entry of (item.system.abilities ?? []).filter((a) => (upTo ? a.level <= level : a.level === level))) {
+      const doc = await fromUuid(entry.uuid);
+      if (!doc) continue;
+      const candidate = { name: doc.name, requirements: doc.system?.requirements ?? "", uuid: entry.uuid };
+      if (!isAbilityOwned(owned, candidate)) entries.push({ doc, entry });
+    }
+    if (!entries.length) return;
+    const list = entries.map(({ doc }) => `<li>${foundry.utils.escapeHTML(doc.name)}</li>`).join("");
+    const ok = await foundry.applications.api.DialogV2.confirm({
+      window: { title: item.name },
+      content: `<p>${game.i18n.localize("OSE.classes.AddAbilities")}</p><ul>${list}</ul>`,
+      rejectClose: false,
+    });
+    if (!ok) return;
+    const scope = game.system.id;
+    const grantedBy = { type: item.type, key: item.system.key };
+    const data = entries.map(({ doc, entry }) => {
+      const base = doc.pack ? game.items.fromCompendium(doc) : doc.toObject();
+      const flags = { grantedBy };
+      const target = item.type === "class" ? entry.target || doc.system?.targetFrom : "";
+      if (target) flags.classTarget = { classKey: item.system.key, target };
+      return foundry.utils.mergeObject(base, { flags: { [scope]: flags } });
+    });
+    await this.createEmbeddedDocuments("Item", data);
+  }
+
+  /**
+   * Delete a class or race, offering to delete the abilities it granted.
+   *
+   * @param {Item} item - An embedded class or race item
+   */
+  async removeGrantingItem(item) {
+    const scope = game.system.id;
+    const links = [];
+    for (const { uuid } of item.system.abilities ?? []) {
+      const doc = await fromUuid(uuid);
+      if (doc) links.push({ uuid, name: doc.name, requirements: doc.system?.requirements ?? "" });
+    }
+    const owned = this.items
+      .filter((i) => i.type === "ability")
+      .map((i) => ({
+        id: i.id,
+        name: i.name,
+        requirements: i.system.requirements ?? "",
+        source: i._stats?.compendiumSource ?? i.flags?.core?.sourceId ?? "",
+        grantedBy: i.getFlag(scope, "grantedBy"),
+      }));
+    const ids = abilitiesGrantedBy({ type: item.type, system: item.system, links }, owned);
+    const esc = foundry.utils.escapeHTML;
+    const boxes = ids
+      .map(
+        (id) =>
+          `<label class="checkbox"><input type="checkbox" name="${id}" checked> ${esc(this.items.get(id).name)}</label>`,
+      )
+      .join("");
+    const content = ids.length
+      ? `<p>${game.i18n.format("OSE.classes.RemoveWithAbilities", { name: esc(item.name) })}</p><div class="granted-abilities">${boxes}</div>`
+      : `<p>${game.i18n.format("OSE.dialog.confirmDeleteItem", { name: esc(item.name) })}</p>`;
+    const chosen = await foundry.applications.api.DialogV2.confirm({
+      window: { title: game.i18n.localize("OSE.dialog.deleteItem") },
+      content,
+      yes: { callback: (_event, button) => ids.filter((id) => button.form.elements[id]?.checked) },
+      rejectClose: false,
+    });
+    if (!chosen) return;
+    await this.deleteEmbeddedDocuments("Item", [item.id, ...chosen]);
   }
 
   isNew() {
@@ -346,14 +611,13 @@ export default class OseActor extends Actor {
     const actorData = this.system;
 
     const label = game.i18n.localize("OSE.roll.hd");
-    let rollParts = [actorData.hp.hd];
+    const hd = rollableHd(actorData.hp.hd);
+    let rollParts = [hd];
 
     if (actorType === "character") {
       // A character always gains at least 1 hit point per Hit Die,
       // regardless of CON modifier.
-      rollParts = [
-        `max(${actorData.hp.hd} + ${actorData.scores.con.mod * actorData.details.level}, ${actorData.hp.hd[0]})`,
-      ];
+      rollParts = [`max(${hd} + ${actorData.scores.con.mod * actorData.details.level}, ${hd[0]})`];
     }
 
     const data = {
@@ -385,10 +649,10 @@ export default class OseActor extends Actor {
     let label = "";
     if (options.check === "wilderness") {
       rollParts.push(actorData.details.appearing.w);
-      label = "2";
+      label = game.i18n.localize("OSE.roll.appearingWilderness");
     } else {
       rollParts.push(actorData.details.appearing.d);
-      label = "1";
+      label = game.i18n.localize("OSE.roll.appearingDungeon");
     }
     const data = {
       actor: this,

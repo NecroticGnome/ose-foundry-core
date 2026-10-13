@@ -24,6 +24,7 @@
           style="background-image: url({{item.img}})"
         ></div>
         <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
+        {{#if (lookup @root.warnedItems item.id)}}<i class="fas fa-triangle-exclamation item-warning" data-tooltip="{{lookup @root.warnedItems item.id}}"></i>{{/if}}
         <div class="tag-row icon-row">
           {{#each item.system.qualities as |tag|}} {{#if tag.image}}
           <img
@@ -103,6 +104,7 @@
           style="background-image: url({{item.img}})"
         ></div>
         <h4 class="item-name" data-action="toggleSummary" data-tooltip="{{item.name}}">{{item.name~}}</h4>
+        {{#if (lookup @root.warnedItems item.id)}}<i class="fas fa-triangle-exclamation item-warning" data-tooltip="{{lookup @root.warnedItems item.id}}"></i>{{/if}}
         <div class="field-short">
           {{#if @root.config.ascendingAC}} {{item.system.aac.value}} {{else}}
           {{item.system.ac.value}} {{/if}}

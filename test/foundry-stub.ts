@@ -30,6 +30,8 @@ class StringField extends DataField {
   }
 }
 
+class HTMLField extends StringField {}
+
 class NumberField extends DataField {
   getInitialValue() {
     return this.options.initial ?? null;
@@ -137,7 +139,7 @@ Object.assign(globalThis, {
   foundry: {
     abstract: { TypeDataModel },
     data: {
-      fields: { DataField, StringField, NumberField, BooleanField, ArrayField, ObjectField, SchemaField },
+      fields: { DataField, StringField, HTMLField, NumberField, BooleanField, ArrayField, ObjectField, SchemaField },
     },
   },
   CONFIG: { OSE },

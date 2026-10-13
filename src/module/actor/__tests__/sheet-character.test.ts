@@ -49,6 +49,7 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
         "spells",
         "inventory",
         "notes",
+        "effects",
       ]);
     });
 
@@ -195,6 +196,121 @@ export default ({ describe, it, expect, after, afterEach }: QuenchMethods) => {
       expect(data?.system.meleeMod).not.undefined;
       expect(data?.system.rangedMod).not.undefined;
       expect(data?.system.init).not.undefined;
+    });
+
+    it("lets the level 0 spell maximum be set with class items", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const row = { xp: 0, hd: "1d4", hdcon: true, thac0: 19, bba: 0, saves: {}, spellSlots: { 1: 1 } };
+      const caster = (name: string, sort: number) => ({
+        name,
+        type: "class",
+        sort,
+        system: { key: name, level: 1, levels: [row] },
+      });
+      await actor?.createEmbeddedDocuments("Item", [
+        caster("Magic-User", 1),
+        caster("Illusionist", 2),
+        { name: "Spark", type: "spell", system: { lvl: 0, class: "Magic-User" } },
+      ]);
+      for (const pooled of [true, false]) {
+        await actor?.sheet?.render({ force: true });
+        await waitForInput();
+        const selector = `${pooled ? ".spell-pool " : ""}input[name="system.spells.0.max"]`;
+        expect(actor?.sheet?.element.querySelector(selector), pooled ? "pools" : "single class").not.null;
+        await actor?.items.getName("Illusionist")?.delete();
+      }
+      await actor?.sheet?.close();
+    });
+
+    it("uses the class level titles until a title is set, without storing them", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      const cls = (name: string, titles: string[], sort: number) => ({
+        name,
+        type: "class",
+        sort,
+        system: { titles, level: 2 },
+      });
+      await actor?.createEmbeddedDocuments("Item", [
+        cls("Fighter", ["Veteran", "Warrior"], 1),
+        cls("Magic-User", ["Medium", "Seer"], 2),
+      ]);
+      expect(actor?.system.details.title).equal("Warrior / Seer");
+
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector('[name="system.details.alignment"]'));
+      await actor?.sheet?.submit();
+      expect(actor?._source.system.details.title).equal("");
+
+      await actor?.update({ "system.details.title": "Lord" });
+      expect(actor?.system.details.title).equal("Lord");
+      await actor?.sheet?.close();
+    });
+
+    it("shows exploration skills raised by abilities without storing them", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      await actor?.createEmbeddedDocuments("Item", [
+        {
+          name: "Keen Hearing",
+          type: "ability",
+          system: { roll: "1d6", rollType: "below", rollTarget: 3, exploration: "ld" },
+        },
+      ]);
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector('[name="system.exploration.ld"]'));
+      const input = actor?.sheet?.element?.querySelector('[name="system.exploration.ld"]') as HTMLInputElement;
+      expect(input.value).equal("3");
+      expect(input.dataset.tooltip).contain("Keen Hearing");
+      await actor?.sheet?.submit();
+      expect(actor?._source.system.exploration.ld).equal(1);
+      await actor?.sheet?.close();
+    });
+
+    it("shows a class table column's final value and where it comes from", async () => {
+      const actor = await createMockActorKey("character", {}, key);
+      await actor?.createEmbeddedDocuments("Item", [
+        {
+          name: "Thief",
+          type: "class",
+          system: {
+            key: "thief",
+            level: 1,
+            tables: [
+              { key: "skills", label: "Skills", columns: [{ key: "hn", name: "Hear noise" }], rows: [{ hn: "1-2" }] },
+            ],
+          },
+        },
+      ]);
+      await actor?.createEmbeddedDocuments("ActiveEffect", [
+        { name: "Keen Ears", changes: [{ key: "system.tables.skills.hn.current", mode: 2, value: "1" }] },
+      ]);
+      await actor?.sheet?.render(true);
+      await waitUntil(() => actor?.sheet?.element?.querySelector(".class-table-cell"));
+      const cell = actor?.sheet?.element?.querySelector(".class-table-cell") as HTMLElement;
+      expect(cell.querySelector(".cell-value")?.textContent).equal("1-3");
+      expect(cell.dataset.tooltip).equal("Hear noise: Thief 2, Keen Ears +1");
+      await actor?.sheet?.close();
+    });
+
+    after(async () => {
+      await cleanUpActorsByKey(key);
+    });
+  });
+
+  describe("layout", () => {
+    it("keeps the tab body inside the window when warnings are shown", async () => {
+      const actor = await createMockActorKey("character", { system: { scores: { con: { value: 8 } } } }, key);
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Hardy", type: "class", system: { key: "hardy", requirements: "Minimum CON 9", level: 1 } },
+      ]);
+      expect(actor.system.warnings.length).greaterThan(0);
+      const sheet = actor.sheet as unknown as OseActorSheetCharacter & { _showWarnings: boolean };
+      sheet._showWarnings = true;
+      await sheet.render(true);
+      await waitUntil(() => !!sheet.element?.querySelector(".sheet-body"));
+      const body = (sheet.element.querySelector(".sheet-body") as HTMLElement).getBoundingClientRect();
+      const content = (sheet.element.querySelector(".window-content") as HTMLElement).getBoundingClientRect();
+      expect(body.bottom).at.most(content.bottom + 1);
+      await sheet.close();
     });
 
     after(async () => {

@@ -1,0 +1,50 @@
+<div class="inventory character-classes">
+  <div data-action="toggleCategory" class="item-category-title flexrow">
+    <div class="category-name">{{localize 'TYPES.Item.class'}}</div>
+    <div class="field-short">{{localize 'OSE.details.level'}}</div>
+    <div class="field-long">{{localize 'OSE.details.experience.base'}}</div>
+    <div class="item-controls"></div>
+  </div>
+  <ol class="item-list class-list">
+    {{#each classes as |cls|}}
+    <li class="item-entry item class-row {{#if cls.canLevelUp}}notify{{/if}}" data-item-id="{{cls.id}}">
+      <div class="item-header flexrow">
+        <div class="item-name flexrow">
+          <div class="item-image" style="background-image: url('{{cls.img}}')"></div>
+          <a data-action="editItem">{{cls.name}}</a>
+          {{#if cls.tables.length}}<a class="class-tables-toggle" data-action="toggleClassTables" data-class-id="{{cls.id}}" data-tooltip="{{#if cls.collapsed}}OSE.classes.ShowTables{{else}}OSE.classes.HideTables{{/if}}"><i class="fas {{#if cls.collapsed}}fa-caret-right{{else}}fa-caret-down{{/if}}"></i></a>{{/if}}
+          {{#unless cls.hasTable}}<i class="fas fa-pen-ruler" data-tooltip="OSE.classes.NoTableHint"></i>{{/unless}}
+        </div>
+        <div class="field-short">{{cls.level}}</div>
+        <div class="field-long class-xp flexrow">
+          <input type="number" data-class-xp="{{cls.id}}" value="{{cls.xp}}" {{#unless @root.owner}}disabled{{/unless}} />
+          {{#if cls.next}}<span>/ {{cls.next}}</span>{{/if}}
+          {{#if cls.bonus}}<span class="xp-bonus" data-tooltip="OSE.classes.XpAdjustment">{{numberFormat cls.bonus sign=true}}%</span>{{/if}}
+        </div>
+        {{#if @root.owner}}
+        <div class="item-controls">
+          {{#if cls.canLevelUp}}<a class="item-control" data-action="levelUp" data-tooltip="OSE.classes.LevelUp"><i class="fas fa-circle-up"></i></a>{{/if}}
+          <a class="item-control" data-action="deleteItem" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a>
+        </div>
+        {{/if}}
+      </div>
+      {{#unless cls.collapsed}}
+      {{#each cls.tables as |table|}}
+      <div class="class-table-row">
+        <span class="class-table-label">{{table.label}}</span>
+        <div class="class-table-cells">
+          {{#each table.cells as |cell|}}
+          {{#if cell.abilityId}}
+          <a class="class-table-cell rollable" data-action="rollClassSkill" data-ability-id="{{cell.abilityId}}" data-tooltip="{{cell.name}}"><span class="cell-label">{{cell.label}}</span><span class="cell-value">{{cell.value}}</span></a>
+          {{else}}
+          <span class="class-table-cell" data-tooltip="{{cell.name}}"><span class="cell-label">{{cell.label}}</span><span class="cell-value">{{cell.value}}</span></span>
+          {{/if}}
+          {{/each}}
+        </div>
+      </div>
+      {{/each}}
+      {{/unless}}
+    </li>
+    {{/each}}
+  </ol>
+</div>

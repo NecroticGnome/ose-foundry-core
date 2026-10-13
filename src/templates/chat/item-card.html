@@ -2,10 +2,11 @@
     tokenId}}data-token-id="{{tokenId}}" {{/if}}>
     <div class="ose chat-block">
         <div class="flexrow chat-header">
+            {{#if item.img}}<img class="chat-item-img" src="{{item.img}}" alt="" />{{/if}}
             <div class="chat-title">
                 <h2>{{item.name}}</h2>
             </div>
-            <div class="chat-img" style="background-image:url('{{item.img}}')"></div>
+            {{#if actor.img}}<div class="chat-img" style="background-image:url('{{actor.img}}')"></div>{{/if}}
         </div>
 
         <div class="card-content">

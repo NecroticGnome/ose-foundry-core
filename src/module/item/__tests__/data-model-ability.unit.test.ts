@@ -76,3 +76,127 @@ describe("OseDataModelAbility", () => {
     });
   });
 });
+
+describe("roll target from a class table", () => {
+  const thief = {
+    type: "class",
+    system: {
+      key: "thief",
+      level: 2,
+      tables: [
+        { key: "skills", label: "Skills", columns: [{ key: "hs", label: "HS" }], rows: [{ hs: 10 }, { hs: 15 }] },
+      ],
+    },
+  };
+  const parentWith = (flag: unknown, items: unknown[] = [thief]) => ({
+    getFlag: () => flag,
+    actor: { items },
+  });
+
+  it("uses the linked cell for the class's level", () => {
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3 },
+      { parent: parentWith({ classKey: "thief", target: "skills.hs" }) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(15);
+    expect(ability.rollTargetFromClass).toBe(true);
+  });
+
+  it("keeps its own target without a link, class or numeric cell", () => {
+    for (const parent of [
+      parentWith(undefined),
+      parentWith({ classKey: "thief", target: "skills.hs" }, []),
+      parentWith({ classKey: "thief", target: "skills.zz" }),
+    ]) {
+      const ability = new OseDataModelAbility({ rollTarget: 3 }, { parent });
+      ability.prepareDerivedData();
+      expect(ability.rollTarget).toBe(3);
+      expect(ability.rollTargetFromClass).toBe(false);
+    }
+  });
+
+  it("follows its own table link on a character whose class has the column", () => {
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3, targetFrom: "skills.hs" },
+      { parent: parentWith(undefined) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(15);
+    expect(ability.rollTargetFromClass).toBe(true);
+  });
+
+  it("prefers the class's own link over the ability's", () => {
+    const tables = [
+      {
+        key: "skills",
+        label: "Skills",
+        columns: [{ key: "hs" }, { key: "ms" }],
+        rows: [
+          { hs: 10, ms: 30 },
+          { hs: 15, ms: 35 },
+        ],
+      },
+    ];
+    const cls = { type: "class", system: { key: "thief", level: 2, tables } };
+    const ability = new OseDataModelAbility(
+      { rollTarget: 3, targetFrom: "skills.hs" },
+      { parent: parentWith({ classKey: "thief", target: "skills.ms" }, [cls]) },
+    );
+    ability.prepareDerivedData();
+    expect(ability.rollTarget).toBe(35);
+  });
+
+  describe("effectiveTarget", () => {
+    const owned = (exploration: Record<string, number> | undefined) => ({
+      parent: { actor: { system: { exploration } } },
+    });
+
+    it("is the character's exploration skill for a flagged ability", () => {
+      const ability = new OseDataModelAbility(
+        { roll: "1d6", rollType: "below", rollTarget: 2, exploration: "ld" },
+        owned({ ld: 3 }),
+      );
+      expect(ability.effectiveTarget).toBe(3);
+    });
+
+    it("keeps its own target for a roll-over ability", () => {
+      const ability = new OseDataModelAbility(
+        { roll: "1d6", rollType: "above", rollTarget: 5, exploration: "ld" },
+        owned({ ld: 3 }),
+      );
+      expect(ability.effectiveTarget).toBe(5);
+    });
+
+    it("is the current value of its table column on the character", () => {
+      const tables = { skills: { hs: { current: 25, levels: [10, 15] } } };
+      const parent = { ...parentWith(undefined), actor: { items: [thief], system: { tables } } };
+      const ability = new OseDataModelAbility({ rollTarget: 3, targetFrom: "skills.hs" }, { parent });
+      ability.prepareDerivedData();
+      expect(ability.rollTarget).toBe(15);
+      expect(ability.effectiveTarget).toBe(25);
+    });
+
+    it("keeps the table value when the current value isn't a number", () => {
+      const tables = { skills: { hs: { current: "T", levels: [10, 15] } } };
+      const parent = { ...parentWith(undefined), actor: { items: [thief], system: { tables } } };
+      const ability = new OseDataModelAbility({ rollTarget: 3, targetFrom: "skills.hs" }, { parent });
+      ability.prepareDerivedData();
+      expect(ability.effectiveTarget).toBe(15);
+    });
+
+    it("keeps its own target when it doesn't roll x-in-6", () => {
+      const ability = new OseDataModelAbility(
+        { roll: "1d100", rollType: "below", rollTarget: 30, exploration: "ld" },
+        owned({ ld: 3 }),
+      );
+      expect(ability.effectiveTarget).toBe(30);
+    });
+
+    it("is the roll target when unflagged or not on a character", () => {
+      expect(new OseDataModelAbility({ rollTarget: 2 }, owned({ ld: 3 })).effectiveTarget).toBe(2);
+      expect(new OseDataModelAbility({ rollTarget: 2, exploration: "ld" }, owned(undefined)).effectiveTarget).toBe(2);
+      expect(new OseDataModelAbility({ rollTarget: 2, exploration: "ld" }).effectiveTarget).toBe(2);
+    });
+  });
+});

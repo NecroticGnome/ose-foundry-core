@@ -3,18 +3,6 @@
  */
 import OSE from "../config";
 import OseEntityTweaks from "../dialog/entity-tweaks";
-import { removeItemFromActor } from "./inventory-actions";
-
-export const promptRemoveItemFromActor = (sheet, item) =>
-  foundry.applications.api.DialogV2.confirm({
-    window: { title: game.i18n.localize("OSE.dialog.deleteItem") },
-    content: game.i18n.format("OSE.dialog.confirmDeleteItem", { name: item.name }),
-    yes: {
-      default: false,
-      callback: () => removeItemFromActor(sheet.actor, item),
-    },
-    defaultYes: false,
-  });
 
 export const chooseItemType = async (choices = ["weapon", "armor", "shield", "gear"]) => {
   const templateData = {

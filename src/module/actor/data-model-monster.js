@@ -15,6 +15,9 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
     this.spells = new OseDataModelCharacterSpells(this.spells, this.#spellList);
     this.config.movementAuto = false;
     this.movement = new OseDataModelCharacterMove(this.encumbrance, false, this.movement.base);
+    const source = this.parent._source.system;
+    if (this.ac.value !== source.ac?.value) this.aac.value = 19 - this.ac.value;
+    else if (this.aac.value !== source.aac?.value) this.ac.value = 19 - this.aac.value;
   }
 
   /**

@@ -1,0 +1,41 @@
+<div class="inventory effects-list">
+  {{#each effectGroups as |group|}}
+  <div class="item-category-title flexrow">
+    <div class="category-name">{{localize group.label}}</div>
+    <div class="field-long">{{localize "OSE.effects.Source"}}</div>
+    <div class="field-long">{{localize "OSE.effects.Duration"}}</div>
+    <div class="item-controls">
+      {{#if @first}}{{#if @root.editable}}<a class="item-control" data-action="createEffect" data-tooltip="OSE.effects.Create"><i class="fas fa-plus"></i></a>{{/if}}{{/if}}
+    </div>
+  </div>
+  <ol class="item-list">
+    {{#each group.effects as |e|}}
+    <li class="item-entry effect-entry {{#if e.disabled}}inactive{{/if}}" data-effect-uuid="{{e.uuid}}">
+      <div class="item-header flexrow">
+        <div class="item-name flexrow">
+          <div class="item-image" style="background-image: url('{{e.img}}')"></div>
+          <a data-action="editEffect">{{e.name}}</a>
+        </div>
+        <div class="field-long">{{#if e.source}}{{e.source}}{{else}}{{localize "OSE.effects.Actor"}}{{/if}}</div>
+        <div class="field-long">{{e.duration}}</div>
+        <div class="item-controls">
+          {{#if e.fixed}}
+          <span class="item-control locked" data-tooltip="OSE.effects.Fixed"><i class="fas fa-lock"></i></span>
+          {{else if @root.editable}}
+          <a class="item-control" data-action="toggleEffect" data-tooltip="{{#if e.disabled}}OSE.effects.Enable{{else}}OSE.effects.Disable{{/if}}"><i class="fas {{#if e.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i></a>
+          <a class="item-control" data-action="editEffect" data-tooltip="OSE.effects.Edit"><i class="fas fa-edit"></i></a>
+          {{#if e.source}}
+          <span class="item-control locked" data-tooltip="OSE.effects.FromItem"><i class="fas fa-trash"></i></span>
+          {{else}}
+          <a class="item-control" data-action="deleteEffect" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a>
+          {{/if}}
+          {{/if}}
+        </div>
+      </div>
+    </li>
+    {{else}}
+    <li class="item-entry effect-entry empty"><span class="hint">{{localize "OSE.effects.None"}}</span></li>
+    {{/each}}
+  </ol>
+  {{/each}}
+</div>
