@@ -618,6 +618,11 @@
           font-weight: bold;
         }
 
+        // text-indent is inherited into inline-block rolls and links, pushing their text under the icon.
+        a {
+          text-indent: 0;
+        }
+
         line-height: 36px;
       }
 
