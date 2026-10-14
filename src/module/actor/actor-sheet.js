@@ -18,6 +18,7 @@ import {
 import {
   createItem,
   onSpellChange,
+  promptRemoveItemFromActor,
   removeItemFromActor,
   resetSpells,
   rollAbility,
