@@ -69,8 +69,9 @@ export const renameColumnKeys = (current: ClassTable[], submitted: ClassTable[])
       const out = { ...row };
       columns.forEach((col, c) => {
         const old = before[c]?.key;
-        if (!old || old === col.key) return;
-        out[col.key] = row[old];
+        const value = old ? row[old] : undefined;
+        if (!old || old === col.key || value === undefined) return;
+        out[col.key] = value;
         delete out[old];
       });
       return out;

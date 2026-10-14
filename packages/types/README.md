@@ -5,8 +5,8 @@ TypeScript types for the [Old-School Essentials
 
 This package is intentionally minimal in its initial release. It re-exports
 **only the types that are already explicitly declared in OSE's TypeScript
-source** — config unions, the character helper-class interfaces, and the
-character class definitions. The shipped surface grows automatically as the
+source** — config unions, the character helper-class interfaces, the item
+data shapes, and the character class definitions. The shipped surface grows automatically as the
 system's remaining `.js` data models are converted to `.ts`.
 
 The package ships a single declaration-only entrypoint (`index.d.ts`). It
@@ -27,13 +27,14 @@ automatically — you don't need to do anything extra.
 
 ## What's exported
 
-As of 6-12-2026:
+As of 14 October 2026:
 
 
 | Group                                                                             | Types                                                                                                                                            |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Config unions** (from `src/module/config.ts`)                                   | `OseConfig`, `Save`, `Armor`, `Attribute`, `ExplorationSkill`, `RollType`, `Color`, `InventoryItemTag`, `EncumbranceOption`, `ApplyDamageOption` |
-| **Character helper interfaces** (from `src/module/actor/data-model-classes/*.ts`) | `CharacterScores`, `CharacterAC`, `CharacterMove`, `CharacterEncumbrance`, `CharacterSpells`                                                     |
+| **Config unions** (from `src/module/config.ts`)                                   | `OseConfig`, `Save`, `Armor`, `Attribute`, `ExplorationSkill`, `RollType`, `Color`, `InventoryItemTag`, `InventoryItemTagValue`, `EncumbranceOption`, `ApplyDamageOption` |
+| **Character helper interfaces** (from `src/module/actor/data-model-classes/*.ts`) | `CharacterScores`, `CharacterAC`, `CharacterMove`, `CharacterEncumbrance`, `CharacterSpells`, `ExplorationSkills` (from `src/module/actor/exploration-skills`) |
+| **Item data** (from `src/module/item/item-types.ts`) | `WeaponItemData`, `ArmorItemData`, `ArmorType`, `SpellItemData`, `AbilityItemData`, `ContainerItemData`, `MiscItemData`, `PhysicalItemData`, `NonPhysicalItemData`, `CarriedItem`, `ItemTag`, `DisplayTag` |
 | **Classes** (from `src/types/classes.ts`)                                         | `ClassicClassName`, `OseClass`                                                                                                                   |
 
 
@@ -54,8 +55,6 @@ As the system migrates its `.js` data models to `.ts`, the explicit type
 definitions in those files become eligible for re-export here. Likely future
 additions, in roughly the order they'd land:
 
-- `WeaponSystemData`, `ItemSystemData`, `ArmorSystemData`, `SpellSystemData`,
-`AbilitySystemData`, `ContainerSystemData` — when `src/module/item/data-model-*.js` move to TypeScript
 - `CharacterSystemData` / `MonsterSystemData` (and their `*Source` variants) —
 when the actor data models migrate
 - Document-level convenience types (e.g. `OseCharacter = Actor & { type: "character"; … }`) — once the system data shapes are available to compose with
