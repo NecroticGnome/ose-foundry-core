@@ -132,6 +132,10 @@ class Roll {
   }
 }
 
+Object.assign(Math, {
+  clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
+});
+
 Object.assign(globalThis, {
   Roll,
   foundry: {
@@ -143,6 +147,9 @@ Object.assign(globalThis, {
   CONFIG: { OSE },
   game: {
     system: { id: "ose" },
+    settings: {
+      get: () => false,
+    },
     i18n: {
       localize: (key: string) => key,
     },
