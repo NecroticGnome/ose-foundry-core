@@ -153,6 +153,21 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       expect(actor?.system.details.treasure.type).equal("+ 100gp");
     });
 
+    it("links a table whose drag data is cleared once the drop handler awaits", async () => {
+      const actor = await createMockActorKey("monster", {}, key);
+      const rollTable = await createMockRollTable();
+      let readable = true;
+      const json = JSON.stringify({ type: "RollTable", uuid: rollTable?.uuid });
+      const event = { dataTransfer: { getData: () => (readable ? json : "") } } as unknown as DragEvent;
+      // eslint-disable-next-line no-underscore-dangle
+      const dropped = (actor?.sheet as unknown as OseActorSheetMonster)._onDrop(event);
+      readable = false;
+      await dropped;
+      await waitForInput();
+
+      expect(actor?.system.details.treasure.table).equal(`@UUID[RollTable.${rollTable?.id}]`);
+    });
+
     it("shows linked tables alongside typed treasure", async () => {
       const actor = await createMockActorKey(
         "monster",

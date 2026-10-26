@@ -135,8 +135,9 @@ export default class OseActorSheetMonster extends OseActorSheet {
   }
 
   async _onDrop(event) {
-    await super._onDrop(event);
+    // Read the data before awaiting.
     const data = TextEditor.getDragEventData(event);
+    await super._onDrop(event);
     if (data.type !== "RollTable" || !this.isEditable) return;
 
     let link = "";
