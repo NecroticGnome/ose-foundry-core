@@ -186,6 +186,8 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       await waitForInput();
       const field = actor?.sheet?.element.querySelector(".treasure-table");
       expect(field?.querySelectorAll(".treasure-links a").length).equal(2);
+      expect(field?.querySelector(".treasure-summary a")?.textContent?.trim()).equal(`Treasure A ${key}`);
+      expect(field?.querySelector(".treasure-summary .more")?.textContent).equal("+2");
       expect(field?.querySelector<HTMLInputElement>('input[name="system.details.treasure.type"]')?.value).equal(
         "C + 100gp",
       );
