@@ -7,7 +7,7 @@
   Old-School Essentials – Foundry VTT Edition
 </h1>
 <p align="center">
-  <!-- BEGIN TEXT REQUIRED BY LICENSE -->Requires <strong><em>Old-School Essentials</em></strong> Classic Fantasy or Advanced Fantasy.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at <a href="https://necroticgnome.com">Necrotic Gnome's website</a>. Buy <a href="https://www.foundryvtt.store/products/ose-advancedfantasytome">Old-School Essentials: Premium Game</a> and <a href="https://www.foundryvtt.store/creators/necroticgnome">more Necrotic Gnome content</a> for Foundry VTT.
+  <!-- BEGIN TEXT REQUIRED BY LICENSE -->Requires <strong><em>Old-School Essentials</em></strong> Classic Fantasy or Advanced Fantasy.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at <a href="https://necroticgnome.com">Necrotic Gnome's website</a>. Buy <a href="https://www.foundryvtt.store/products/ose-premiumgame">Old-School Essentials: Premium Game</a> and <a href="https://www.foundryvtt.store/creators/necroticgnome">more Necrotic Gnome content</a> for Foundry VTT.
 </p>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->

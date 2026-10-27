@@ -13,7 +13,11 @@ export interface IndexEntry {
   load: () => Promise<Record<string, unknown>>;
 }
 
-const PREFERRED_PACKS = ["ose-advancedfantasytome.classes", "classicfantasycompendium.classes"];
+const PREFERRED_PACKS = [
+  "ose-premiumgame.classes",
+  "ose-advancedfantasytome.classes",
+  "classicfantasycompendium.classes",
+];
 
 export const resolveClass = (text: string, entries: IndexEntry[]) => {
   const n = normaliseName(text);
@@ -22,7 +26,7 @@ export const resolveClass = (text: string, entries: IndexEntry[]) => {
   return entries.find((e) => e.key && e.key === k) ?? entries.find((e) => normaliseName(e.name) === n) ?? null;
 };
 
-const rank = (id: string) => {
+export const packRank = (id: string) => {
   const i = PREFERRED_PACKS.indexOf(id);
   return i === -1 ? PREFERRED_PACKS.length : i;
 };
@@ -40,7 +44,7 @@ export const buildClassIndex = async (): Promise<IndexEntry[]> => {
     });
   }
   const packs = [...(game.packs?.filter((p) => p.documentName === "Item") ?? [])];
-  packs.sort((a, b) => rank(a.collection) - rank(b.collection));
+  packs.sort((a, b) => packRank(a.collection) - packRank(b.collection));
   for (const pack of packs) {
     const index = await pack.getIndex({ fields: ["type", "system.key"] as never });
     for (const entry of index as unknown as {

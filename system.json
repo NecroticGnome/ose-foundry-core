@@ -127,12 +127,8 @@
   "relationships": {
     "recommends": [
       {
-        "id": "ose-advancedfantasytome",
-        "type": "module",
-        "compatibility": {
-          "minimum": "25.07.01",
-          "verified": "25.07.03"
-        }
+        "id": "ose-premiumgame",
+        "type": "module"
       },
       {
         "id": "classicfantasycompendium",
