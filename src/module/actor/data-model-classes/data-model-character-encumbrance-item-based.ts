@@ -134,9 +134,10 @@ export default class OseDataModelCharacterEncumbranceItemBased
 
     this.#max = this.usingEquippedEncumbrance ? this.#equippedMax : this.#packedMax;
 
-    this.#atFiveEighths = this.#packedWeight > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepOne;
-    this.#atThreeQuarters = this.#packedWeight > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepTwo;
-    this.#atSevenEights = this.#packedWeight > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepThree;
+    const packedLoad = this.#packedWeight - this.#weightMod;
+    this.#atFiveEighths = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepOne;
+    this.#atThreeQuarters = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepTwo;
+    this.#atSevenEights = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepThree;
 
     this.#atOneThird = this.#equippedWeight > OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepOne;
     this.#atFiveNinths = this.#equippedWeight > OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepTwo;
@@ -219,7 +220,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
   }
 
   get encumbered() {
-    return this.value > this.max + this.#weightMod;
+    return this.#equippedWeight > this.#equippedMax || this.#packedWeight > this.#packedMax + this.#weightMod;
   }
 
   // eslint-disable-next-line class-methods-use-this

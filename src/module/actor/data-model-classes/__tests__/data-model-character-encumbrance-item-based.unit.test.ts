@@ -33,4 +33,29 @@ describe("Item-based encumbrance", () => {
     expect(enc.packedLabel).toBe("7/17");
     expect(enc.equippedLabel).toBe("2/9");
   });
+
+  it("shifts the packed breakpoints by the STR mod", () => {
+    vi.spyOn(game.settings, "get").mockReturnValue(true);
+
+    const enc = new EncumbranceItemBased(9, [slots(11, false)], { scores: { str: { mod: 1 } } });
+
+    expect(enc.atFirstBreakpoint).toBe(false);
+  });
+
+  it("does not add the STR mod to the equipped limit", () => {
+    vi.spyOn(game.settings, "get").mockReturnValue(true);
+
+    const enc = new EncumbranceItemBased(9, [slots(10, true)], { scores: { str: { mod: 1 } } });
+
+    expect(enc.encumbered).toBe(true);
+  });
+
+  it("is encumbered by an overloaded pack even when equipped drives movement", () => {
+    vi.spyOn(game.settings, "get").mockReturnValue(true);
+
+    const enc = new EncumbranceItemBased(9, [slots(8, true), slots(18, false)], { scores: { str: { mod: 1 } } });
+
+    expect(enc.usingEquippedEncumbrance).toBe(true);
+    expect(enc.encumbered).toBe(true);
+  });
 });
