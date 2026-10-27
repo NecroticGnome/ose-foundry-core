@@ -36,17 +36,78 @@
           padding-inline: 2px;
         }
 
-        // With text, or several tables, the links shrink to icons; names are in the tooltips.
-        &.typed,
-        &.many {
-          .treasure-links a {
-            font-size: 0;
-            padding: 0 2px;
+        &.menu {
+          position: relative;
+          min-width: 0;
+          flex: 1.4;
 
-            i {
-              font-size: var(--font-size-12);
-              margin: 0;
+          .treasure-summary {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            line-height: 1.5;
+            white-space: nowrap;
+
+            a {
+              min-width: 0;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
+
+            .more,
+            i {
+              flex: none;
+            }
+          }
+
+          .treasure-value {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+            flex-direction: column;
+            align-items: stretch;
+            min-width: 100%;
+            width: max-content;
+            max-width: 16rem;
+            padding: 0.25rem;
+            background: url("../../../ui/parchment.jpg");
+            color: #333;
+            border: 1px solid variables.$colorTan;
+            border-radius: 3px;
+            box-shadow: 0 0 6px 1px variables.$colorDark;
+          }
+
+          &:is(:hover, :focus-within) .treasure-value {
+            display: flex;
+          }
+
+          .treasure-title {
+            margin: 0 0 0.25rem;
+            padding-bottom: 2px;
+            border-bottom: 1px solid variables.$colorTan;
+            font-size: var(--font-size-12);
+            font-weight: bold;
+            text-align: left;
+          }
+
+          .treasure-links {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .treasure-links a {
+            max-width: 100%;
+          }
+
+          input,
+          &.linked:not(.typed) input {
+            flex: none;
+            width: 100%;
+            padding-inline: 2px;
           }
         }
 
@@ -132,6 +193,10 @@
   }
   .attribute-group {
     .attacks-description {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 43px;
       margin: 2px;
       padding: 0;
       text-align: center;

@@ -97,8 +97,12 @@
         <label data-tooltip="Special Abilities"
           >{{localize 'OSE.details.special.abilities'}}</label>
       </li>
-      <li class="treasure-table {{#if treasureLink}}linked{{/if}} {{#if system.details.treasure.type}}typed{{/if}} {{#if treasureMany}}many{{/if}}" data-tooltip="OSE.details.treasure">
+      <li class="treasure-table {{#if treasureLink}}linked{{/if}} {{#if system.details.treasure.type}}typed{{/if}} {{#if treasureMenu}}menu{{/if}}" {{#unless treasureMenu}}data-tooltip="OSE.details.treasure"{{/unless}}>
+        {{#if treasureMenu}}
+          <div class="treasure-summary">{{{treasureMenu.first}}}<span class="more">+{{treasureMenu.more}}</span><i class="fas fa-caret-down"></i></div>
+        {{/if}}
         <div class="treasure-value">
+          {{#if treasureMenu}}<h4 class="treasure-title">{{localize 'OSE.details.treasure'}}</h4>{{/if}}
           {{#if treasureLink}}<div class="treasure-links">{{{treasureLink}}}</div>{{/if}}
           <input type="text" name="system.details.treasure.type" value="{{system.details.treasure.type}}" />
         </div>
