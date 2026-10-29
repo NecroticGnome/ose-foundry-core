@@ -75,6 +75,12 @@ export default class OseActorSheet extends HandlebarsApplicationMixin(ActorSheet
     },
   };
 
+  _onSubmitForm(formConfig, event) {
+    // Check if the document exists before ProseMirror tries to save a deleted document.
+    if (!this.document.collection?.has(this.document.id)) return;
+    return super._onSubmitForm(formConfig, event);
+  }
+
   /**
    * @param {string} _tabId
    * @returns {boolean} Whether the tab is shown for this actor.
