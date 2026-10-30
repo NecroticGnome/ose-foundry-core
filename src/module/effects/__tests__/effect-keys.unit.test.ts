@@ -1,11 +1,22 @@
 import fs from "node:fs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { effectKeys } from "../effect-keys";
 
 const en = JSON.parse(fs.readFileSync("src/lang/en.json", "utf8"));
 const keys = (type: "character" | "monster") => effectKeys(type).map((k) => k.key);
 
 describe("effectKeys", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("offers characters the packed encumbrance cap only under item-based encumbrance", () => {
+    expect(keys("character")).not.toContain("system.encumbrance.packedMax");
+    vi.spyOn(game.settings, "get").mockReturnValue("itembased");
+    expect(keys("character")).toContain("system.encumbrance.packedMax");
+    expect(keys("monster")).not.toContain("system.encumbrance.packedMax");
+  });
+
   it("offers characters their score, AC modifier, exploration and XP inputs", () => {
     expect(keys("character")).toEqual(
       expect.arrayContaining([
