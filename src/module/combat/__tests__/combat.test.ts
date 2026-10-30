@@ -79,6 +79,19 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     await waitForInput();
   };
 
+  // Record the combatants core starts a (non-skipped) turn for, until stopped.
+  const recordStartTurns = () => {
+    type StartTurn = (combatant: Combatant, context?: { skipped?: boolean }) => Promise<void>;
+    const combat = game.combat as unknown as { _onStartTurn: StartTurn };
+    const started: (string | null)[] = [];
+    const original = combat._onStartTurn;
+    combat._onStartTurn = async function (combatant, context) {
+      if (!context?.skipped) started.push(combatant.id);
+      return original.call(this, combatant, context);
+    };
+    return { started, stop: () => Reflect.deleteProperty(combat, "_onStartTurn") };
+  };
+
   before(async function () {
     // Creating a scene + ~20 actors headless routinely exceeds mocha's default
     // 2000ms hook timeout, which aborted the entire batch before any test ran.
@@ -681,9 +694,13 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should reroll initiative for all groups on new round", async () => {
+      const { started, stop } = recordStartTurns();
       await game?.combat?.nextRound();
       // nextRound rerolls each group's initiative asynchronously.
       await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
+      await waitUntil(() => started.length > 0);
+      stop();
+      expect(started).to.deep.equal([game.combat?.combatant?.id]);
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);
@@ -1006,9 +1023,13 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     });
 
     it("should reroll initiative for all combatants on new round", async () => {
+      const { started, stop } = recordStartTurns();
       await game?.combat?.nextRound();
       // nextRound rerolls 20 initiatives asynchronously.
       await waitUntil(() => game.messages.size === 20 && !game.combat?.combatants?.some((c) => c.initiative === null));
+      await waitUntil(() => started.length > 0);
+      stop();
+      expect(started).to.deep.equal([game.combat?.combatant?.id]);
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(2);

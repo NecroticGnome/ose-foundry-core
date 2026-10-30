@@ -175,30 +175,41 @@ export class OSECombat extends foundry.documents.Combat {
    * Reset the actions of all combatants in the combat.
    */
   async resetActions() {
-    for (const combatant of this.combatants) {
-      await combatant.setFlag(game.system.id, "prepareSpell", false);
-      await combatant.setFlag(game.system.id, "moveInCombat", false);
-    }
+    const flags = { [`flags.${game.system.id}.prepareSpell`]: false, [`flags.${game.system.id}.moveInCombat`]: false };
+    await this.updateEmbeddedDocuments(
+      "Combatant",
+      this.combatants.map((c) => ({ _id: c.id, ...flags })),
+    );
   }
 
   /** @override */
-  async _onEndRound(context: CombatRoundEventContext) {
-    await super._onEndRound(context);
-    if (context?.round) {
-      // Further processing when rounds other than round 0 end (start combat).
-      switch (this.#rerollBehavior) {
-        case "reset":
-          await this.resetAll({ updateTurn: false });
-          break;
-
-        case "reroll":
-          await this.smartRerollInitiative();
-          break;
-        default:
-          break;
-      }
-      await this.resetActions();
+  async _manageTurnEvents() {
+    // Re-roll before core picks who starts the round, so turn events go to the new first combatant.
+    if (game.user.isActiveGM && this.started && this.previous?.round && this.current.round > this.previous.round) {
+      const previous = { ...this.previous };
+      await this.#onNewRound();
+      // v13 overwrites the previous state on combatant updates even without turn events.
+      Object.assign(this.previous, previous);
     }
+    return super._manageTurnEvents();
+  }
+
+  /**
+   * Re-roll or reset initiative and clear combatant actions for a new round.
+   */
+  async #onNewRound() {
+    switch (this.#rerollBehavior) {
+      case "reset":
+        await this.resetAll({ updateTurn: false });
+        break;
+
+      case "reroll":
+        await this.smartRerollInitiative();
+        break;
+      default:
+        break;
+    }
+    await this.resetActions();
   }
 
   /** @override */
@@ -224,7 +235,7 @@ export class OSECombat extends foundry.documents.Combat {
    */
   async activateCombatant(turn: number) {
     if (game.user.isGM) {
-      await game.combat.update({ turn });
+      await this.update({ turn });
     }
   }
 
@@ -241,12 +252,15 @@ export class OSECombat extends foundry.documents.Combat {
       return;
     }
 
-    if (this.#combatantGroups.has(groupName)) {
+    if (!this.groups.some((g: CombatantGroup) => g.name === groupName)) {
+      if (!this.#combatantGroups.has(groupName)) {
+        const groupCreation = this.createEmbeddedDocuments("CombatantGroup", [{ name: groupName, initiative: null }]);
+        this.#combatantGroups.set(
+          groupName,
+          groupCreation.finally(() => this.#combatantGroups.delete(groupName)),
+        );
+      }
       await this.#combatantGroups.get(groupName);
-    } else {
-      const groupCreation = this.createEmbeddedDocuments("CombatantGroup", [{ name: groupName, initiative: null }]);
-      this.#combatantGroups.set(groupName, groupCreation);
-      await groupCreation;
     }
 
     const group = this.groups.find((g: CombatantGroup) => g.name === groupName);
@@ -286,9 +300,9 @@ export class OSECombat extends foundry.documents.Combat {
     // First sort by initiative
     const ia = Number.isNumeric(a.initiative) ? a.initiative : Number.NEGATIVE_INFINITY;
     const ib = Number.isNumeric(b.initiative) ? b.initiative : Number.NEGATIVE_INFINITY;
+    // Two unrolled initiatives give NaN, which falls through to the tie-breaks.
     const initiativeDiff = ib - ia;
-
-    if (initiativeDiff !== 0) return initiativeDiff;
+    if (initiativeDiff) return initiativeDiff;
 
     // If still tied, sort by group name if available
     if (a.group?.name && b.group?.name && a.group?.name !== b.group?.name) {
@@ -302,8 +316,8 @@ export class OSECombat extends foundry.documents.Combat {
 
     // If still tied, sort by disposition
     // Higher values of CONST.TOKEN_DISPOSITIONS are sorted first (e.g. Friendly).
-    const dispositionA = a.token?.disposition ?? 0;
-    const dispositionB = b.token?.disposition ?? 0;
+    const dispositionA = a.disposition ?? CONST.TOKEN_DISPOSITIONS.NEUTRAL;
+    const dispositionB = b.disposition ?? CONST.TOKEN_DISPOSITIONS.NEUTRAL;
     if (dispositionA !== dispositionB) {
       // Return negative to prioritize higher disposition values
       return dispositionB - dispositionA;
