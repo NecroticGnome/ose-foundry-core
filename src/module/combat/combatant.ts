@@ -19,6 +19,11 @@ export class OSECombatant extends Combatant {
     return this.actor?.system?.isSlow;
   }
 
+  /** Token disposition, falling back to the actor's prototype token. */
+  get disposition(): number | undefined {
+    return this.token?.disposition ?? this.actor?.prototypeToken?.disposition;
+  }
+
   get isDefeated() {
     if (this.defeated) return true;
 
@@ -75,12 +80,12 @@ export class OSECombatant extends Combatant {
       return assignedGroup;
     }
 
-    switch (this.token?.disposition) {
-      case -1:
+    switch (this.disposition) {
+      case CONST.TOKEN_DISPOSITIONS.HOSTILE:
         return "red";
-      case 0:
+      case CONST.TOKEN_DISPOSITIONS.NEUTRAL:
         return "purple";
-      case 1:
+      case CONST.TOKEN_DISPOSITIONS.FRIENDLY:
         return "green";
       default:
         return "white";
