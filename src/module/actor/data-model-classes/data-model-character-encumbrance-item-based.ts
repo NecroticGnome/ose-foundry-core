@@ -79,8 +79,27 @@ export default class OseDataModelCharacterEncumbranceItemBased
 
   #weightMod = 0;
 
+  /**
+   * The equipped and packed caps from stored values.
+   */
+  static caps(max?: number | null, packedMax?: number | null) {
+    const isDefaultMax =
+      !max ||
+      max === OseDataModelCharacterEncumbrance.baseEncumbranceCap ||
+      max === OseDataModelCharacterEncumbranceItemBased.baseEncumbranceCap ||
+      max === OseDataModelCharacterEncumbranceItemBased.alternateBaseEncumbranceCap;
+    const equipped = isDefaultMax ? OseDataModelCharacterEncumbranceItemBased.baseEncumbranceCap : max;
+    const packed =
+      packedMax ?? (isDefaultMax ? OseDataModelCharacterEncumbranceItemBased.alternateBaseEncumbranceCap : max);
+    return { equipped, packed };
+  }
+
   // eslint-disable-next-line sonarjs/cognitive-complexity, @typescript-eslint/no-unused-vars
-  constructor(max = 16, items: Item[] = [], options: { scores?: { str?: { mod?: number } } } = {}) {
+  constructor(
+    max = 16,
+    items: Item[] = [],
+    options: { scores?: { str?: { mod?: number } }; packedMax?: number | null } = {},
+  ) {
     super(OseDataModelCharacterEncumbranceItemBased.type, max);
     if (game.settings.get(game.system.id, "encumbranceItemStrengthMod")) {
       this.#weightMod = Math.max(0, options.scores?.str?.mod ?? 0);
@@ -88,14 +107,9 @@ export default class OseDataModelCharacterEncumbranceItemBased
       this.#weightMod = 0;
     }
 
-    const isDefaultMax =
-      !max ||
-      max === OseDataModelCharacterEncumbrance.baseEncumbranceCap ||
-      max === OseDataModelCharacterEncumbranceItemBased.baseEncumbranceCap ||
-      max === OseDataModelCharacterEncumbranceItemBased.alternateBaseEncumbranceCap;
-
-    this.#packedMax = isDefaultMax ? 16 : max;
-    this.#equippedMax = isDefaultMax ? 9 : max;
+    const caps = OseDataModelCharacterEncumbranceItemBased.caps(max, options.packedMax);
+    this.#packedMax = caps.packed;
+    this.#equippedMax = caps.equipped;
     this.#packedWeight =
       Math.ceil(
         items.reduce((acc, item: Item) => {
@@ -130,18 +144,20 @@ export default class OseDataModelCharacterEncumbranceItemBased
         return acc;
       }, 0),
     );
-    this.#weight = this.usingEquippedEncumbrance ? this.#equippedWeight : this.#packedWeight;
-
-    this.#max = this.usingEquippedEncumbrance ? this.#equippedMax : this.#packedMax;
-
+    // Breakpoints are the same fractions of each cap as the default 9 and 16 slots.
+    const C = OseDataModelCharacterEncumbranceItemBased;
     const packedLoad = this.#packedWeight - this.#weightMod;
-    this.#atFiveEighths = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepOne;
-    this.#atThreeQuarters = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepTwo;
-    this.#atSevenEights = packedLoad > OseDataModelCharacterEncumbranceItemBased.packedStepCounts.stepThree;
+    const packedOver = (n: number) => packedLoad * C.alternateBaseEncumbranceCap > n * this.#packedMax;
+    const equippedOver = (n: number) => this.#equippedWeight * C.baseEncumbranceCap > n * this.#equippedMax;
+    this.#atFiveEighths = packedOver(C.packedStepCounts.stepOne);
+    this.#atThreeQuarters = packedOver(C.packedStepCounts.stepTwo);
+    this.#atSevenEights = packedOver(C.packedStepCounts.stepThree);
+    this.#atOneThird = equippedOver(C.equippedStepCounts.stepOne);
+    this.#atFiveNinths = equippedOver(C.equippedStepCounts.stepTwo);
+    this.#atSevenNinths = equippedOver(C.equippedStepCounts.stepThree);
 
-    this.#atOneThird = this.#equippedWeight > OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepOne;
-    this.#atFiveNinths = this.#equippedWeight > OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepTwo;
-    this.#atSevenNinths = this.#equippedWeight > OseDataModelCharacterEncumbranceItemBased.equippedStepCounts.stepThree;
+    this.#weight = this.usingEquippedEncumbrance ? this.#equippedWeight : this.#packedWeight;
+    this.#max = this.usingEquippedEncumbrance ? this.#equippedMax : this.#packedMax;
   }
 
   static defineSchema() {
@@ -161,6 +177,7 @@ export default class OseDataModelCharacterEncumbranceItemBased
         integer: false,
         initial: OseDataModelCharacterEncumbranceItemBased.baseEncumbranceCap,
       }),
+      packedMax: new NumberField({ integer: false, nullable: true, initial: null }),
       atFirstBreakpoint: new BooleanField({ initial: false }),
       atSecondBreakpoint: new BooleanField({ initial: false }),
       atThirdBreakpoint: new BooleanField({ initial: false }),
@@ -178,25 +195,18 @@ export default class OseDataModelCharacterEncumbranceItemBased
   }
 
   get steps() {
-    return this.usingEquippedEncumbrance
-      ? Object.values(OseDataModelCharacterEncumbranceItemBased.equippedEncumbranceSteps)
-      : Object.values(OseDataModelCharacterEncumbranceItemBased.packedEncumbranceSteps);
+    return this.usingEquippedEncumbrance ? this.equippedSteps : this.packedSteps;
   }
 
   get usingEquippedEncumbrance() {
-    const equippedValues = Object.values(OseDataModelCharacterEncumbranceItemBased.equippedStepCounts);
-    const packedValues = Object.values(OseDataModelCharacterEncumbranceItemBased.packedStepCounts);
-    let equippedIndex = equippedValues.findIndex((step) => step >= this.#equippedWeight);
-    equippedIndex = equippedIndex === -1 ? 4 : equippedIndex;
-
-    let packedIndex = packedValues.findIndex((step) => step >= this.#packedWeight - this.#weightMod);
-    packedIndex = packedIndex === -1 ? 4 : packedIndex;
-    if (equippedIndex === 0 && packedIndex === 0) {
+    const equippedLevel = [this.#atOneThird, this.#atFiveNinths, this.#atSevenNinths].filter(Boolean).length;
+    const packedLevel = [this.#atFiveEighths, this.#atThreeQuarters, this.#atSevenEights].filter(Boolean).length;
+    if (equippedLevel === 0 && packedLevel === 0) {
       // both are under the first breakpoint, use weight comparison
       return this.#equippedWeight >= this.#packedWeight - this.#weightMod;
     }
 
-    return equippedIndex >= packedIndex;
+    return equippedLevel >= packedLevel;
   }
 
   get value(): number {
