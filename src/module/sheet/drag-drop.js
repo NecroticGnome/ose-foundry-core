@@ -128,7 +128,7 @@ export const onDropClass = async (sheet, itemData) => {
     if (!ok) return;
     const cls = await actor.addClass(itemData, { replace: existing });
     if (cls?.system.level === 1) await actor.offerAbilities(cls, 1);
-    return cls && [cls];
+    return cls;
   }
   const start = await promptClassStart(
     itemData,
@@ -137,7 +137,7 @@ export const onDropClass = async (sheet, itemData) => {
   if (!start) return;
   const cls = await actor.addClass(itemData, { level: start.level, rollHp: start.rollHp });
   if (cls && start.offer) await actor.offerAbilities(cls, start.level, { upTo: true });
-  return cls && [cls];
+  return cls;
 };
 
 // One race per character; existing characters usually already include its modifiers.
@@ -155,17 +155,17 @@ export const onDropRace = async (sheet, itemData) => {
   }
   const scope = game.system.id;
   const modifiers = (itemData.effects ?? []).find((e) => e.flags?.[scope]?.raceModifiers);
-  const modifiersIncluded =
-    !!modifiers &&
-    !actor.isNew() &&
-    !!(await DialogV2.confirm({
+  let modifiersIncluded = false;
+  if (modifiers && !actor.isNew()) {
+    modifiersIncluded = await DialogV2.confirm({
       window: { title: itemData.name },
       content: `<p>${game.i18n.format("OSE.race.AlreadyIncluded", { race: esc(itemData.name) })}</p>`,
       rejectClose: false,
-    }));
-  const race = await actor.setRace(itemData, { modifiersIncluded });
+    });
+  }
+  const race = await actor.setRace(itemData, { modifiersIncluded: !!modifiersIncluded });
   if (race) await actor.offerAbilities(race, 1);
-  return race && [race];
+  return race;
 };
 
 export const onContainerItemRemove = async (sheet, item, container) => {

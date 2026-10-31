@@ -207,55 +207,48 @@ export default class OseActor extends Actor {
   /**
    * Add a class without asking anything.
    *
-   * @param {Item|object} item - A class item or its data
+   * @param {object} data - Class item data
    * @param {object} [options]
    * @param {number} [options.level] - The level the class starts at; its XP comes from the class table
    * @param {boolean} [options.rollHp] - Roll starting hit points for each level
-   * @param {boolean} [options.grantAbilities] - Add the abilities granted up to that level
-   * @param {boolean} [options.chat] - Post a chat card of the stats that changed
    * @param {Item} [options.replace] - A class to remove first; its level and XP carry over unless a level is given
    * @returns {Promise<Item|undefined>} The embedded class
    */
-  async addClass(item, { level, rollHp = false, grantAbilities = false, chat = true, replace } = {}) {
-    const data = item.toObject?.() ?? foundry.utils.deepClone(item);
-    const keep = replace && (level === undefined || level === replace.system.level);
-    Object.assign(
-      data.system,
-      keep
+  async addClass(data, { level, rollHp = false, replace } = {}) {
+    const item = foundry.utils.deepClone(data);
+    const progress =
+      replace && level === undefined
         ? { level: replace.system.level, xp: replace.system.xp }
-        : startingProgress(data.system.levels ?? [], level ?? 1),
-    );
+        : startingProgress(item.system.levels ?? [], level ?? 1);
+    Object.assign(item.system, progress);
     const before = this.classStats();
     if (replace) await replace.delete();
-    const [cls] = await this.createEmbeddedDocuments("Item", [data]);
+    const [cls] = await this.createEmbeddedDocuments("Item", [item]);
     if (!cls) return;
     const hp = rollHp ? await this.rollStartingHp(cls, cls.system.level) : null;
-    if (chat) await this.postClassChanges(cls, before, hp);
+    await this.postClassChanges(cls, before, hp);
     await this.addLanguages(cls.system.languages);
-    if (grantAbilities) await this.offerAbilities(cls, cls.system.level, { upTo: true, confirm: false });
     return cls;
   }
 
   /**
    * Set the character's race without asking anything, replacing any it has.
    *
-   * @param {Item|object} item - A race item or its data
+   * @param {object} data - Race item data
    * @param {object} [options]
    * @param {boolean} [options.modifiersIncluded] - The scores already include the race's modifiers, so its effect starts disabled
-   * @param {boolean} [options.grantAbilities] - Add the abilities the race grants at 1st level
    * @returns {Promise<Item|undefined>} The embedded race
    */
-  async setRace(item, { modifiersIncluded = false, grantAbilities = false } = {}) {
-    const data = item.toObject?.() ?? foundry.utils.deepClone(item);
+  async setRace(data, { modifiersIncluded = false } = {}) {
+    const item = foundry.utils.deepClone(data);
     if (modifiersIncluded) {
-      const modifiers = (data.effects ?? []).find((e) => e.flags?.[game.system.id]?.raceModifiers);
+      const modifiers = (item.effects ?? []).find((e) => e.flags?.[game.system.id]?.raceModifiers);
       if (modifiers) modifiers.disabled = true;
     }
     await this.system.race?.delete();
-    const [race] = await this.createEmbeddedDocuments("Item", [data]);
+    const [race] = await this.createEmbeddedDocuments("Item", [item]);
     if (!race) return;
     await this.addLanguages(race.system.languages);
-    if (grantAbilities) await this.offerAbilities(race, 1, { confirm: false });
     return race;
   }
 
@@ -266,7 +259,7 @@ export default class OseActor extends Actor {
    */
   async addLanguages(names) {
     const known = this.system.languages?.value ?? [];
-    const merged = mergeLanguages(known, names ?? [], this.system.details?.alignment ?? "");
+    const merged = mergeLanguages(known, names, this.system.details?.alignment ?? "");
     if (merged.length === known.length) return;
     return this.update({ "system.languages.value": merged });
   }

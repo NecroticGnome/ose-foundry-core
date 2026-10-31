@@ -349,10 +349,12 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await game.settings.set(game.system.id, "promptAddClassAbilities", false);
       const ability = await createWorldTestItem("ability", "Backstab");
       const actor = (await createMockActor("character")) as OseActor;
-      await actor.addClass(
-        { name: "Thief", type: "class", system: { levels, abilities: [{ uuid: ability?.uuid, level: 1 }] } },
-        { grantAbilities: true },
-      );
+      const thief = await actor.addClass({
+        name: "Thief",
+        type: "class",
+        system: { levels, abilities: [{ uuid: ability?.uuid, level: 1 }] },
+      });
+      await actor.offerAbilities(thief, 1, { confirm: false });
       expect(actor.items.getName("Backstab")?.type).equal("ability");
       await actor.delete();
     });
