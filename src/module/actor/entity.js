@@ -1,6 +1,7 @@
 import { isAbilityOwned } from "../classes/abilities";
 import { statChanges } from "../classes/changes";
 import { abilitiesGrantedBy } from "../classes/granted";
+import { mergeLanguages } from "../classes/languages";
 import {
   applyXpBonus,
   divideHp,
@@ -10,6 +11,7 @@ import {
   SAVE_KEYS,
   splitStartingHp,
   splitXp,
+  startingProgress,
 } from "../classes/progression";
 import { tableRowValues } from "../classes/tables";
 import OSE from "../config";
@@ -200,6 +202,73 @@ export default class OseActor extends Actor {
       count: prevCount + 1,
       dice: rolls.map((r) => r.roll).filter(Boolean),
     };
+  }
+
+  /**
+   * Add a class without asking anything.
+   *
+   * @param {Item|object} item - A class item or its data
+   * @param {object} [options]
+   * @param {number} [options.level] - The level the class starts at; its XP comes from the class table
+   * @param {boolean} [options.rollHp] - Roll starting hit points for each level
+   * @param {boolean} [options.grantAbilities] - Add the abilities granted up to that level
+   * @param {boolean} [options.chat] - Post a chat card of the stats that changed
+   * @param {Item} [options.replace] - A class to remove first; its level and XP carry over unless a level is given
+   * @returns {Promise<Item|undefined>} The embedded class
+   */
+  async addClass(item, { level, rollHp = false, grantAbilities = false, chat = true, replace } = {}) {
+    const data = item.toObject?.() ?? foundry.utils.deepClone(item);
+    const keep = replace && (level === undefined || level === replace.system.level);
+    Object.assign(
+      data.system,
+      keep
+        ? { level: replace.system.level, xp: replace.system.xp }
+        : startingProgress(data.system.levels ?? [], level ?? 1),
+    );
+    const before = this.classStats();
+    if (replace) await replace.delete();
+    const [cls] = await this.createEmbeddedDocuments("Item", [data]);
+    if (!cls) return;
+    const hp = rollHp ? await this.rollStartingHp(cls, cls.system.level) : null;
+    if (chat) await this.postClassChanges(cls, before, hp);
+    await this.addLanguages(cls.system.languages);
+    if (grantAbilities) await this.offerAbilities(cls, cls.system.level, { upTo: true, confirm: false });
+    return cls;
+  }
+
+  /**
+   * Set the character's race without asking anything, replacing any it has.
+   *
+   * @param {Item|object} item - A race item or its data
+   * @param {object} [options]
+   * @param {boolean} [options.modifiersIncluded] - The scores already include the race's modifiers, so its effect starts disabled
+   * @param {boolean} [options.grantAbilities] - Add the abilities the race grants at 1st level
+   * @returns {Promise<Item|undefined>} The embedded race
+   */
+  async setRace(item, { modifiersIncluded = false, grantAbilities = false } = {}) {
+    const data = item.toObject?.() ?? foundry.utils.deepClone(item);
+    if (modifiersIncluded) {
+      const modifiers = (data.effects ?? []).find((e) => e.flags?.[game.system.id]?.raceModifiers);
+      if (modifiers) modifiers.disabled = true;
+    }
+    await this.system.race?.delete();
+    const [race] = await this.createEmbeddedDocuments("Item", [data]);
+    if (!race) return;
+    await this.addLanguages(race.system.languages);
+    if (grantAbilities) await this.offerAbilities(race, 1, { confirm: false });
+    return race;
+  }
+
+  /**
+   * Add languages the character doesn't know yet.
+   *
+   * @param {string[]} names - Language names; "Alignment" stands for the character's alignment
+   */
+  async addLanguages(names) {
+    const known = this.system.languages?.value ?? [];
+    const merged = mergeLanguages(known, names ?? [], this.system.details?.alignment ?? "");
+    if (merged.length === known.length) return;
+    return this.update({ "system.languages.value": merged });
   }
 
   // The stats a class drives, for before/after comparison.

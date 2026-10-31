@@ -2,7 +2,6 @@
  * @file Shared drag-and-drop handlers used by actor sheets.
  */
 import { rollsStartingHp } from "../classes/levels";
-import { startingProgress } from "../classes/progression";
 import OSE from "../config";
 
 export const onDragStartItem = (sheet, event) => {
@@ -127,30 +126,18 @@ export const onDropClass = async (sheet, itemData) => {
       rejectClose: false,
     });
     if (!ok) return;
-    itemData.system.level = existing.system.level;
-    itemData.system.xp = existing.system.xp;
-    const before = actor.classStats();
-    await existing.delete();
-    const created = await onDropItemCreate(sheet, [itemData]);
-    const [cls] = created ?? [];
-    if (cls) await actor.postClassChanges(cls, before);
+    const cls = await actor.addClass(itemData, { replace: existing });
     if (cls?.system.level === 1) await actor.offerAbilities(cls, 1);
-    return created;
+    return cls && [cls];
   }
   const start = await promptClassStart(
     itemData,
     rollsStartingHp({ isNew: actor.isNew(), hasClass: !!existing, level: Number(actor._source.system.details?.level) }),
   );
   if (!start) return;
-  Object.assign(itemData.system, startingProgress(itemData.system.levels ?? [], start.level));
-  const before = actor.classStats();
-  const created = await onDropItemCreate(sheet, [itemData]);
-  const [cls] = created ?? [];
-  if (!cls) return created;
-  const hp = start.rollHp ? await actor.rollStartingHp(cls, start.level) : null;
-  await actor.postClassChanges(cls, before, hp);
-  if (start.offer) await actor.offerAbilities(cls, start.level, { upTo: true });
-  return created;
+  const cls = await actor.addClass(itemData, { level: start.level, rollHp: start.rollHp });
+  if (cls && start.offer) await actor.offerAbilities(cls, start.level, { upTo: true });
+  return cls && [cls];
 };
 
 // One race per character; existing characters usually already include its modifiers.
@@ -165,22 +152,20 @@ export const onDropRace = async (sheet, itemData) => {
       rejectClose: false,
     });
     if (!ok) return;
-    await existing.delete();
   }
   const scope = game.system.id;
   const modifiers = (itemData.effects ?? []).find((e) => e.flags?.[scope]?.raceModifiers);
-  if (modifiers && !actor.isNew()) {
-    const included = await DialogV2.confirm({
+  const modifiersIncluded =
+    !!modifiers &&
+    !actor.isNew() &&
+    !!(await DialogV2.confirm({
       window: { title: itemData.name },
       content: `<p>${game.i18n.format("OSE.race.AlreadyIncluded", { race: esc(itemData.name) })}</p>`,
       rejectClose: false,
-    });
-    if (included) modifiers.disabled = true;
-  }
-  const created = await onDropItemCreate(sheet, [itemData]);
-  const [race] = created ?? [];
+    }));
+  const race = await actor.setRace(itemData, { modifiersIncluded });
   if (race) await actor.offerAbilities(race, 1);
-  return created;
+  return race && [race];
 };
 
 export const onContainerItemRemove = async (sheet, item, container) => {
