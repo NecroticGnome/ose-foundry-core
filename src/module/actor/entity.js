@@ -284,9 +284,12 @@ export default class OseActor extends Actor {
    *
    * @param {Item} item - An embedded class or race item
    * @param {number} level - The level just reached
+   * @param {object} [options]
+   * @param {boolean} [options.upTo] - Include the abilities of every level up to this one
+   * @param {boolean} [options.confirm] - Ask before adding; false adds them regardless of the prompt setting
    */
-  async offerAbilities(item, level, { upTo = false } = {}) {
-    if (!game.settings.get(game.system.id, "promptAddClassAbilities")) return;
+  async offerAbilities(item, level, { upTo = false, confirm = true } = {}) {
+    if (confirm && !game.settings.get(game.system.id, "promptAddClassAbilities")) return;
     const owned = this.items
       .filter((i) => i.type === "ability")
       .map((i) => ({
@@ -302,13 +305,15 @@ export default class OseActor extends Actor {
       if (!isAbilityOwned(owned, candidate)) entries.push({ doc, entry });
     }
     if (!entries.length) return;
-    const list = entries.map(({ doc }) => `<li>${foundry.utils.escapeHTML(doc.name)}</li>`).join("");
-    const ok = await foundry.applications.api.DialogV2.confirm({
-      window: { title: item.name },
-      content: `<p>${game.i18n.localize("OSE.classes.AddAbilities")}</p><ul>${list}</ul>`,
-      rejectClose: false,
-    });
-    if (!ok) return;
+    if (confirm) {
+      const list = entries.map(({ doc }) => `<li>${foundry.utils.escapeHTML(doc.name)}</li>`).join("");
+      const ok = await foundry.applications.api.DialogV2.confirm({
+        window: { title: item.name },
+        content: `<p>${game.i18n.localize("OSE.classes.AddAbilities")}</p><ul>${list}</ul>`,
+        rejectClose: false,
+      });
+      if (!ok) return;
+    }
     const scope = game.system.id;
     const grantedBy = { type: item.type, key: item.system.key };
     const data = entries.map(({ doc, entry }) => {
