@@ -29,6 +29,7 @@ const preloadHandlebarsTemplates = async () => {
     `${OSE.systemPath()}/templates/items/partials/ability-links.html`,
     `${OSE.systemPath()}/templates/items/partials/tag-list.html`,
     `${OSE.systemPath()}/templates/items/partials/mode-toggle.html`,
+    `${OSE.systemPath()}/templates/items/partials/requirements-table.html`,
     // Party Sheet
     `${OSE.systemPath()}/templates/apps/party-sheet.html`,
     // `${OSE.systemPath()}/templates/apps/party-xp.html`,

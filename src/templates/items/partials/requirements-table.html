@@ -1,0 +1,20 @@
+{{!-- Minimum and maximum ability scores. Context: scoreKeys, requirementRows, editing. --}}
+<h3 class="section-title">{{localize 'OSE.abilities.Requirements'}}</h3>
+<table class="class-table requirements">
+  <thead>
+    <tr>
+      <th></th>
+      {{#each scoreKeys as |k|}}<th>{{lookup @root.config.scores k}}</th>{{/each}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#each requirementRows as |row|}}
+    <tr>
+      <td class="caption">{{localize row.label}}</td>
+      {{#each row.values as |v|}}
+      <td>{{#if @root.editing}}<input type="number" name="system.requirements.{{v.score}}.{{row.bound}}" value="{{v.value}}" />{{else}}{{v.value}}{{/if}}</td>
+      {{/each}}
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

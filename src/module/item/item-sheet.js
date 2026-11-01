@@ -97,6 +97,7 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
       removeRow: OseItemSheet._onRemoveRow,
       openUuid: OseItemSheet._onOpenUuid,
       addClassLimit: OseItemSheet._onAddClassLimit,
+      addSaveBonus: OseItemSheet._onAddSaveBonus,
       addTable: OseItemSheet._onAddTable,
       removeTable: OseItemSheet._onRemoveTable,
       addTableColumn: OseItemSheet._onAddTableColumn,
@@ -259,6 +260,15 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
     suggestions ??= this.isEditable ? loadSuggestions() : null;
     const known = (await suggestions) ?? { classKeys: [], weapons: [], tableColumns: [] };
     const list = (values) => new Intl.ListFormat(game.i18n.lang, { type: "conjunction" }).format(values);
+    const scoreKeys = Object.keys(CONFIG.OSE.scores);
+    const scoreLabel = (k) => k.toUpperCase();
+    const signed = (v) => (Number(v) > 0 ? `+${v}` : `${v}`);
+    const mins = scoreKeys
+      .filter((k) => system.requirements[k]?.min)
+      .map((k) => `${scoreLabel(k)} ${system.requirements[k].min}`);
+    const maxes = scoreKeys
+      .filter((k) => system.requirements[k]?.max)
+      .map((k) => `${scoreLabel(k)} ${system.requirements[k].max}`);
     const context = {
       abilityLinks,
       embedded: !!this.item.parent,
@@ -268,37 +278,39 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
       languageChoices: ["Alignment", ...CONFIG.OSE.languages],
       spellListChoices: CONFIG.OSE.spellLists ?? [],
       classKeyChoices: known.classKeys,
+      scoreKeys,
+      requirementsText: [
+        mins.length ? game.i18n.format("OSE.race.MinimumText", { scores: list(mins) }) : "",
+        maxes.length ? game.i18n.format("OSE.race.MaximumText", { scores: list(maxes) }) : "",
+      ]
+        .filter(Boolean)
+        .join("; "),
+      requirementRows: ["min", "max"].map((bound) => ({
+        bound,
+        label: bound === "min" ? "OSE.race.Minimum" : "OSE.race.Maximum",
+        values: scoreKeys.map((score) => ({ score, value: system.requirements[score]?.[bound] ?? "" })),
+      })),
     };
     if (this.item.type === "race") {
       const changes = readChanges(this.#modifierEffect() ?? {});
-      const scoreKeys = Object.keys(CONFIG.OSE.scores);
       const modifier = (k) => changes.find((c) => c.key === `system.scores.${k}.value`)?.value ?? "";
-      const signed = (v) => (Number(v) > 0 ? `+${v}` : `${v}`);
-      const scoreLabel = (k) => k.toUpperCase();
       const mods = scoreKeys.filter((k) => modifier(k) !== "").map((k) => `${signed(modifier(k))} ${scoreLabel(k)}`);
-      const mins = scoreKeys
-        .filter((k) => system.requirements[k]?.min)
-        .map((k) => `${scoreLabel(k)} ${system.requirements[k].min}`);
-      const maxes = scoreKeys
-        .filter((k) => system.requirements[k]?.max)
-        .map((k) => `${scoreLabel(k)} ${system.requirements[k].max}`);
+      const saveLabel = (k) => game.i18n.localize(CONFIG.OSE.saves_long[k]);
       return {
         ...context,
-        scoreKeys,
         modifiersText: mods.length ? mods.join(", ") : game.i18n.localize("OSE.race.NoModifiers"),
-        requirementsText: [
-          mins.length ? game.i18n.format("OSE.race.MinimumText", { scores: list(mins) }) : "",
-          maxes.length ? game.i18n.format("OSE.race.MaximumText", { scores: list(maxes) }) : "",
-        ]
-          .filter(Boolean)
-          .join("; "),
         modifiers: Object.fromEntries(
           scoreKeys.map((k) => [k, this.editing ? modifier(k) : modifier(k) === "" ? "" : signed(modifier(k))]),
         ),
-        requirementRows: ["min", "max"].map((bound) => ({
-          bound,
-          label: bound === "min" ? "OSE.race.Minimum" : "OSE.race.Maximum",
-          values: scoreKeys.map((score) => ({ score, value: system.requirements[score]?.[bound] ?? "" })),
+        infravisionText: system.infravision
+          ? game.i18n.format("OSE.race.InfravisionText", { range: system.infravision })
+          : "",
+        saveBonusRows: system.saveBonuses.map((entry, index) => ({
+          ...entry,
+          index,
+          saveOptions: SAVE_KEYS.map((k) => ({ value: k, label: saveLabel(k), selected: entry.saves.includes(k) })),
+          savesText: entry.saves.length ? list(entry.saves.map(saveLabel)) : game.i18n.localize("OSE.race.AllSaves"),
+          bonusText: entry.bonus === null ? game.i18n.localize("OSE.race.SaveBonusByCon") : signed(entry.bonus),
         })),
       };
     }
@@ -588,8 +600,14 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
 
   static _onAddClassLimit() {
     const classLimits = this.item.system.toObject().classLimits;
-    classLimits.push({ classKey: "", maxLevel: 1 });
+    classLimits.push({ classKey: "", maxLevel: 1, npcOnly: false });
     return this.item.update({ "system.classLimits": classLimits });
+  }
+
+  static _onAddSaveBonus() {
+    const saveBonuses = this.item.system.toObject().saveBonuses;
+    saveBonuses.push({ saves: [], bonus: null, against: "" });
+    return this.item.update({ "system.saveBonuses": saveBonuses });
   }
 
   // Class tables: nested arrays edited as whole copies.
