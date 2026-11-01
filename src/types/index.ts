@@ -23,6 +23,13 @@ export type { CharacterMove } from "../module/actor/data-model-classes/data-mode
 export type { CharacterScores } from "../module/actor/data-model-classes/data-model-character-scores";
 export type { CharacterSpells } from "../module/actor/data-model-classes/data-model-character-spells";
 export type { ExplorationSkills } from "../module/actor/exploration-skills";
+export type { OwnedAbility } from "../module/classes/abilities";
+export type { ClassStats, StatChange } from "../module/classes/changes";
+export type { ClassLike, Derived, Finals } from "../module/classes/derive";
+export type { ClassLevelRow, PrimeReq, SaveKey } from "../module/classes/progression";
+export type { RaceSaveBonus } from "../module/classes/race-saves";
+export type { ScoreBounds, ScoreRequirements } from "../module/classes/requirements";
+export type { ClassTable } from "../module/classes/tables";
 export type {
   ApplyDamageOption,
   Armor,
@@ -41,12 +48,16 @@ export type {
   ArmorItemData,
   ArmorType,
   CarriedItem,
+  ClassAccess,
+  ClassItemData,
+  ClassLimit,
   ContainerItemData,
   DisplayTag,
   ItemTag,
   MiscItemData,
   NonPhysicalItemData,
   PhysicalItemData,
+  RaceItemData,
   SpellItemData,
   WeaponItemData,
 } from "../module/item/item-types";

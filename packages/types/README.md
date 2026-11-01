@@ -27,14 +27,15 @@ automatically — you don't need to do anything extra.
 
 ## What's exported
 
-As of 14 October 2026:
+As of 30 October 2026:
 
 
 | Group                                                                             | Types                                                                                                                                            |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Config unions** (from `src/module/config.ts`)                                   | `OseConfig`, `Save`, `Armor`, `Attribute`, `ExplorationSkill`, `RollType`, `Color`, `InventoryItemTag`, `InventoryItemTagValue`, `EncumbranceOption`, `ApplyDamageOption` |
 | **Character helper interfaces** (from `src/module/actor/data-model-classes/*.ts`) | `CharacterScores`, `CharacterAC`, `CharacterMove`, `CharacterEncumbrance`, `CharacterSpells`, `ExplorationSkills` (from `src/module/actor/exploration-skills`) |
-| **Item data** (from `src/module/item/item-types.ts`) | `WeaponItemData`, `ArmorItemData`, `ArmorType`, `SpellItemData`, `AbilityItemData`, `ContainerItemData`, `MiscItemData`, `PhysicalItemData`, `NonPhysicalItemData`, `CarriedItem`, `ItemTag`, `DisplayTag` |
+| **Item data** (from `src/module/item/item-types.ts`) | `WeaponItemData`, `ArmorItemData`, `ArmorType`, `SpellItemData`, `AbilityItemData`, `ContainerItemData`, `MiscItemData`, `PhysicalItemData`, `NonPhysicalItemData`, `CarriedItem`, `ItemTag`, `DisplayTag`, `ClassItemData`, `RaceItemData`, `ClassLimit`, `ClassAccess` |
+| **Class and race rules** (from `src/module/classes/*.ts`) | `PrimeReq`, `ClassLevelRow`, `SaveKey`, `ClassTable`, `ScoreRequirements`, `ScoreBounds`, `RaceSaveBonus`, `OwnedAbility`, `ClassLike`, `Derived`, `Finals`, `ClassStats`, `StatChange` |
 | **Classes** (from `src/types/classes.ts`)                                         | `ClassicClassName`, `OseClass`                                                                                                                   |
 
 
