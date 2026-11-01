@@ -7,6 +7,8 @@
  * `@ose-foundry-core/types`. Interfaces here have none.
  */
 import type { ClassLevelRow, PrimeReq } from "../classes/progression";
+import type { RaceSaveBonus } from "../classes/race-saves";
+import type { ScoreRequirements } from "../classes/requirements";
 import type { ClassTable } from "../classes/tables";
 import type { InventoryItemTagValue, RollType, Save } from "../config";
 
@@ -163,7 +165,8 @@ export interface SpellItemData extends NonPhysicalItemData {
 export interface ClassItemData {
   key: string;
   description: string;
-  requirements: string;
+  requirements: ScoreRequirements;
+  requirementsText: string;
   primeReqs: PrimeReq[];
   maxLevel: number;
   hitDie: string;
@@ -189,12 +192,23 @@ export interface ClassItemData {
   readonly title: string;
 }
 
+export interface ClassLimit {
+  classKey: string;
+  maxLevel: number;
+  npcOnly: boolean;
+}
+
+export type ClassAccess = { allowed: false } | { allowed: true; maxLevel: number | null; npcOnly: boolean };
+
 /** A race; ability modifiers live in a transferred Active Effect on the item. */
 export interface RaceItemData {
   key: string;
   description: string;
-  requirements: Record<string, { min: number | null; max: number | null }>;
+  requirements: ScoreRequirements;
   languages: string[];
-  classLimits: { classKey: string; maxLevel: number }[];
+  classLimits: ClassLimit[];
+  infravision: number | null;
+  saveBonuses: RaceSaveBonus[];
   abilities: { uuid: string; level: number }[];
+  classAccess(classKey: string): ClassAccess;
 }

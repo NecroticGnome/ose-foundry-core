@@ -4,7 +4,6 @@ import {
   type ClassInput,
   computeWarnings,
   contextKey,
-  parseScoreRequirements,
   unmetRequirement,
   type WarningInput,
 } from "../warnings";
@@ -192,16 +191,13 @@ describe("demihuman classes", () => {
 });
 
 describe("class score requirements", () => {
-  it.each([
-    ["Minimum CON 9, minimum DEX 9", { con: { min: 9, max: null }, dex: { min: 9, max: null } }],
-    ["Minimum CHA 9", { cha: { min: 9, max: null } }],
-    ["Maximum INT 6; minimum str 13", { int: { min: null, max: 6 }, str: { min: 13, max: null } }],
-    ["None", {}],
-    ["", {}],
-  ])("parses %o", (text, expected) => expect(parseScoreRequirements(text)).toEqual(expected));
-
   it("warns per score on the class", () => {
-    const bard = cls({ id: "b", name: "Bard", key: "bard", requirements: "Minimum CON 9, minimum DEX 9" });
+    const bard = cls({
+      id: "b",
+      name: "Bard",
+      key: "bard",
+      requirements: { con: { min: 9, max: null }, dex: { min: 9, max: null } },
+    });
     const scores = { str: 10, int: 10, wis: 10, dex: 12, con: 4, cha: 10 };
     const warnings = computeWarnings(input({ classes: [bard], scores }));
     expect(warnings.map((w) => [w.key, w.itemId, w.message, w.data])).toEqual([

@@ -36,9 +36,7 @@ export const classicClassToItemData = (cls: OseClass, primeReqAbilities: string[
   }));
   const system: Partial<ClassItemData> = {
     key: toKey(cls.name),
-    requirements: Object.entries(cls.requirements)
-      .map(([k, v], i) => `${i ? "minimum" : "Minimum"} ${k.toUpperCase()} ${v}`)
-      .join(", "),
+    requirements: Object.fromEntries(Object.entries(cls.requirements).map(([k, v]) => [k, { min: v, max: null }])),
     demihuman: ["Dwarf", "Elf", "Halfling"].includes(cls.name),
     primeReqs: defaultPrimeReqs(primeReqAbilities),
     maxLevel: levels.length,
