@@ -57,6 +57,10 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
       ...CONFIG.OSE,
       ascendingAC: game.settings.get(game.system.id, "ascendingAC"),
     };
+    if (CONFIG.OSE.encumbrance.type === "itembased" && context.isCharacter) {
+      const { max, packedMax } = context.system.encumbrance;
+      context.itemBasedCaps = CONFIG.OSE.encumbrance.caps(max, packedMax);
+    }
     return context;
   }
 
@@ -67,15 +71,13 @@ export default class OseEntityTweaks extends HandlebarsApplicationMixin(Applicat
   async _submit(raw) {
     const data = { ...raw };
 
-    // Item-based encumbrance tracks two separate values. If the user hasn't
-    // changed the value, null it out so the default applies.
+    // For item-based encumbrance, store default equipped cap as null, and always store the packed value.
     const encumbranceMax = "system.encumbrance.max";
-    if (
-      CONFIG.OSE.encumbrance.type === "itembased" &&
-      (data[encumbranceMax] === this.document.system.encumbrance.defaultMax ||
-        data[encumbranceMax] === this.document.system.encumbrance.alternateMax)
-    ) {
-      data[encumbranceMax] = null;
+    const packedMax = "system.encumbrance.packedMax";
+    if (CONFIG.OSE.encumbrance.type === "itembased" && encumbranceMax in data) {
+      const { defaultMax, alternateMax } = this.document.system.encumbrance;
+      if (data[encumbranceMax] === defaultMax || data[encumbranceMax] === alternateMax) data[encumbranceMax] = null;
+      if (packedMax in data) data[packedMax] ??= alternateMax;
     }
 
     const { tweaks, ...rest } = foundry.utils.expandObject(data);

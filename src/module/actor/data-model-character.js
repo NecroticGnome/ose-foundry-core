@@ -18,6 +18,10 @@ const getItemsOfActorOfType = (actor, filterType, filterFn = null) =>
 
 export default class OseDataModelCharacter extends foundry.abstract.TypeDataModel {
   prepareBaseData() {
+    // Resolve an unset packed cap so effects modify the real value.
+    if ("packedMax" in this.encumbrance) {
+      this.encumbrance.packedMax ??= CONFIG.OSE.encumbrance.caps?.(this.encumbrance.max).packed;
+    }
     this.derivedFromClasses = false;
     const { classes } = this;
     const summary = summariseClasses(classes);
@@ -88,6 +92,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
       {
         significantTreasure: game.settings.get(game.system.id, "significantTreasure"),
         scores: this.scores,
+        packedMax: this.encumbrance.packedMax,
       },
       this.scores.str.mod,
     );

@@ -201,6 +201,7 @@
   "OSE.effects.DeleteConfirm": "Delete the effect \"{name}\"?",
   "OSE.effects.keys.aac": "Ascending Armor Class",
   "OSE.effects.keys.encumbranceMax": "Maximum Encumbrance",
+  "OSE.effects.keys.encumbrancePackedMax": "Maximum Packed Encumbrance",
   "OSE.effects.Help": "Attribute keys (opens the reference)",
   "OSE.effects.Locked": "Changed by {effects}. Click to disable to edit.",
   "OSE.effects.LockedTitle": "Changed by an effect",

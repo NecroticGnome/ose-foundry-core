@@ -45,5 +45,8 @@ export const effectKeys = (type: "character" | "monster"): EffectKey[] =>
         { key: "system.details.xp.share", label: "OSE.details.experience.share" },
         { key: "system.details.magic.bonus", label: "OSE.details.magic.bonus" },
         { key: "system.encumbrance.max", label: "OSE.effects.keys.encumbranceMax" },
+        ...(OSE.encumbrance.type === "itembased"
+          ? [{ key: "system.encumbrance.packedMax", label: "OSE.effects.keys.encumbrancePackedMax" }]
+          : []),
         { key: "system.retainer.loyalty", label: "OSE.Loyalty" },
       ];

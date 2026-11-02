@@ -51,11 +51,24 @@
     <label for="ac">{{localize "OSE.ArmorClassBonus"}}</label>
     <input type="text" name="tweaks.ac" value="{{lookup @root.tweaks 'ac'}}" data-dtype="Number" id="ac" />
   </div>
+  {{#if itemBasedCaps}}
+  <div class="form-group">
+    <label for="encumbrance">{{localize "OSE.Encumbrance"}} ({{localize "OSE.items.ItemBasedEncumbranceEquipped"}})</label>
+    <input type="text" name="system.encumbrance.max" id="encumbrance" value="{{itemBasedCaps.equipped}}"
+      data-dtype="Number" {{#unless user.isGM}}disabled{{/unless}} />
+  </div>
+  <div class="form-group">
+    <label for="encumbrance-packed">{{localize "OSE.Encumbrance"}} ({{localize "OSE.items.ItemBasedEncumbrancePacked"}})</label>
+    <input type="text" name="system.encumbrance.packedMax" id="encumbrance-packed" value="{{itemBasedCaps.packed}}"
+      data-dtype="Number" {{#unless user.isGM}}disabled{{/unless}} />
+  </div>
+  {{else}}
   <div class="form-group">
     <label for="encumbrance">{{localize "OSE.Encumbrance"}}</label>
     <input type="text" name="system.encumbrance.max" id="encumbrance" value="{{@root.system.encumbrance.max}}"
       data-dtype="Number" {{#unless user.isGM}}disabled{{/unless}} />
   </div>
+  {{/if}}
   <div class="form-group">
     <label for="movementAuto">{{localize "OSE.Setting.MovementAuto"}}</label>
     <input type="checkbox" name="system.config.movementAuto" id="movementAuto" {{checked system.config.movementAuto}}

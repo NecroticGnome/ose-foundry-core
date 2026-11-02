@@ -58,6 +58,10 @@
 <td><code>system.encumbrance.pct</code></td>
 <td><code>system.encumbrance.max</code></td>
 </tr>
+<tr>
+<td><code>system.encumbrance.packedPct</code> (item-based)</td>
+<td><code>system.encumbrance.packedMax</code></td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -338,12 +342,12 @@
 </tbody>
 </table>
 <h3 id="encumbrance">Encumbrance</h3>
-<p><code>system.encumbrance.max</code> is the only input - default <code>1600</code> (<code>9</code> for item-based). Everything else is derived and depends on the world's <code>encumbranceOption</code> setting:</p>
+<p><code>system.encumbrance.max</code> default <code>1600</code> (<code>9</code> for item-based). Item-based also has <code>system.encumbrance.packedMax</code> - default <code>16</code>. Everything else is derived and depends on the world's <code>encumbranceOption</code> setting:</p>
 <ul>
 <li>All variants: <code>value</code>, <code>pct</code> (0-100), <code>encumbered</code>, <code>enabled</code>, <code>variant</code>, <code>steps</code>, <code>atFirstBreakpoint</code> / <code>atSecondBreakpoint</code> / <code>atThirdBreakpoint</code>.</li>
 <li><code>complete</code> / <code>detailed</code>: coin weight, breakpoints at 25%, 37.5%, 50%.</li>
 <li><code>basic</code>: breakpoints come from heaviest equipped armour and treasure carried; adds <code>overTreasureThreshold</code>, <code>overSignificantTreasureThreshold</code>.</li>
-<li><code>itembased</code>: item slots; adds <code>equippedValue</code> / <code>packedValue</code>, <code>equippedPct</code> / <code>packedPct</code>, <code>weightMod</code>, and related fields.</li>
+<li><code>itembased</code>: item slots, breakpoints at 3/9, 5/9, 7/9 of the equipped cap and 10/16, 12/16, 14/16 of the packed cap (the slower of the two applies); adds <code>equippedValue</code> / <code>packedValue</code>, <code>equippedPct</code> / <code>packedPct</code>, <code>weightMod</code>, and related fields.</li>
 </ul>
 <h3 id="spells">Spells</h3>
 <table>
