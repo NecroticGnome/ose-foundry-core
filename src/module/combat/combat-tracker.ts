@@ -10,6 +10,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       ...foundry.applications.sidebar.tabs.CombatTracker.DEFAULT_OPTIONS.actions,
       casting: OSECombatTracker.#onCombatantControl,
       retreat: OSECombatTracker.#onCombatantControl,
+      rollGroup: OSECombatTracker.#onRollGroup,
     },
   };
 
@@ -25,6 +26,29 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       turn.group = combatant.group;
     });
     return context;
+  }
+
+  /** Roll initiative for the group whose header button was clicked. */
+  static #onRollGroup(_event: PointerEvent, target: HTMLElement) {
+    const group = this.viewed?.groups.get(target.dataset.groupId);
+    if (group) return this.viewed.rollGroupInitiative([group]);
+  }
+
+  /**
+   * Prompt for a group's initiative. Set an empty value to clear it.
+   *
+   * @param {CombatantGroup} group - The group to set.
+   */
+  async #promptGroupInitiative(group: CombatantGroup) {
+    const value = await foundry.applications.api.DialogV2.prompt({
+      window: { title: "OSE.combat.SetGroupInitiative" },
+      content: `<label>${game.i18n.localize("OSE.Initiative")} <input type="number" name="initiative" value="${group.initiative ?? ""}" autofocus></label>`,
+      ok: { callback: (_event, button) => button.form.elements.initiative.value },
+      rejectClose: false,
+    });
+    if (value === null || value === undefined) return;
+    if (value === "" && !game.user.isGM) return;
+    await this.viewed.setGroupInitiative(group, value === "" ? null : Number(value));
   }
 
   /** @inheritDoc */
@@ -170,17 +194,35 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
       const label = combatantGroup.name;
       const groupContainer = document.createElement("li");
 
-      const initiativeCounter = document.createElement("span");
+      const isOwner = game.user.isGM || combatantGroup.members.some((c: OSECombatant) => c.isOwner);
+      const unrolled = combatantGroup.initiative === null;
+      let initiativeCounter: HTMLElement;
+      if (label === "slow") {
+        initiativeCounter = document.createElement("span");
+        initiativeCounter.innerHTML = `<i class="fa fa-weight-hanging"></i>`;
+      } else if (isOwner && unrolled) {
+        initiativeCounter = document.createElement("button");
+        initiativeCounter.setAttribute("type", "button");
+        initiativeCounter.classList.add("inline-control", "icon", "fa-solid", "fa-dice-d6");
+        initiativeCounter.dataset.action = "rollGroup";
+        initiativeCounter.dataset.groupId = combatantGroup.id;
+        initiativeCounter.dataset.tooltip = game.i18n.localize("OSE.combat.RollGroupInitiative");
+      } else {
+        initiativeCounter = document.createElement("span");
+        initiativeCounter.textContent = combatantGroup.initiative;
+      }
       initiativeCounter.classList.add("create-button");
       initiativeCounter.style.fontSize = "1.25em";
       initiativeCounter.style.fontWeight = "600";
       initiativeCounter.style.flex = "0 0 20px";
       initiativeCounter.style.textAlign = "center";
-
-      if (label === "slow") {
-        initiativeCounter.innerHTML = `<i class="fa fa-weight-hanging"></i>`;
-      } else {
-        initiativeCounter.textContent = combatantGroup.initiative;
+      // Players may only enter a value for their own unrolled group.
+      if (label !== "slow" && (game.user.isGM || (isOwner && unrolled))) {
+        initiativeCounter.addEventListener("contextmenu", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          this.#promptGroupInitiative(combatantGroup);
+        });
       }
 
       const groupHeader = document.createElement("div");
@@ -201,7 +243,7 @@ export default class OSECombatTracker extends foundry.applications.sidebar.tabs.
 
       tokenName.append(nameStrong);
       groupHeader.append(tokenName);
-      groupHeader.append(initiativeCounter.cloneNode(true));
+      groupHeader.append(initiativeCounter);
 
       const wrapper = document.createElement("div");
       wrapper.className = "wrapper";

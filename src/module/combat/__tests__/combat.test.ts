@@ -46,6 +46,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
   // The hasPlayerOwner assertions need a non-GM user. Headless/CI worlds may
   // not have one, so we create one for the batch and remove it afterwards.
   let createdTestUser: User | null = null;
+  let playerUserId: string | undefined;
 
   const createCombatant = async (actor: OseActor) => {
     const token = await actor.getTokenDocument();
@@ -69,6 +70,19 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
     // wait until they have all landed before tests assert on them.
     await waitUntil(() => game.combat?.combatants?.size === tokens.length);
   };
+
+  const spyWarnings = () => {
+    const keys: string[] = [];
+    const original = ui.notifications.warn;
+    ui.notifications.warn = (message: string, options?: object) => {
+      keys.push(message);
+      return original.call(ui.notifications, message, options);
+    };
+    return { keys, stop: () => (ui.notifications.warn = original) };
+  };
+
+  const hasGroupRoll = (group: string) =>
+    game.messages.contents.some((cm) => cm.content.includes(`data-group-key="${group}"`));
 
   const getCombatTrackerElement = () => document.querySelector("#combat ol.combat-tracker");
 
@@ -110,6 +124,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       })) as User;
       nonGMUser = createdTestUser ?? undefined;
     }
+    playerUserId = nonGMUser?.id;
 
     // Create mock actors for testing
     pc1 = await createMockActorKey(
@@ -582,13 +597,11 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       // The click handler rolls each group's initiative asynchronously; wait
       // until all rolls and their chat messages have landed, then let the
       // tracker re-render before asserting on DOM state.
-      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
+      await waitUntil(() => game.messages.size === 1 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
-      expect(game.messages.size).to.equal(3);
+      expect(game.messages.size).to.equal(1);
       for (const group of game.combat.groups.contents.map((g) => g.name)) {
-        expect(
-          game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group }))),
-        ).to.be.true;
+        expect(hasGroupRoll(group)).to.be.true;
       }
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
@@ -618,7 +631,10 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       for (const group of game.combat?.groups ?? []) {
         groupInitiatives.set(group.name, group.initiative);
       }
+      const warnings = spyWarnings();
       await game.combat.startCombat();
+      warnings.stop();
+      expect(warnings.keys).to.not.include("OSE.combat.UnrolledInitiative");
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
@@ -640,18 +656,16 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await game.combat.startCombat();
       // startCombat triggers async initiative rolls for unrolled groups; wait
       // for all rolls/messages to land before asserting.
-      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
+      await waitUntil(() => game.messages.size === 1 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
       expect(game.combat?.turn).to.equal(0);
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
-      expect(game.messages.size).to.equal(3);
+      expect(game.messages.size).to.equal(1);
       for (const group of game.combat.groups.contents.map((g) => g.name)) {
-        expect(
-          game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group }))),
-        ).to.be.true;
+        expect(hasGroupRoll(group)).to.be.true;
       }
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
@@ -697,7 +711,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       const { started, stop } = recordStartTurns();
       await game?.combat?.nextRound();
       // nextRound rerolls each group's initiative asynchronously.
-      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
+      await waitUntil(() => game.messages.size === 1 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitUntil(() => started.length > 0);
       stop();
       expect(started).to.deep.equal([game.combat?.combatant?.id]);
@@ -707,7 +721,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(game.combat?.turn).to.equal(0);
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
-      expect(game.messages.size).to.equal(3);
+      expect(game.messages.size).to.equal(1);
       expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
 
@@ -720,23 +734,107 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(playerGroups.length).to.be.greaterThan(0);
       expect(npcGroups.length).to.be.greaterThan(0);
       const playerInitiatives = new Map(playerGroups.map((g) => [g.id, g.initiative]));
-      const hasMessageFor = (group: string) =>
-        game.messages.contents.some((cm) => cm.flavor.includes(game.i18n.format("OSE.roll.initiative", { group })));
 
       const button = document.querySelector(
         ".combat-tracker-header .combat-control[data-action='rerollNPCInitiative']",
       );
       expect(button).to.not.be.null;
       button?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
-      await waitUntil(() => game.messages.size === npcGroups.length);
+      await waitUntil(() => game.messages.size === 1);
       await waitForInput();
 
-      expect(game.messages.size).to.equal(npcGroups.length);
-      for (const g of npcGroups) expect(hasMessageFor(g.name)).to.be.true;
+      expect(game.messages.size).to.equal(1);
+      for (const g of npcGroups) expect(hasGroupRoll(g.name)).to.be.true;
       for (const g of playerGroups) {
-        expect(hasMessageFor(g.name)).to.be.false;
+        expect(hasGroupRoll(g.name)).to.be.false;
         expect(game.combat.groups.get(g.id)?.initiative).to.equal(playerInitiatives.get(g.id));
       }
+    });
+
+    it("should roll a combatant's initiative for its whole group", async () => {
+      await game.combat.resetAll({ updateTurn: false });
+      await waitUntil(() => !game.combat?.groups?.some((g) => g.initiative !== null));
+      await trashChat();
+      await waitUntil(() => game.messages.size === 0);
+      const group = game.combat.groups.find((g) => g.name === "green");
+      const combatant = group?.members.first();
+      expect(combatant).to.not.be.undefined;
+
+      await game.combat.rollInitiative([combatant.id]);
+      await waitUntil(() => game.combat.groups.get(group.id)?.initiative !== null);
+      await waitForInput();
+
+      const rolled = game.combat.groups.get(group.id);
+      expect(rolled?.initiative).to.be.a("number");
+      for (const c of rolled?.members ?? []) expect(c.initiative).to.equal(rolled?.initiative);
+      expect(game.combat.groups.filter((g) => g.id !== group.id).some((g) => g.initiative !== null)).to.be.false;
+      expect(game.messages.size).to.equal(1);
+      expect(hasGroupRoll("green")).to.be.true;
+    });
+
+    it("should roll only unrolled groups the querying player owns", async () => {
+      expect(playerUserId).to.not.be.undefined;
+      await game.combat.resetAll({ updateTurn: false });
+      await waitUntil(() => !game.combat?.groups?.some((g) => g.initiative !== null));
+      const player = game.users.get(playerUserId);
+      const owned = game.combat.groups.filter((g) => g.members.some((c) => c.testUserPermission(player, "OWNER")));
+      const unowned = game.combat.groups.filter((g) => !owned.includes(g));
+      expect(owned.length).to.be.greaterThan(0);
+      expect(unowned.length).to.be.greaterThan(0);
+
+      const query = CONFIG.queries[`${game.system.id}.rollGroupInitiative`];
+      expect(query).to.be.a("function");
+      await query({ combatId: game.combat.id, groupIds: game.combat.groups.map((g) => g.id), userId: playerUserId });
+      await waitForInput();
+      for (const g of owned) expect(game.combat.groups.get(g.id)?.initiative).to.be.a("number");
+      for (const g of unowned) expect(game.combat.groups.get(g.id)?.initiative).to.be.null;
+
+      const before = new Map(owned.map((g) => [g.id, game.combat.groups.get(g.id)?.initiative]));
+      await query({ combatId: game.combat.id, groupIds: owned.map((g) => g.id), userId: playerUserId });
+      await waitForInput();
+      for (const g of owned) expect(game.combat.groups.get(g.id)?.initiative).to.equal(before.get(g.id));
+    });
+
+    it("should roll an unrolled group from its header button", async () => {
+      await game.combat.resetAll({ updateTurn: false });
+      await waitUntil(() => !game.combat?.groups?.some((g) => g.initiative !== null));
+      await trashChat();
+      await waitUntil(() => game.messages.size === 0);
+      await waitUntil(
+        () => !!getCombatTrackerElement()?.querySelector("li[data-group-key='red'] [data-action='rollGroup']"),
+      );
+      const button = getCombatTrackerElement()?.querySelector("li[data-group-key='red'] [data-action='rollGroup']");
+      button?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      await waitUntil(() => game.combat.groups.find((g) => g.name === "red")?.initiative !== null);
+      await waitForInput();
+      expect(game.messages.size).to.equal(1);
+      expect(hasGroupRoll("red")).to.be.true;
+      expect(game.combat.groups.filter((g) => g.name !== "red").some((g) => g.initiative !== null)).to.be.false;
+      expect(getCombatTrackerElement()?.querySelector("li[data-group-key='red'] [data-action='rollGroup']")).to.be.null;
+    });
+
+    it("should set and clear a group's initiative manually", async () => {
+      const group = game.combat.groups.find((g) => g.name === "green");
+      await game.combat.setGroupInitiative(group, 5);
+      expect(game.combat.groups.get(group.id)?.initiative).to.equal(5);
+      await game.combat.setGroupInitiative(group, null);
+      expect(game.combat.groups.get(group.id)?.initiative).to.be.null;
+    });
+
+    it("should let a querying player set only their unrolled groups", async () => {
+      await game.combat.resetAll({ updateTurn: false });
+      await waitUntil(() => !game.combat?.groups?.some((g) => g.initiative !== null));
+      const player = game.users.get(playerUserId);
+      const owned = game.combat.groups.filter((g) => g.members.some((c) => c.testUserPermission(player, "OWNER")));
+      const query = CONFIG.queries[`${game.system.id}.rollGroupInitiative`];
+      const groupIds = game.combat.groups.map((g) => g.id);
+      await query({ combatId: game.combat.id, groupIds, value: 2.5 }, { user: player });
+      expect(game.combat.groups.some((g) => g.initiative !== null)).to.be.false;
+      // v13 has no context.user, so the claimed userId is trusted.
+      await query({ combatId: game.combat.id, groupIds, userId: playerUserId, value: 4 });
+      for (const g of game.combat.groups) expect(g.initiative).to.equal(owned.includes(g) ? 4 : null);
+      await query({ combatId: game.combat.id, groupIds, value: 6 }, { user: player });
+      for (const g of owned) expect(game.combat.groups.get(g.id)?.initiative).to.equal(4);
     });
   });
 
@@ -778,8 +876,11 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await addAllTokensToCombat();
       await waitForInput();
 
+      const warnings = spyWarnings();
       await game.combat.startCombat();
+      warnings.stop();
       await waitForInput();
+      expect(warnings.keys).to.include("OSE.combat.UnrolledInitiative");
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
       expect(game.combat?.turn).to.equal(0);
@@ -808,8 +909,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
     it("should reset initiative for all groups on new round", async () => {
       await game?.combat?.smartRerollInitiative();
-      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
-      expect(game.messages.size).to.equal(3);
+      await waitUntil(() => game.messages.size === 1 && !game.combat?.groups?.some((g) => g.initiative === null));
+      expect(game.messages.size).to.equal(1);
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
 
       await game?.combat?.nextRound();
@@ -822,7 +923,7 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(game.combat?.turn).to.equal(0);
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
-      expect(game.messages.size).to.equal(3);
+      expect(game.messages.size).to.equal(1);
       expect(game.combat?.groups?.some((g) => g.initiative !== null)).to.be.false;
       expect(getCombatantElements()?.[0]?.classList.contains("active")).to.be.true;
     });
@@ -869,14 +970,14 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       await game.combat.startCombat();
       // startCombat rolls initiative for all groups asynchronously; wait for
       // every roll/message to land so later tests see a settled state.
-      await waitUntil(() => game.messages.size === 3 && !game.combat?.groups?.some((g) => g.initiative === null));
+      await waitUntil(() => game.messages.size === 1 && !game.combat?.groups?.some((g) => g.initiative === null));
       await waitForInput();
       expect(game.combat?.started).to.be.true;
       expect(game.combat?.round).to.equal(1);
       expect(game.combat?.turn).to.equal(0);
       expect(game.combat?.groups?.size).to.equal(3);
       expect(game.combat?.combatants?.size).to.equal(20);
-      expect(game.messages.size).to.equal(3);
+      expect(game.messages.size).to.equal(1);
       expect(game.combat?.groups?.some((g) => g.initiative === null)).to.be.false;
     });
 
