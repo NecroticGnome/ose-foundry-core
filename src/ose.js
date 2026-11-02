@@ -63,6 +63,7 @@ Hooks.once("init", async () => {
 
   CONFIG.Combat.fallbackTurnMarker = "icons/svg/circle.svg";
   CONFIG.ui.combat = OSECombatTracker;
+  CONFIG.queries[`${game.system.id}.rollGroupInitiative`] = OSECombat.handleRollGroupQuery;
   CONFIG.Token.rulerClass = TokenRulerOSE;
 
   game.ose = {

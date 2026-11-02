@@ -62,7 +62,6 @@
   "OSE.roll.direction.orHigher": "{target} or higher",
   "OSE.roll.direction.orLower": "{target} or lower",
   "OSE.roll.reaction": "Reaction roll",
-  "OSE.roll.initiative": "Group {group} rolls for Initiative!",
   "OSE.roll.individualInit": "{name} rolls for Initiative!",
   "OSE.roll.individualInitGroup": "Initiative Rolls",
 
@@ -369,6 +368,11 @@
   "OSE.combat.SetCombatantAsActive": "Set Active",
   "OSE.combat.SetCombatantGroups": "Set Combatant Groups",
   "OSE.combat.RerollNPCs": "Reroll NPCs",
+  "OSE.combat.NoActiveGM": "A GM must be connected to roll group initiative.",
+  "OSE.combat.RollGroupInitiative": "Roll group initiative (right-click to enter value)",
+  "OSE.combat.SetGroupInitiative": "Set Group Initiative",
+  "OSE.combat.GroupInitiativeRefused": "The GM could not apply that initiative value. Ask the GM to enter it.",
+  "OSE.combat.UnrolledInitiative": "Some combatants have not rolled initiative.",
   "OSE.CombatFlag.SpellDeclared": "Spell Declared",
   "OSE.CombatFlag.RetreatFromMeleeDeclared": "Retreat From Melee Declared",
 

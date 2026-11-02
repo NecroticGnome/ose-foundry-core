@@ -3,6 +3,7 @@
  */
 import { OSE } from "../config";
 import OSECombatGroupSelector from "./combat-set-groups";
+import type { OSECombatant } from "./combatant";
 
 export const actionGroups = {
   slow: "OSE.items.Slow",
@@ -86,42 +87,128 @@ export class OSECombat extends foundry.documents.Combat {
       return this.#rollAbsolutelyEveryone({ excludeAlreadyRolled, updateTurn });
     }
 
-    const updates = [];
-    const messages = [];
-    for (const group of this.groups) {
-      if (group.members.size === 0 || (excludeAlreadyRolled && group.initiative !== null) || group.name === "slow") {
-        continue;
+    const groups = this.groups.filter(
+      (group: CombatantGroup) =>
+        group.members.size > 0 &&
+        !(excludeAlreadyRolled && group.initiative !== null) &&
+        !(npcOnly && group.members.some((c) => c.hasPlayerOwner)),
+    );
+    return this.rollGroupInitiative(groups);
+  }
+
+  /**
+   * Roll one initiative per group and post them on a single chat card.
+   *
+   * @param {CombatantGroup[]} groups - The groups to roll for.
+   */
+  async rollGroupInitiative(groups: CombatantGroup[]) {
+    const toRoll = groups.filter((g) => g.members.size > 0 && g.name !== "slow");
+    if (!toRoll.length) return this;
+
+    if (!this.isOwner) {
+      const gm = game.users.activeGM;
+      if (!gm) {
+        ui.notifications.warn("OSE.combat.NoActiveGM", { localize: true });
+        return this;
       }
-      if (npcOnly && group.members.some((c) => c.hasPlayerOwner)) {
-        continue;
-      }
-
-      const roll = new Roll(OSECombat.GROUP_FORMULA);
-      await roll.evaluate();
-      updates.push({ _id: group.id, initiative: roll.total });
-
-      // Construct chat message data
-      const messageData = {
-        speaker: {
-          alias: game.i18n.localize("OSE.Initiative"),
-        },
-        flavor: game.i18n.format("OSE.roll.initiative", {
-          group: foundry.utils.escapeHTML(group.name),
-        }),
-        flags: { "core.initiativeRoll": true },
-      };
-      const chatData = await roll.toMessage(messageData, { create: false });
-      messages.push(chatData);
-    }
-
-    if (updates.length === 0) {
+      await gm.query(`${game.system.id}.rollGroupInitiative`, {
+        combatId: this.id,
+        groupIds: toRoll.map((g) => g.id),
+        userId: game.user.id,
+      });
       return this;
     }
 
-    await foundry.documents.ChatMessage.implementation.create(messages);
-    await this.updateEmbeddedDocuments("CombatantGroup", updates);
+    const rolls = [];
+    const updates = [];
+    const rows = [];
+    for (const group of toRoll) {
+      const roll = await new Roll(OSECombat.GROUP_FORMULA).evaluate();
+      rolls.push(roll);
+      updates.push({ _id: group.id, initiative: roll.total });
+      const label = foundry.utils.escapeHTML(game.i18n.localize(`OSE.colors.${group.name}`));
+      const anchor = (await roll.toAnchor()).outerHTML;
+      rows.push(
+        `<li class="ose-initiative-group" data-group-key="${group.name}"><strong>${label}</strong> ${anchor}</li>`,
+      );
+    }
 
+    await this.updateEmbeddedDocuments("CombatantGroup", updates);
+    await foundry.documents.ChatMessage.implementation.create({
+      speaker: { alias: game.i18n.localize("OSE.Initiative") },
+      flavor: game.i18n.localize("OSE.roll.individualInitGroup"),
+      content: `<ul class="ose-initiative-groups">${rows.join("")}</ul>`,
+      rolls,
+      sound: CONFIG.sounds.dice,
+      flags: { "core.initiativeRoll": true },
+    });
     return this;
+  }
+
+  /**
+   * Set a group's initiative directly. Null to clear it.
+   *
+   * @param {CombatantGroup} group - The group to set.
+   * @param {number|null} value - The initiative value.
+   */
+  async setGroupInitiative(group: CombatantGroup, value: number | null) {
+    if (this.isOwner) return group.update({ initiative: value });
+    const gm = game.users.activeGM;
+    if (!gm) {
+      ui.notifications.warn("OSE.combat.NoActiveGM", { localize: true });
+      return;
+    }
+    const applied = await gm.query(`${game.system.id}.rollGroupInitiative`, {
+      combatId: this.id,
+      groupIds: [group.id],
+      userId: game.user.id,
+      value,
+    });
+    if (!applied) ui.notifications.warn("OSE.combat.GroupInitiativeRefused", { localize: true });
+  }
+
+  /**
+   * GM handler for a player's group initiative roll or manual value.
+   *
+   * @param {object} data - The query data.
+   * @param {object} [context] - Query context; v14 includes the sending user.
+   */
+  static async handleRollGroupQuery(
+    { combatId, groupIds, userId, value }: { combatId: string; groupIds: string[]; userId: string; value?: number },
+    context: { user?: User } = {},
+  ) {
+    const combat = game.combats.get(combatId) as OSECombat | undefined;
+    const user = context.user ?? game.users.get(userId);
+    if (!combat || !user) return false;
+    if (value !== undefined && !Number.isInteger(value)) return false;
+    const groups = groupIds
+      .map((id) => combat.groups.get(id))
+      .filter(
+        (g): g is CombatantGroup =>
+          !!g && g.initiative === null && g.members.some((c) => c.testUserPermission(user, "OWNER")),
+      );
+    if (value !== undefined) {
+      await combat.updateEmbeddedDocuments(
+        "CombatantGroup",
+        groups.map((g) => ({ _id: g.id, initiative: value })),
+      );
+    } else await combat.rollGroupInitiative(groups);
+    return true;
+  }
+
+  /** @override */
+  async rollInitiative(ids: string | string[], options = {}) {
+    if (!this.isGroupInitiative) return super.rollInitiative(ids, options);
+    const idList = typeof ids === "string" ? [ids] : ids;
+    const groups = new Set<CombatantGroup>();
+    const loose = [];
+    for (const id of idList) {
+      const group = this.combatants.get(id)?.group as CombatantGroup | undefined;
+      if (group && group.name !== "slow") groups.add(group);
+      else loose.push(id);
+    }
+    if (loose.length) await super.rollInitiative(loose, options);
+    return this.rollGroupInitiative([...groups]);
   }
 
   /**
@@ -168,7 +255,22 @@ export class OSECombat extends foundry.documents.Combat {
       await this.smartRerollInitiative({
         excludeAlreadyRolled: true,
       });
+    this.#warnUnrolled();
     return this;
+  }
+
+  /** @override */
+  async nextTurn() {
+    this.#warnUnrolled();
+    return super.nextTurn();
+  }
+
+  /** Warn without blocking when an active combatant has no initiative yet. */
+  #warnUnrolled() {
+    const unrolled = this.combatants.some(
+      (c) => !c.isDefeated && !c.isSlow && c.group?.name !== "slow" && c.initiative === null,
+    );
+    if (unrolled) ui.notifications.warn("OSE.combat.UnrolledInitiative", { localize: true });
   }
 
   /**
