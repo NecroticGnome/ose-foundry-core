@@ -221,10 +221,15 @@ export class OSECombat extends foundry.documents.Combat {
   /**
    * Handle updating a combatant group.
    */
-  async onUpdateCombatantGroup() {
+  onUpdateCombatantGroup() {
     this.setupTurns();
-    await ui.combat.render({ force: true });
+    this.#renderTracker();
   }
+
+  // Batch group updates into one tracker render.
+  #renderTracker = foundry.utils.debounce(() => {
+    if (this.isView) ui.combat.render();
+  }, 50);
 
   /** @override */
   async rollAll(options: object) {
