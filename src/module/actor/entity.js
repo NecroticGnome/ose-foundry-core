@@ -213,9 +213,11 @@ export default class OseActor extends Actor {
    * @param {number} [options.level] - The level the class starts at; its XP comes from the class table
    * @param {boolean} [options.rollHp] - Roll starting hit points for each level
    * @param {Item} [options.replace] - A class to remove first; its level and XP carry over unless a level is given
+   * @throws {Error} If the actor is not a character
    * @returns {Promise<Item|undefined>} The embedded class
    */
   async addClass(data, { level, rollHp = false, replace } = {}) {
+    this.#requireCharacter();
     const item = foundry.utils.deepClone(data);
     const progress =
       replace && level === undefined
@@ -238,9 +240,11 @@ export default class OseActor extends Actor {
    * @param {object} data - Race item data
    * @param {object} [options]
    * @param {boolean} [options.modifiersIncluded] - The scores already include the race's modifiers, so its effect starts disabled
+   * @throws {Error} If the actor is not a character
    * @returns {Promise<Item|undefined>} The embedded race
    */
   async setRace(data, { modifiersIncluded = false } = {}) {
+    this.#requireCharacter();
     const item = foundry.utils.deepClone(data);
     if (modifiersIncluded) {
       const modifiers = (item.effects ?? []).find((e) => e.flags?.[game.system.id]?.raceModifiers);
@@ -251,6 +255,12 @@ export default class OseActor extends Actor {
     if (!race) return;
     await this.addLanguages(race.system.languages);
     return race;
+  }
+
+  #requireCharacter() {
+    if (this.type !== "character") {
+      throw new Error(game.i18n.format("OSE.error.notACharacter", { name: this.name }));
+    }
   }
 
   /**

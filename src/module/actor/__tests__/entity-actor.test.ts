@@ -333,6 +333,18 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await actor.delete();
     });
 
+    it("refuses to add a class or race to a monster", async () => {
+      const monster = await createMockActor("monster");
+      let error: unknown;
+      await monster.addClass({ name: "Fighter", type: "class", system: { levels } }).catch((e) => (error = e));
+      expect(error).instanceOf(Error);
+      error = undefined;
+      await monster.setRace({ name: "Dwarf", type: "race", system: {} }).catch((e) => (error = e));
+      expect(error).instanceOf(Error);
+      expect(monster.items.size).equal(0);
+      await monster.delete();
+    });
+
     it("replaces a class, carrying its level and XP over", async () => {
       const actor = (await createMockActor("character")) as OseActor;
       const [fighter] = await actor.createEmbeddedDocuments("Item", [
