@@ -235,7 +235,7 @@ export default class OseActor extends Actor {
   }
 
   /**
-   * Embed a race in place of any the character has and teach it the race's languages.
+   * Embed a race in place of any the character has, replacing its languages with the race's.
    *
    * @param {object} data - Race item data
    * @param {object} [options]
@@ -253,7 +253,7 @@ export default class OseActor extends Actor {
     await this.system.race?.delete();
     const [race] = await this.createEmbeddedDocuments("Item", [item]);
     if (!race) return;
-    await this.addLanguages(race.system.languages);
+    await this.addLanguages(race.system.languages, { replace: true });
     return race;
   }
 
@@ -264,14 +264,16 @@ export default class OseActor extends Actor {
   }
 
   /**
-   * Add languages the character doesn't know yet.
+   * Add languages the character doesn't know yet, or start its list over.
    *
    * @param {string[]} names - Language names; "Alignment" stands for the character's alignment
+   * @param {object} [options]
+   * @param {boolean} [options.replace] - Forget every language first
    */
-  async addLanguages(names) {
-    const known = this.system.languages?.value ?? [];
-    const merged = mergeLanguages(known, names, this.system.details?.alignment ?? "");
-    if (merged.length === known.length) return;
+  async addLanguages(names, { replace = false } = {}) {
+    const current = this.system.languages?.value ?? [];
+    const merged = mergeLanguages(replace ? [] : current, names, this.system.details?.alignment ?? "");
+    if (merged.length === current.length && merged.every((name, i) => name === current[i])) return;
     return this.update({ "system.languages.value": merged });
   }
 

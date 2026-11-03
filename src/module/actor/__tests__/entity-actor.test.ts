@@ -371,10 +371,10 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       await actor.delete();
     });
 
-    it("replaces the race, disabling its modifiers when the scores already include them", async () => {
+    it("replaces the race and its languages, disabling its modifiers when the scores already include them", async () => {
       const actor = (await createMockActor("character")) as OseActor;
-      await actor.update({ "system.languages.value": ["Common"], "system.details.alignment": "Lawful" });
-      await actor.createEmbeddedDocuments("Item", [{ name: "Human", type: "race" }]);
+      await actor.update({ "system.languages.value": ["Gnoll"], "system.details.alignment": "Lawful" });
+      await actor.createEmbeddedDocuments("Item", [{ name: "Halfling", type: "race" }]);
       const scope = game.system.id;
       const race = await actor.setRace(
         {
