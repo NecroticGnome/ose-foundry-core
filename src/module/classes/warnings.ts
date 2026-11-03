@@ -24,6 +24,7 @@ export interface RaceInput {
   key?: string;
   limits: Record<string, number | null>;
   allowedKeys: string[];
+  npcOnlyKeys?: string[];
   requirements?: ScoreRequirements;
 }
 
@@ -185,6 +186,9 @@ export const computeWarnings = (input: WarningInput): Warning[] => {
       if (race.allowedKeys.length && !race.allowedKeys.includes(cls.key)) {
         out.push(warn("raceClass", race.id, { race: race.name, cls: cls.name }));
         continue;
+      }
+      if (race.npcOnlyKeys?.includes(cls.key)) {
+        out.push(warn("raceClassNpc", race.id, { race: race.name, cls: cls.name }));
       }
       const max = race.limits[cls.key];
       if (max != null && cls.level > max) {

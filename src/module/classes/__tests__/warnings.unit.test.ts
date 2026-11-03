@@ -134,6 +134,10 @@ describe("race warnings", () => {
       "raceClass:r",
     ]);
   });
+  it("warns when the class is NPC-only for the race", () => {
+    const race = { ...dwarf, allowedKeys: [...dwarf.allowedKeys, "cleric"], npcOnlyKeys: ["cleric"] };
+    expect(keys(input({ race, classes: [cls({ key: "cleric", name: "Cleric" })] }))).toEqual(["raceClassNpc:r"]);
+  });
   it("treats an empty class list as unrestricted", () => {
     const human = { id: "h", name: "Human", limits: {}, allowedKeys: [] };
     expect(keys(input({ race: human, classes: [cls({ key: "anything", level: 20, tableLength: 20 })] }))).toEqual([]);

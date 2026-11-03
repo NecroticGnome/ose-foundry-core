@@ -478,6 +478,7 @@
   "OSE.warnings.customMix": "{cls} has no level table, so its saves and THAC0 are ignored alongside other classes.",
   "OSE.warnings.raceLevel": "{cls} is level {level}; {race} characters can reach level {max}.",
   "OSE.warnings.raceClass": "{race} characters can't normally be {cls}.",
+  "OSE.warnings.raceClassNpc": "{cls} is an NPC-only class for {race} characters.",
   "OSE.warnings.scoreRange": "{score} is {value}, outside 3-18.",
   "OSE.warnings.demihumanRace": "{cls} is a demihuman class, which already includes its race. It isn't used with a race item such as {race}.",
   "OSE.warnings.scoreMin": "{name} needs {score} of at least {limit}; it is {value}.",

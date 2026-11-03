@@ -205,6 +205,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
             key: race.system.key,
             limits: Object.fromEntries(race.system.classLimits.map((l) => [l.classKey, l.maxLevel])),
             allowedKeys: race.system.classLimits.map((l) => l.classKey),
+            npcOnlyKeys: race.system.classLimits.filter((l) => l.npcOnly).map((l) => l.classKey),
             requirements: race.system.requirements,
           }
         : null,
