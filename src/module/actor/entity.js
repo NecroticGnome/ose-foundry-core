@@ -205,7 +205,8 @@ export default class OseActor extends Actor {
   }
 
   /**
-   * Add a class without asking anything.
+   * Embed a class at a starting level and XP, roll its hit points if asked, report the
+   * changed stats to chat and teach the character its languages.
    *
    * @param {object} data - Class item data
    * @param {object} [options]
@@ -232,7 +233,7 @@ export default class OseActor extends Actor {
   }
 
   /**
-   * Set the character's race without asking anything, replacing any it has.
+   * Embed a race in place of any the character has and teach it the race's languages.
    *
    * @param {object} data - Race item data
    * @param {object} [options]
