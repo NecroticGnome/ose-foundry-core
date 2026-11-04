@@ -23,3 +23,8 @@ export const raceSaveBonus = (entry: RaceSaveBonus, con: number | null | undefin
   entry.bonus ?? conSaveBonus(con ?? 0);
 
 export const appliesToSave = (entry: RaceSaveBonus, save: SaveKey) => !entry.saves.length || entry.saves.includes(save);
+
+export const totalRaceSaveBonus = (bonuses: RaceSaveBonus[], save: SaveKey, con: number | null | undefined) => {
+  const applicable = bonuses.filter((b) => !b.against && appliesToSave(b, save));
+  return applicable.reduce((sum, b) => sum + raceSaveBonus(b, con), 0);
+};

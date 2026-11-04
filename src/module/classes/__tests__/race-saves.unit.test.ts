@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appliesToSave, raceSaveBonus } from "../race-saves";
+import { appliesToSave, raceSaveBonus, totalRaceSaveBonus } from "../race-saves";
 
 const resilience = { saves: ["death", "wand", "spell"] as const, bonus: null, against: "" };
 const illusions = { saves: [], bonus: 2, against: "illusions" };
@@ -32,5 +32,13 @@ describe("appliesToSave", () => {
     expect(appliesToSave(entry, "spell")).toBe(true);
     expect(appliesToSave(entry, "breath")).toBe(false);
     expect(appliesToSave(illusions, "breath")).toBe(true);
+  });
+});
+
+describe("totalRaceSaveBonus", () => {
+  const bonuses = [{ ...resilience, saves: [...resilience.saves] }, illusions];
+  it("sums the unconditional bonuses that cover a save", () => {
+    expect(totalRaceSaveBonus(bonuses, "death", 15)).toBe(4);
+    expect(totalRaceSaveBonus(bonuses, "breath", 15)).toBe(0);
   });
 });

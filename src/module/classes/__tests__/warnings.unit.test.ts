@@ -32,6 +32,7 @@ const input = (over: Partial<WarningInput> = {}): WarningInput => ({
   ...over,
 });
 const keys = (i: WarningInput) => computeWarnings(i).map((w) => `${w.key}:${w.itemId}`);
+const open = () => ({ allowed: true as const, maxLevel: null, npcOnly: false });
 
 const thief = cls({ id: "t", name: "Thief", key: "thief", armour: ["leather"], stealthSkills: ["Hide in Shadows"] });
 const mage = cls({ id: "m", name: "Magic-User", key: "magic-user", armour: ["none"] });
@@ -117,14 +118,22 @@ describe("contextKey", () => {
     expect(contextKey(a)).toBe(contextKey(b));
   });
   it("changes with the race", () => {
-    expect(contextKey(input())).not.toBe(
-      contextKey(input({ race: { id: "r", name: "Elf", limits: {}, allowedKeys: [] } })),
-    );
+    expect(contextKey(input())).not.toBe(contextKey(input({ race: { id: "r", name: "Elf", classAccess: open } })));
   });
 });
 
 describe("race warnings", () => {
-  const dwarf = { id: "r", name: "Dwarf", limits: { fighter: 12, thief: 11 }, allowedKeys: ["fighter", "thief"] };
+  const limits: Record<string, { maxLevel: number; npcOnly: boolean }> = {
+    fighter: { maxLevel: 12, npcOnly: false },
+    thief: { maxLevel: 11, npcOnly: false },
+    cleric: { maxLevel: 8, npcOnly: true },
+  };
+  const dwarf = {
+    id: "r",
+    name: "Dwarf",
+    classAccess: (key: string) =>
+      limits[key] ? { allowed: true as const, ...limits[key] } : { allowed: false as const },
+  };
   it("warns when a class is above the race limit", () => {
     expect(keys(input({ race: dwarf, classes: [cls({ level: 13 })] }))).toEqual(["raceLevel:r"]);
     expect(keys(input({ race: dwarf, classes: [cls({ level: 12 })] }))).toEqual([]);
@@ -135,11 +144,10 @@ describe("race warnings", () => {
     ]);
   });
   it("warns when the class is NPC-only for the race", () => {
-    const race = { ...dwarf, allowedKeys: [...dwarf.allowedKeys, "cleric"], npcOnlyKeys: ["cleric"] };
-    expect(keys(input({ race, classes: [cls({ key: "cleric", name: "Cleric" })] }))).toEqual(["raceClassNpc:r"]);
+    expect(keys(input({ race: dwarf, classes: [cls({ key: "cleric", name: "Cleric" })] }))).toEqual(["raceClassNpc:r"]);
   });
-  it("treats an empty class list as unrestricted", () => {
-    const human = { id: "h", name: "Human", limits: {}, allowedKeys: [] };
+  it("treats an open race as unrestricted", () => {
+    const human = { id: "h", name: "Human", classAccess: open };
     expect(keys(input({ race: human, classes: [cls({ key: "anything", level: 20, tableLength: 20 })] }))).toEqual([]);
   });
   it("warns about scores outside 3-18 only with a race", () => {
@@ -182,7 +190,7 @@ describe("race warnings", () => {
 
 describe("demihuman classes", () => {
   const elf = cls({ id: "e", name: "Elf", key: "elf", demihuman: true });
-  const human = { id: "r", name: "Human", limits: {}, allowedKeys: [] };
+  const human = { id: "r", name: "Human", classAccess: open };
   it("warns on the class when a race item is also present", () => {
     const warnings = computeWarnings(input({ classes: [elf], race: human }));
     expect(warnings.map((w) => [w.key, w.itemId, w.data])).toEqual([

@@ -1,6 +1,7 @@
 /**
  * @file Rule warnings for class and race restrictions. Warnings never block anything.
  */
+import type { ClassAccess } from "../item/item-types";
 import { toKey } from "./matching";
 import type { ScoreRequirements } from "./requirements";
 
@@ -22,9 +23,7 @@ export interface RaceInput {
   id: string;
   name: string;
   key?: string;
-  limits: Record<string, number | null>;
-  allowedKeys: string[];
-  npcOnlyKeys?: string[];
+  classAccess: (classKey: string) => ClassAccess;
   requirements?: ScoreRequirements;
 }
 
@@ -183,16 +182,16 @@ export const computeWarnings = (input: WarningInput): Warning[] => {
       out.push(warn("demihumanRace", cls.id, { cls: cls.name, race: race.name }));
     }
     for (const cls of classes) {
-      if (race.allowedKeys.length && !race.allowedKeys.includes(cls.key)) {
+      const access = race.classAccess(cls.key);
+      if (!access.allowed) {
         out.push(warn("raceClass", race.id, { race: race.name, cls: cls.name }));
         continue;
       }
-      if (race.npcOnlyKeys?.includes(cls.key)) {
-        out.push(warn("raceClassNpc", race.id, { race: race.name, cls: cls.name }));
-      }
-      const max = race.limits[cls.key];
-      if (max != null && cls.level > max) {
-        out.push(warn("raceLevel", race.id, { race: race.name, cls: cls.name, level: cls.level, max }));
+      if (access.npcOnly) out.push(warn("raceClassNpc", race.id, { race: race.name, cls: cls.name }));
+      if (access.maxLevel != null && cls.level > access.maxLevel) {
+        out.push(
+          warn("raceLevel", race.id, { race: race.name, cls: cls.name, level: cls.level, max: access.maxLevel }),
+        );
       }
     }
     out.push(...scoreWarnings("raceScore", race, race.requirements ?? {}, input.scores));
