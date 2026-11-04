@@ -4,7 +4,6 @@ import {
   type ClassInput,
   computeWarnings,
   contextKey,
-  parseScoreRequirements,
   unmetRequirement,
   type WarningInput,
 } from "../warnings";
@@ -33,6 +32,7 @@ const input = (over: Partial<WarningInput> = {}): WarningInput => ({
   ...over,
 });
 const keys = (i: WarningInput) => computeWarnings(i).map((w) => `${w.key}:${w.itemId}`);
+const open = () => ({ allowed: true as const, maxLevel: null, npcOnly: false });
 
 const thief = cls({ id: "t", name: "Thief", key: "thief", armour: ["leather"], stealthSkills: ["Hide in Shadows"] });
 const mage = cls({ id: "m", name: "Magic-User", key: "magic-user", armour: ["none"] });
@@ -118,14 +118,22 @@ describe("contextKey", () => {
     expect(contextKey(a)).toBe(contextKey(b));
   });
   it("changes with the race", () => {
-    expect(contextKey(input())).not.toBe(
-      contextKey(input({ race: { id: "r", name: "Elf", limits: {}, allowedKeys: [] } })),
-    );
+    expect(contextKey(input())).not.toBe(contextKey(input({ race: { id: "r", name: "Elf", classAccess: open } })));
   });
 });
 
 describe("race warnings", () => {
-  const dwarf = { id: "r", name: "Dwarf", limits: { fighter: 12, thief: 11 }, allowedKeys: ["fighter", "thief"] };
+  const limits: Record<string, { maxLevel: number; npcOnly: boolean }> = {
+    fighter: { maxLevel: 12, npcOnly: false },
+    thief: { maxLevel: 11, npcOnly: false },
+    cleric: { maxLevel: 8, npcOnly: true },
+  };
+  const dwarf = {
+    id: "r",
+    name: "Dwarf",
+    classAccess: (key: string) =>
+      limits[key] ? { allowed: true as const, ...limits[key] } : { allowed: false as const },
+  };
   it("warns when a class is above the race limit", () => {
     expect(keys(input({ race: dwarf, classes: [cls({ level: 13 })] }))).toEqual(["raceLevel:r"]);
     expect(keys(input({ race: dwarf, classes: [cls({ level: 12 })] }))).toEqual([]);
@@ -135,8 +143,11 @@ describe("race warnings", () => {
       "raceClass:r",
     ]);
   });
-  it("treats an empty class list as unrestricted", () => {
-    const human = { id: "h", name: "Human", limits: {}, allowedKeys: [] };
+  it("warns when the class is NPC-only for the race", () => {
+    expect(keys(input({ race: dwarf, classes: [cls({ key: "cleric", name: "Cleric" })] }))).toEqual(["raceClassNpc:r"]);
+  });
+  it("treats an open race as unrestricted", () => {
+    const human = { id: "h", name: "Human", classAccess: open };
     expect(keys(input({ race: human, classes: [cls({ key: "anything", level: 20, tableLength: 20 })] }))).toEqual([]);
   });
   it("warns about scores outside 3-18 only with a race", () => {
@@ -179,7 +190,7 @@ describe("race warnings", () => {
 
 describe("demihuman classes", () => {
   const elf = cls({ id: "e", name: "Elf", key: "elf", demihuman: true });
-  const human = { id: "r", name: "Human", limits: {}, allowedKeys: [] };
+  const human = { id: "r", name: "Human", classAccess: open };
   it("warns on the class when a race item is also present", () => {
     const warnings = computeWarnings(input({ classes: [elf], race: human }));
     expect(warnings.map((w) => [w.key, w.itemId, w.data])).toEqual([
@@ -192,16 +203,13 @@ describe("demihuman classes", () => {
 });
 
 describe("class score requirements", () => {
-  it.each([
-    ["Minimum CON 9, minimum DEX 9", { con: { min: 9, max: null }, dex: { min: 9, max: null } }],
-    ["Minimum CHA 9", { cha: { min: 9, max: null } }],
-    ["Maximum INT 6; minimum str 13", { int: { min: null, max: 6 }, str: { min: 13, max: null } }],
-    ["None", {}],
-    ["", {}],
-  ])("parses %o", (text, expected) => expect(parseScoreRequirements(text)).toEqual(expected));
-
   it("warns per score on the class", () => {
-    const bard = cls({ id: "b", name: "Bard", key: "bard", requirements: "Minimum CON 9, minimum DEX 9" });
+    const bard = cls({
+      id: "b",
+      name: "Bard",
+      key: "bard",
+      requirements: { con: { min: 9, max: null }, dex: { min: 9, max: null } },
+    });
     const scores = { str: 10, int: 10, wis: 10, dex: 12, con: 4, cha: 10 };
     const warnings = computeWarnings(input({ classes: [bard], scores }));
     expect(warnings.map((w) => [w.key, w.itemId, w.message, w.data])).toEqual([

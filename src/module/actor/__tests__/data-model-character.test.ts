@@ -857,6 +857,25 @@ export default ({ describe, it, expect, after, before }: QuenchMethods) => {
       await actor.delete();
     });
 
+    it("lowers derived saves by the race's unconditional bonuses", async () => {
+      const actor = await classActor();
+      await actor.update({ "system.scores.con.value": 15 });
+      const dwarf = {
+        name: "Dwarf",
+        type: "race",
+        system: {
+          saveBonuses: [
+            { saves: ["death"], bonus: null, against: "" },
+            { saves: [], bonus: 2, against: "illusions" },
+          ],
+        },
+      };
+      await actor.createEmbeddedDocuments("Item", [fighter, dwarf]);
+      expect(actor.system.saves.death.value).equal(6);
+      expect(actor.system.saves.wand.value).equal(11);
+      await actor.delete();
+    });
+
     it("returns to stored values when the class is removed", async () => {
       const actor = await classActor();
       const [cls] = await actor.createEmbeddedDocuments("Item", [fighter]);

@@ -30,6 +30,14 @@ describe("OseDataModelClass", () => {
     expect(new OseDataModelClass({ languages: ["Common"] }).languages).toEqual(["Common"]);
   });
 
+  it("reads older free-text requirements into score bounds", () => {
+    const c = new OseDataModelClass({ requirements: "Minimum CON 9, minimum DEX 9" });
+    expect(c.requirements).toEqual({ con: { min: 9, max: null }, dex: { min: 9, max: null } });
+    expect(c.requirementsText).toBe("");
+    expect(new OseDataModelClass({ requirements: "Must be Lawful" }).requirementsText).toBe("Must be Lawful");
+    expect(new OseDataModelClass().requirements.str).toEqual({ min: null, max: null });
+  });
+
   it("reads the current and next rows", () => {
     const c = new OseDataModelClass({ levels, level: 1, xp: 1999 });
     expect(c.currentRow?.xp).toBe(0);

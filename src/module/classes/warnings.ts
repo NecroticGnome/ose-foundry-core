@@ -1,7 +1,10 @@
 /**
  * @file Rule warnings for class and race restrictions. Warnings never block anything.
  */
+import type { ClassAccess } from "../item/item-types";
 import { toKey } from "./matching";
+import type { ScoreRequirements } from "./requirements";
+
 export interface ClassInput {
   id: string;
   name: string;
@@ -12,7 +15,7 @@ export interface ClassInput {
   armour: string[];
   weapons: string[];
   stealthSkills: string[];
-  requirements?: string;
+  requirements?: ScoreRequirements;
   demihuman?: boolean;
 }
 
@@ -20,12 +23,9 @@ export interface RaceInput {
   id: string;
   name: string;
   key?: string;
-  limits: Record<string, number | null>;
-  allowedKeys: string[];
+  classAccess: (classKey: string) => ClassAccess;
   requirements?: ScoreRequirements;
 }
-
-export type ScoreRequirements = Record<string, { min: number | null; max: number | null }>;
 
 export interface ArmourInput {
   id: string;
@@ -100,18 +100,6 @@ const warn = (key: string, itemId: string, data: Record<string, string | number>
   data,
 });
 
-// "Minimum CON 9, minimum DEX 9" → { con: { min: 9, max: null }, dex: ... }; other text is ignored.
-export const parseScoreRequirements = (text: string): ScoreRequirements => {
-  const out: ScoreRequirements = {};
-  for (const [, bound, score, value] of (text ?? "").matchAll(
-    /\b(min|max)(?:imum)?\s+(str|int|wis|dex|con|cha)\s+(\d+)/gi,
-  )) {
-    const key = score.toLowerCase();
-    out[key] = { min: null, max: null, ...out[key], [bound.toLowerCase()]: Number(value) };
-  }
-  return out;
-};
-
 // One warning per score outside its requirement, keyed so each can be dismissed.
 const scoreWarnings = (
   prefix: string,
@@ -180,7 +168,7 @@ export const computeWarnings = (input: WarningInput): Warning[] => {
     out.push(warn("classCount", c.id, { cls: c.name, max: MAX_CLASSES }));
   });
   for (const cls of classes) {
-    out.push(...scoreWarnings("classScore", cls, parseScoreRequirements(cls.requirements ?? ""), input.scores));
+    out.push(...scoreWarnings("classScore", cls, cls.requirements ?? {}, input.scores));
   }
   for (const cls of classes) {
     if (cls.hasTable && cls.level > cls.tableLength) {
@@ -194,13 +182,16 @@ export const computeWarnings = (input: WarningInput): Warning[] => {
       out.push(warn("demihumanRace", cls.id, { cls: cls.name, race: race.name }));
     }
     for (const cls of classes) {
-      if (race.allowedKeys.length && !race.allowedKeys.includes(cls.key)) {
+      const access = race.classAccess(cls.key);
+      if (!access.allowed) {
         out.push(warn("raceClass", race.id, { race: race.name, cls: cls.name }));
         continue;
       }
-      const max = race.limits[cls.key];
-      if (max != null && cls.level > max) {
-        out.push(warn("raceLevel", race.id, { race: race.name, cls: cls.name, level: cls.level, max }));
+      if (access.npcOnly) out.push(warn("raceClassNpc", race.id, { race: race.name, cls: cls.name }));
+      if (access.maxLevel != null && cls.level > access.maxLevel) {
+        out.push(
+          warn("raceLevel", race.id, { race: race.name, cls: cls.name, level: cls.level, max: access.maxLevel }),
+        );
       }
     }
     out.push(...scoreWarnings("raceScore", race, race.requirements ?? {}, input.scores));

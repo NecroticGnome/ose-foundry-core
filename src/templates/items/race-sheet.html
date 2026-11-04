@@ -23,11 +23,14 @@
         <input type="text" name="system.key" value="{{system.key}}" data-tooltip="OSE.classes.KeyHint" />
         <label>{{localize 'OSE.category.languages'}}</label>
         {{> (path "/templates/items/partials/tag-list.html") field="languages" values=system.languages choices=languageChoices placeholder="OSE.classes.AddLanguage" }}
+        <label data-tooltip="OSE.race.InfravisionHint">{{localize 'OSE.race.Infravision'}}</label>
+        <input type="number" name="system.infravision" value="{{system.infravision}}" min="0" step="10" />
       </div>
       {{else}}
       <dl class="class-summary stat-block">
         {{#if requirementsText}}<dt>{{localize 'OSE.abilities.Requirements'}}</dt><dd>{{requirementsText}}</dd>{{/if}}
         <dt>{{localize 'OSE.race.AbilityModifiers'}}</dt><dd>{{modifiersText}}</dd>
+        {{#if infravisionText}}<dt>{{localize 'OSE.race.Infravision'}}</dt><dd>{{infravisionText}}</dd>{{/if}}
         {{#if languagesText}}<dt>{{localize 'OSE.category.languages'}}</dt><dd>{{languagesText}}</dd>{{/if}}
       </dl>
       {{/if}}
@@ -41,25 +44,7 @@
         {{/if}}
       </div>
 
-      <h3 class="section-title">{{localize 'OSE.abilities.Requirements'}}</h3>
-      <table class="class-table requirements">
-        <thead>
-          <tr>
-            <th></th>
-            {{#each scoreKeys as |k|}}<th>{{lookup @root.config.scores k}}</th>{{/each}}
-          </tr>
-        </thead>
-        <tbody>
-          {{#each requirementRows as |row|}}
-          <tr>
-            <td class="caption">{{localize row.label}}</td>
-            {{#each row.values as |v|}}
-            <td>{{#if @root.editing}}<input type="number" name="system.requirements.{{v.score}}.{{row.bound}}" value="{{v.value}}" />{{else}}{{v.value}}{{/if}}</td>
-            {{/each}}
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
+      {{> (path "/templates/items/partials/requirements-table.html") }}
 
     </div>
 
@@ -70,6 +55,7 @@
           <tr>
             <th data-tooltip="OSE.race.ClassKeyHint">{{localize 'OSE.race.ClassKey'}}</th>
             <th>{{localize 'OSE.classes.MaxLevel'}}</th>
+            <th data-tooltip="OSE.race.NpcOnlyHint">{{localize 'OSE.race.NpcOnly'}}</th>
             {{#if editing}}<th class="control"><a data-action="addClassLimit" data-tooltip="OSE.Add"><i class="fas fa-plus"></i></a></th>{{/if}}
           </tr>
         </thead>
@@ -79,10 +65,12 @@
             {{#if @root.editing}}
             <td><input type="text" name="system.classLimits.{{i}}.classKey" value="{{limit.classKey}}" list="ose-class-keys-{{@root.document.id}}" /></td>
             <td><input type="number" name="system.classLimits.{{i}}.maxLevel" value="{{limit.maxLevel}}" /></td>
+            <td><input type="checkbox" name="system.classLimits.{{i}}.npcOnly" {{checked limit.npcOnly}} /></td>
             <td class="control"><a data-action="removeRow" data-field="classLimits" data-index="{{i}}" data-name="{{limit.classKey}}" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a></td>
             {{else}}
             <td>{{limit.classKey}}</td>
             <td>{{limit.maxLevel}}</td>
+            <td>{{#if limit.npcOnly}}<i class="fas fa-check"></i>{{/if}}</td>
             {{/if}}
           </tr>
           {{/each}}
@@ -107,6 +95,39 @@
             <td>{{#if @root.editing}}<input type="number" data-modifier="{{k}}" value="{{lookup @root.modifiers k}}" />{{else}}{{lookup @root.modifiers k}}{{/if}}</td>
             {{/each}}
           </tr>
+        </tbody>
+      </table>
+
+      <h3 class="section-title">{{localize 'OSE.race.SaveBonuses'}}</h3>
+      <p class="hint">{{localize 'OSE.race.SaveBonusesHint'}}</p>
+      <table class="class-table save-bonuses">
+        <thead>
+          <tr>
+            <th>{{localize 'OSE.race.SaveBonusSaves'}}</th>
+            <th data-tooltip="OSE.race.SaveBonusAmountHint">{{localize 'OSE.race.SaveBonusAmount'}}</th>
+            <th data-tooltip="OSE.race.SaveBonusAgainstHint">{{localize 'OSE.race.SaveBonusAgainst'}}</th>
+            {{#if editing}}<th class="control"><a data-action="addSaveBonus" data-tooltip="OSE.Add"><i class="fas fa-plus"></i></a></th>{{/if}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each saveBonusRows as |row|}}
+          <tr>
+            {{#if @root.editing}}
+            <td>
+              <multi-checkbox name="system.saveBonuses.{{row.index}}.saves">
+                {{#each row.saveOptions as |opt|}}<option value="{{opt.value}}" {{#if opt.selected}}selected{{/if}}>{{opt.label}}</option>{{/each}}
+              </multi-checkbox>
+            </td>
+            <td><input type="number" name="system.saveBonuses.{{row.index}}.bonus" value="{{row.bonus}}" placeholder="{{localize 'OSE.race.SaveBonusByCon'}}" /></td>
+            <td><input type="text" name="system.saveBonuses.{{row.index}}.against" value="{{row.against}}" /></td>
+            <td class="control"><a data-action="removeRow" data-field="saveBonuses" data-index="{{row.index}}" data-name="{{row.savesText}}" data-tooltip="OSE.Delete"><i class="fas fa-trash"></i></a></td>
+            {{else}}
+            <td>{{row.savesText}}</td>
+            <td>{{row.bonusText}}</td>
+            <td>{{row.against}}</td>
+            {{/if}}
+          </tr>
+          {{/each}}
         </tbody>
       </table>
     </div>

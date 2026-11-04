@@ -2,15 +2,20 @@
  * @file The data model for Items of type Class
  */
 import { type ClassLevelRow, levelRow, type PrimeReq, SAVE_KEYS } from "../classes/progression";
+import { type ScoreRequirements, splitScoreRequirements } from "../classes/requirements";
 import type { ClassTable } from "../classes/tables";
+import OSE from "../config";
 import type { ClassItemData } from "./item-types";
+
+const SCORES = Object.keys(OSE.scores);
 
 // fvtt-types cannot resolve this system's data models; see data-model-ability.ts.
 // biome-ignore lint/suspicious/noExplicitAny: see above
 export default class OseDataModelClass extends foundry.abstract.TypeDataModel<any, any> implements ClassItemData {
   declare key: string;
   declare description: string;
-  declare requirements: string;
+  declare requirements: ScoreRequirements;
+  declare requirementsText: string;
   declare primeReqs: PrimeReq[];
   declare maxLevel: number;
   declare hitDie: string;
@@ -30,13 +35,18 @@ export default class OseDataModelClass extends foundry.abstract.TypeDataModel<an
   declare xp: number;
   declare xpBonusOverride: number | null;
 
-  // Languages were comma-separated text before 3.1.0.
+  // Languages were comma-separated text and requirements free text before 3.1.0.
   static migrateData(source: Record<string, unknown>) {
     if (typeof source.languages === "string") {
       source.languages = source.languages
         .split(",")
         .map((l) => l.trim())
         .filter(Boolean);
+    }
+    if (typeof source.requirements === "string") {
+      const { scores, text } = splitScoreRequirements(source.requirements);
+      source.requirements = scores;
+      source.requirementsText ??= text;
     }
     return source;
   }
@@ -45,10 +55,14 @@ export default class OseDataModelClass extends foundry.abstract.TypeDataModel<an
     const { ArrayField, BooleanField, HTMLField, NumberField, ObjectField, SchemaField, StringField } =
       foundry.data.fields;
     const int = (initial = 0) => new NumberField({ integer: true, initial });
+    const bound = () => new NumberField({ integer: true, nullable: true, initial: null });
     return {
       key: new StringField(),
       description: new HTMLField(),
-      requirements: new StringField(),
+      requirements: new SchemaField(
+        Object.fromEntries(SCORES.map((s) => [s, new SchemaField({ min: bound(), max: bound() })])),
+      ),
+      requirementsText: new StringField(),
       primeReqs: new ArrayField(
         new SchemaField({
           ability: new StringField(),

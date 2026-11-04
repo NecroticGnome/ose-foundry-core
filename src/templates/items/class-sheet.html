@@ -42,8 +42,8 @@
       <div class="class-fields">
         <label>{{localize 'OSE.classes.Key'}}</label>
         <input type="text" name="system.key" value="{{system.key}}" data-tooltip="OSE.classes.KeyHint" />
-        <label>{{localize 'OSE.abilities.Requirements'}}</label>
-        <input type="text" name="system.requirements" value="{{system.requirements}}" />
+        <label data-tooltip="OSE.classes.RequirementsTextHint">{{localize 'OSE.classes.RequirementsText'}}</label>
+        <input type="text" name="system.requirementsText" value="{{system.requirementsText}}" />
         <label>{{localize 'OSE.classes.HitDie'}}</label>
         <input type="text" name="system.hitDie" value="{{system.hitDie}}" list="ose-hit-dice-{{document.id}}" />
         <label data-tooltip="OSE.classes.SpellListHint">{{localize 'OSE.classes.SpellList'}}</label>
@@ -59,7 +59,8 @@
       <datalist id="ose-spell-lists-{{document.id}}">{{#each spellListChoices as |c|}}<option value="{{c}}"></option>{{/each}}</datalist>
       {{else}}
       <dl class="class-summary stat-block">
-        {{#if system.requirements}}<dt>{{localize 'OSE.abilities.Requirements'}}</dt><dd>{{system.requirements}}</dd>{{/if}}
+        {{#if requirementsText}}<dt>{{localize 'OSE.abilities.Requirements'}}</dt><dd>{{requirementsText}}</dd>{{/if}}
+        {{#if system.requirementsText}}<dt>{{localize 'OSE.classes.RequirementsText'}}</dt><dd>{{system.requirementsText}}</dd>{{/if}}
         {{#if primeReqText}}<dt>{{localize 'OSE.classes.PrimeRequisite'}}</dt><dd>{{primeReqText}}</dd>{{/if}}
         <dt>{{localize 'OSE.classes.HitDie'}}</dt><dd>{{system.hitDie}}</dd>
         {{#if system.maxLevel}}<dt>{{localize 'OSE.classes.MaxLevel'}}</dt><dd>{{system.maxLevel}}</dd>{{/if}}
@@ -79,6 +80,8 @@
         <div class="editor-content">{{{enriched.description}}}</div>
         {{/if}}
       </div>
+
+      {{> (path "/templates/items/partials/requirements-table.html") }}
 
       <div class="detail-blocks">
       <section class="detail-block prime-reqs-block">

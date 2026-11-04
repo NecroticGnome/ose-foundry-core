@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CLASSIC_FANTASY_CLASSES } from "../classic-fantasy-classes";
 import { CLASSIC_PRIME_REQS, classicClassToItemData } from "../classic-to-item";
-import { parseScoreRequirements } from "../warnings";
 
 describe("classicClassToItemData", () => {
   const fighter = classicClassToItemData(CLASSIC_FANTASY_CLASSES.Fighter, CLASSIC_PRIME_REQS.Fighter);
@@ -32,9 +31,9 @@ describe("classicClassToItemData", () => {
   it("uses the standard single prime requisite table", () => {
     expect(fighter.system.primeReqs?.find((p) => p.percentage === 10)?.minScore).toBe(16);
   });
-  it("writes requirements as text the warnings can read", () => {
+  it("writes minimum scores as structured requirements", () => {
     const halfling = classicClassToItemData(CLASSIC_FANTASY_CLASSES.Halfling, CLASSIC_PRIME_REQS.Halfling);
-    expect(parseScoreRequirements(halfling.system.requirements ?? "")).toEqual({
+    expect(halfling.system.requirements).toEqual({
       con: { min: 9, max: null },
       dex: { min: 9, max: null },
     });
