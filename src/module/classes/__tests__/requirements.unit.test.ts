@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseScoreRequirements, splitScoreRequirements } from "../requirements";
+import { boundLabels, parseScoreRequirements, splitScoreRequirements } from "../requirements";
 
 describe("parseScoreRequirements", () => {
   it.each([
@@ -24,5 +24,13 @@ describe("splitScoreRequirements", () => {
       scores: { cha: { min: 9, max: null } },
       text: "Minimum CHA 9, must be Lawful",
     });
+  });
+});
+
+describe("boundLabels", () => {
+  const reqs = { str: { min: 9, max: null }, dex: { min: null, max: 17 }, con: { min: 9, max: null } };
+  it("labels the scores with the given bound in the given order", () => {
+    expect(boundLabels(reqs, "min", ["str", "int", "wis", "dex", "con", "cha"])).toEqual(["STR 9", "CON 9"]);
+    expect(boundLabels(reqs, "max", ["str", "int", "wis", "dex", "con", "cha"])).toEqual(["DEX 17"]);
   });
 });

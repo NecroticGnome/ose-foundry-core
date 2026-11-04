@@ -28,3 +28,6 @@ export const splitScoreRequirements = (text: string): { scores: ScoreRequirement
     .replace(/[\s,;.]+/g, "");
   return { scores, text: rest ? text.trim() : "" };
 };
+
+export const boundLabels = (reqs: ScoreRequirements, bound: "min" | "max", order: string[]) =>
+  order.filter((k) => reqs[k]?.[bound]).map((k) => `${k.toUpperCase()} ${reqs[k]?.[bound]}`);

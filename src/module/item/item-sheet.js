@@ -14,6 +14,7 @@ import {
   scoreValues,
   standardPrimeReq,
 } from "../classes/progression";
+import { boundLabels } from "../classes/requirements";
 import {
   cellHint,
   columnHeader,
@@ -263,12 +264,8 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
     const scoreKeys = Object.keys(CONFIG.OSE.scores);
     const scoreLabel = (k) => k.toUpperCase();
     const signed = (v) => (Number(v) > 0 ? `+${v}` : `${v}`);
-    const mins = scoreKeys
-      .filter((k) => system.requirements[k]?.min)
-      .map((k) => `${scoreLabel(k)} ${system.requirements[k].min}`);
-    const maxes = scoreKeys
-      .filter((k) => system.requirements[k]?.max)
-      .map((k) => `${scoreLabel(k)} ${system.requirements[k].max}`);
+    const mins = boundLabels(system.requirements, "min", scoreKeys);
+    const maxes = boundLabels(system.requirements, "max", scoreKeys);
     const context = {
       abilityLinks,
       embedded: !!this.item.parent,
