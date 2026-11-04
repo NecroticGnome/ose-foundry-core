@@ -559,6 +559,7 @@ export default ({ describe, it, expect, after, beforeEach, assert }: QuenchMetho
     const isHidden = (el: Element | null) => !!el && getComputedStyle(el).display === "none";
 
     beforeEach(async () => {
+      ui.sidebar.changeTab("chat", "primary");
       await setRollMode("publicroll");
       await trashChat();
     });

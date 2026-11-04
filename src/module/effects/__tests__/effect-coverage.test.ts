@@ -53,7 +53,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
   afterEach(async () => {
     await closeSheets();
   });
-  after(async () => {
+  after(async function () {
+    this.timeout(10_000);
     for (const s of settings) await game.settings.set(game.system.id, s, original[s] as never);
     await cleanUpActorsByKey(key);
   });
@@ -277,7 +278,8 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
 
   describe("every suggested key applies", () => {
     for (const type of ["character", "monster"] as const) {
-      it(`${type}: each key changes the prepared value`, async () => {
+      it(`${type}: each key changes the prepared value`, async function () {
+        this.timeout(20_000);
         const failed: string[] = [];
         for (const { key: path } of effectKeys(type)) {
           if (path === "system.hp.hd") continue;

@@ -302,6 +302,96 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
     });
   });
 
+  describe("addClass and setRace", () => {
+    const saves = { death: 12, wand: 13, paralysis: 14, breath: 15, spell: 16 };
+    const row = (xp: number) => ({ xp, hd: "1d1", hdcon: true, thac0: 19, bba: 0, saves, spellSlots: {} });
+    const levels = [row(0), row(2000), row(4000)];
+    let prompt: boolean;
+
+    before(() => {
+      prompt = game.settings.get(game.system.id, "promptAddClassAbilities");
+    });
+
+    afterEach(async () => {
+      await trashChat();
+      await cleanUpWorldItems();
+      await game.settings.set(game.system.id, "promptAddClassAbilities", prompt);
+    });
+
+    it("starts a class at a level with the table's XP, rolled hit points and a chat card", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.hp.max": 20, "system.hp.value": 20 });
+      const cls = await actor.addClass(
+        { name: "Fighter", type: "class", system: { hitDie: "1d1", levels, languages: ["Common", "Dwarvish"] } },
+        { level: 2, rollHp: true },
+      );
+      expect(cls?.system.level).equal(2);
+      expect(cls?.system.xp).equal(2000);
+      expect(actor.system.hp.max).equal(2);
+      expect(actor.system.languages.value).deep.equal(["Common", "Dwarvish"]);
+      await waitUntil(() => game.messages?.size === 1);
+      await actor.delete();
+    });
+
+    it("refuses to add a class or race to a monster", async () => {
+      const monster = await createMockActor("monster");
+      let error: unknown;
+      await monster.addClass({ name: "Fighter", type: "class", system: { levels } }).catch((e) => (error = e));
+      expect(error).instanceOf(Error);
+      error = undefined;
+      await monster.setRace({ name: "Dwarf", type: "race", system: {} }).catch((e) => (error = e));
+      expect(error).instanceOf(Error);
+      expect(monster.items.size).equal(0);
+      await monster.delete();
+    });
+
+    it("replaces a class, carrying its level and XP over", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      const [fighter] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Fighter", type: "class", system: { level: 2, xp: 2500, levels } },
+      ]);
+      const thief = await actor.addClass({ name: "Thief", type: "class", system: { levels } }, { replace: fighter });
+      expect(actor.items.filter((i) => i.type === "class").map((i) => i.name)).deep.equal(["Thief"]);
+      expect(thief?.system.level).equal(2);
+      expect(thief?.system.xp).equal(2500);
+      await actor.delete();
+    });
+
+    it("grants abilities without asking, even when the prompt setting is off", async () => {
+      await game.settings.set(game.system.id, "promptAddClassAbilities", false);
+      const ability = await createWorldTestItem("ability", "Backstab");
+      const actor = (await createMockActor("character")) as OseActor;
+      const thief = await actor.addClass({
+        name: "Thief",
+        type: "class",
+        system: { levels, abilities: [{ uuid: ability?.uuid, level: 1 }] },
+      });
+      await actor.offerAbilities(thief, 1, { confirm: false });
+      expect(actor.items.getName("Backstab")?.type).equal("ability");
+      await actor.delete();
+    });
+
+    it("replaces the race and its languages, disabling its modifiers when the scores already include them", async () => {
+      const actor = (await createMockActor("character")) as OseActor;
+      await actor.update({ "system.languages.value": ["Gnoll"], "system.details.alignment": "Lawful" });
+      await actor.createEmbeddedDocuments("Item", [{ name: "Halfling", type: "race" }]);
+      const scope = game.system.id;
+      const race = await actor.setRace(
+        {
+          name: "Dwarf",
+          type: "race",
+          system: { languages: ["Common", "Dwarvish", "Alignment"] },
+          effects: [{ name: "Modifiers", flags: { [scope]: { raceModifiers: true } } }],
+        },
+        { modifiersIncluded: true },
+      );
+      expect(actor.items.filter((i) => i.type === "race").map((i) => i.name)).deep.equal(["Dwarf"]);
+      expect(race?.effects.contents[0]?.disabled).equal(true);
+      expect(actor.system.languages.value).deep.equal(["Common", "Dwarvish", "Lawful"]);
+      await actor.delete();
+    });
+  });
+
   describe("_preCreate(data, options, user)", () => {
     it("New character's prototypeToken actorLink defaults to true", async () => {
       const actor = (await createMockActor("character")) as OseActor;

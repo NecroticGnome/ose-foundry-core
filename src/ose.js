@@ -8,6 +8,9 @@ import OseActor from "./module/actor/entity";
 import OseActorSheetMonster from "./module/actor/monster-sheet";
 import TokenRulerOSE from "./module/actor/token-ruler";
 import trackableAttributes from "./module/actor/trackable-attributes";
+import { describeDerivation } from "./module/classes/derive";
+import { rollsStartingHp } from "./module/classes/levels";
+import { startingProgress } from "./module/classes/progression";
 import { OSECombat } from "./module/combat/combat";
 import OSECombatTracker from "./module/combat/combat-tracker";
 import { OSECombatant } from "./module/combat/combatant";
@@ -22,6 +25,7 @@ import { ITEM_DATA_MODELS } from "./module/item/data-models";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
 import { promptClassMigration } from "./module/migration";
+import { convertSingleActor } from "./module/migration/convert-actor";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
 import * as renderList from "./module/renderList";
@@ -69,6 +73,10 @@ Hooks.once("init", async () => {
   game.ose = {
     rollItemMacro: macros.rollItemMacro,
     rollTableMacro: macros.rollTableMacro,
+    describeDerivation,
+    startingProgress,
+    rollsStartingHp,
+    convertSingleActor,
   };
 
   // Init Party Sheet handler
