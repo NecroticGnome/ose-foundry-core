@@ -1,0 +1,38 @@
+name: Publish Types
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm trusted publishing (OIDC)
+
+jobs:
+  publish:
+    # Manual runs should publish from main only.
+    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js version 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # No install scripts while the job can mint a publish token.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Publish @ose-foundry-core/types if the version is new
+        run: |
+          v=$(node -p "require('./packages/types/package.json').version")
+          if npm view "@ose-foundry-core/types@$v" version >/dev/null 2>&1; then
+            echo "@ose-foundry-core/types@$v is already published"
+            exit 0
+          fi
+          npm run release:types
