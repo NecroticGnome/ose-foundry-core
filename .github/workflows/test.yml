@@ -23,3 +23,14 @@ jobs:
 
       - name: Run unit tests
         run: npm test
+
+      - name: Check types package version
+        run: |
+          npm run build:types
+          v=$(node -p "require('./packages/types/package.json').version")
+          dir=$(mktemp -d)
+          if npm pack "@ose-foundry-core/types@$v" --pack-destination "$dir" >/dev/null 2>&1; then
+            tar -xzf "$dir"/*.tgz -C "$dir"
+            cmp -s "$dir/package/index.d.ts" packages/types/index.d.ts ||
+              echo "::warning file=packages/types/package.json::Types changed since $v was published. Bump the version in packages/types/package.json."
+          fi

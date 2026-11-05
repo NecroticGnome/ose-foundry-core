@@ -68,13 +68,17 @@ when the actor data models migrate
 
 ## Releasing
 
-Bump `version` in `packages/types/package.json`, then from the repo root run
-`npm run release:types` — it rebuilds `index.d.ts` and publishes the package to
-npm.
+Bump `version` in `packages/types/package.json`. The workflow automatically warns when
+the built types differ from the published version and the version wasn't bumped.
 
-Publishing needs an npm account with publish rights to the `@ose-foundry-core`
-scope (the scope/org must already exist on npm). Run `npm login` first, then the
-release script.
+Publishing a GitHub release runs the Publish Types workflow, which publishes the
+package if that version isn't on npm yet. 
+
+To publish manually instead, run `npm run release:types` from the repo root — it
+rebuilds `index.d.ts` and publishes the package to npm. Publishing by hand
+needs an npm account with publish rights to the `@ose-foundry-core` scope (the
+scope/org must already exist on npm). Run `npm login` first, then the release
+script.
 
 The package sets `publishConfig.access: public`, so the first publish creates
 the scoped package as public — no extra flags needed.
