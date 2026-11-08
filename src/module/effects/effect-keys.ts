@@ -17,6 +17,8 @@ const shared = (): EffectKey[] => [
   { key: "system.thac0.bba", label: "OSE.AB" },
   { key: "system.thac0.mod.melee", label: "OSE.MeleeBonus" },
   { key: "system.thac0.mod.missile", label: "OSE.MissileBonus" },
+  { key: "system.damage.mod.melee", label: "OSE.MeleeDamageBonus" },
+  { key: "system.damage.mod.missile", label: "OSE.MissileDamageBonus" },
   ...Object.entries(OSE.saves_long).map(([s, label]) => ({ key: `system.saves.${s}.value`, label })),
   { key: "system.initiative.mod", label: "OSE.InitiativeBonus" },
   { key: "system.movement.base", label: "OSE.movement.base" },

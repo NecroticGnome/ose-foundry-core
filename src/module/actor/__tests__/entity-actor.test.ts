@@ -1209,6 +1209,27 @@ export default ({ describe, it, expect, after, afterEach, before, assert }: e2e.
       CONFIG.Dice.randomUniform = existingRandomFunction;
     });
 
+    for (const [type, formula] of [
+      ["melee", "1d6 + 2"],
+      ["missile", "1d6 + 2"],
+    ]) {
+      it(`If ${type} attack, add the ${type} damage bonus to damage roll`, async () => {
+        const existingRandomFunction = CONFIG.Dice.randomUniform;
+        CONFIG.Dice.randomUniform = () => rollSpecificNumber(10, 20);
+
+        const actor = (await createMockActor("character")) as OseActor;
+        await actor.update({
+          system: { scores: { str: { value: 10 }, dex: { value: 18 } }, damage: { mod: { [type]: 2 } } },
+        });
+        await actor.rollAttack({ roll: {} }, { type, skipDialog: true });
+        await waitUntil(() => game.messages?.size === 1);
+        expect(game.messages?.contents[0].content).contain(formula);
+        await actor.delete();
+
+        CONFIG.Dice.randomUniform = existingRandomFunction;
+      });
+    }
+
     it("If item provided with a bonus, it is added as bonus to attack roll", async () => {
       const actor = (await createMockActor("character")) as OseActor;
       const item = await createWorldTestItem("weapon");

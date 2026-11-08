@@ -29,6 +29,12 @@
             "melee": 0
           }
         },
+        "damage": {
+          "mod": {
+            "missile": 0,
+            "melee": 0
+          }
+        },
         "saves": {
           "death": {
             "value": 0
