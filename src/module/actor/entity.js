@@ -901,6 +901,9 @@ export default class OseActor extends Actor {
 
     rollParts.push(...removeFalsyElements(attackMods));
 
+    const damageMod = data.damage?.mod?.[options.type];
+    if (damageMod) dmgParts.push(damageMod);
+
     const rollData = {
       actor: this,
       item: attData.item,

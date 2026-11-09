@@ -48,6 +48,14 @@
     <input type="text" name="tweaks.missile" value="{{lookup @root.tweaks 'missile'}}" data-dtype="Number" id="missile" />
   </div>
   <div class="form-group">
+    <label for="meleeDamage">{{localize "OSE.MeleeDamageBonus"}}</label>
+    <input type="text" name="tweaks.meleeDamage" value="{{lookup @root.tweaks 'meleeDamage'}}" data-dtype="Number" id="meleeDamage" />
+  </div>
+  <div class="form-group">
+    <label for="missileDamage">{{localize "OSE.MissileDamageBonus"}}</label>
+    <input type="text" name="tweaks.missileDamage" value="{{lookup @root.tweaks 'missileDamage'}}" data-dtype="Number" id="missileDamage" />
+  </div>
+  <div class="form-group">
     <label for="ac">{{localize "OSE.ArmorClassBonus"}}</label>
     <input type="text" name="tweaks.ac" value="{{lookup @root.tweaks 'ac'}}" data-dtype="Number" id="ac" />
   </div>

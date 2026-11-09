@@ -84,6 +84,12 @@ export default class OseDataModelMonster extends foundry.abstract.TypeDataModel 
         max: new NumberField({ integer: true }),
       }),
       thac0: new ObjectField(),
+      damage: new SchemaField({
+        mod: new SchemaField({
+          melee: new NumberField({ integer: false, initial: 0 }),
+          missile: new NumberField({ integer: false, initial: 0 }),
+        }),
+      }),
       languages: new ObjectField(),
       saves: new SchemaField({
         breath: new SchemaField({ value: new NumberField({ integer: true }) }),

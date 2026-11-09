@@ -154,6 +154,8 @@
   "OSE.MissileShort": "MIS",
   "OSE.Missile": "Missile",
   "OSE.MissileBonus": "Missile Bonus",
+  "OSE.MeleeDamageBonus": "Melee Damage Bonus",
+  "OSE.MissileDamageBonus": "Missile Damage Bonus",
   "OSE.Initiative": "Initiative",
   "OSE.InitiativeBonus": "Initiative Bonus",
   "OSE.InitiativeShort": "INIT",

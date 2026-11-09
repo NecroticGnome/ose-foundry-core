@@ -14,6 +14,8 @@ const TWEAKS: (TweakField & { monster?: boolean })[] = [
   { id: "initiative", path: "system.initiative.mod", label: "OSE.InitiativeBonus", monster: true },
   { id: "melee", path: "system.thac0.mod.melee", label: "OSE.MeleeBonus" },
   { id: "missile", path: "system.thac0.mod.missile", label: "OSE.MissileBonus" },
+  { id: "meleeDamage", path: "system.damage.mod.melee", label: "OSE.MeleeDamageBonus" },
+  { id: "missileDamage", path: "system.damage.mod.missile", label: "OSE.MissileDamageBonus" },
   { id: "ac", path: "system.ac.mod", label: "OSE.ArmorClassBonus", twin: "system.aac.mod" },
   { id: "magic", path: "system.details.magic.bonus", label: "OSE.details.magic.bonus" },
   { id: "xp", path: "system.details.xp.bonus", label: "OSE.details.experience.bonus" },

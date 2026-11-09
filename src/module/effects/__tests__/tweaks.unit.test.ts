@@ -18,7 +18,16 @@ const character = (over: Record<string, unknown> = {}) => ({
 describe("tweakFields", () => {
   it("gives monsters only the initiative bonus", () => {
     expect(tweakFields("monster").map((t) => t.id)).toEqual(["initiative"]);
-    expect(tweakFields("character").map((t) => t.id)).toEqual(["initiative", "melee", "missile", "ac", "magic", "xp"]);
+    expect(tweakFields("character").map((t) => t.id)).toEqual([
+      "initiative",
+      "melee",
+      "missile",
+      "meleeDamage",
+      "missileDamage",
+      "ac",
+      "magic",
+      "xp",
+    ]);
   });
 });
 

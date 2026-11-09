@@ -128,6 +128,14 @@ export default ({ describe, it, expect, after, afterEach, before }: QuenchMethod
       expect(a.system.rangedMod).equal(base.system.rangedMod + 2);
     });
 
+    it("melee and missile damage bonuses", async () => {
+      const a = await withEffect(await character(), [
+        add("system.damage.mod.melee", 1),
+        add("system.damage.mod.missile", 2),
+      ]);
+      expect([a.system.damage.mod.melee, a.system.damage.mod.missile]).deep.equal([1, 2]);
+    });
+
     it("THAC0 and attack bonus stay in step on a classed character", async () => {
       const a = await character();
       await a.createEmbeddedDocuments("Item", [fighter()]);
