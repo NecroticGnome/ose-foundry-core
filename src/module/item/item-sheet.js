@@ -18,7 +18,7 @@ import { boundLabels } from "../classes/requirements";
 import {
   cellHint,
   columnHeader,
-  findTargetClass,
+  defaultTarget,
   isFormulaKey,
   legendSuggestions,
   renameColumnKeys,
@@ -551,7 +551,11 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
     if (doc?.type !== "ability") return;
     if (abilities.some((a) => a.uuid === doc.uuid)) return;
     return this.item.update({
-      "system.abilities": insertByLevel(abilities, { uuid: doc.uuid, level: 1, target: this.#defaultTarget(doc) }),
+      "system.abilities": insertByLevel(abilities, {
+        uuid: doc.uuid,
+        level: 1,
+        target: defaultTarget(this.item.system.tables ?? [], doc),
+      }),
     });
   }
 
@@ -717,18 +721,6 @@ export default class OseItemSheet extends HandlebarsApplicationMixin(ItemSheetV2
     const values = [...this.item.system[field]];
     values.splice(Number(index), 1);
     return this.item.update({ [`system.${field}`]: values });
-  }
-
-  // A dropped ability's roll target: its own table link if this class has that column, else a column
-  // matching the abbreviation in its name, e.g. "Climb sheer surfaces (CS)" → skills.cs.
-  #defaultTarget(doc) {
-    const tables = this.item.system.tables ?? [];
-    if (doc.system?.targetFrom && findTargetClass([{ key: "", tables }], doc.system.targetFrom)) {
-      return doc.system.targetFrom;
-    }
-    const abbr = /\(([A-Za-z]{2,3})\)\s*$/.exec(doc.name)?.[1]?.toLowerCase();
-    const table = abbr && tables.find((t) => t.columns.some((c) => c.key === abbr));
-    return table ? `${table.key}.${abbr}` : "";
   }
 
   static _onSortAbilities() {
