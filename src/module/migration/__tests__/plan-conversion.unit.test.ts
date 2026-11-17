@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CLASSIC_FANTASY_CLASSES } from "../../classes/classic-fantasy-classes";
 import { CLASSIC_PRIME_REQS, classicClassToItemData } from "../../classes/classic-to-item";
-import { adjustmentRows, planConversion, readSource } from "../plan-conversion";
+import { adjustmentRows, isBlankSpellSlotChange, planConversion, readSource } from "../plan-conversion";
 
 const fighter = () => classicClassToItemData(CLASSIC_FANTASY_CLASSES.Fighter, CLASSIC_PRIME_REQS.Fighter);
 
@@ -65,10 +65,17 @@ describe("planConversion", () => {
     const cleric = classicClassToItemData(CLASSIC_FANTASY_CLASSES.Cleric, CLASSIC_PRIME_REQS.Cleric);
     const s = source({ details: { class: "Cleric", level: 2 }, saves: {}, thac0: {}, hp: {} });
     expect(planConversion(readSource(s), cleric).changes).toEqual([]);
-    const enabled = source({ ...s, spells: { ...s.spells, enabled: true } });
+    const enabled = source({ ...s, spells: { 1: { max: 2 }, enabled: true } });
     expect(planConversion(readSource(enabled), cleric).changes).toEqual([
-      { key: "system.spells.1.max", type: "add", value: -1 },
+      { key: "system.spells.1.max", type: "add", value: 1 },
     ]);
+  });
+
+  it("ignores spell slots never filled in", () => {
+    const cleric = classicClassToItemData(CLASSIC_FANTASY_CLASSES.Cleric, CLASSIC_PRIME_REQS.Cleric);
+    const s = source({ details: { class: "Cleric", level: 3 }, saves: {}, thac0: {}, hp: {} });
+    const enabled = source({ ...s, spells: { 1: { max: 0 }, 2: { max: 0 }, enabled: true } });
+    expect(planConversion(readSource(enabled), cleric).changes).toEqual([]);
   });
 
   it("records differences from the table as changes", () => {
@@ -135,5 +142,20 @@ describe("adjustmentRows", () => {
       { key: "spells.1", value: "+1" },
       { key: "hd", value: "1d6" },
     ]);
+  });
+});
+
+describe("isBlankSpellSlotChange", () => {
+  const system = { spells: { 1: { max: 0 }, 2: { max: 3 } } };
+  it("matches negative spell slot adds against a blank stored max", () => {
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.1.max", mode: 2, value: "-2" })).toBe(true);
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.1.max", type: "add", value: -2 })).toBe(true);
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.4.max", type: "add", value: -1 })).toBe(true);
+  });
+  it("keeps everything else", () => {
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.2.max", type: "add", value: -1 })).toBe(false);
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.1.max", type: "add", value: 1 })).toBe(false);
+    expect(isBlankSpellSlotChange(system, { key: "system.spells.1.max", mode: 5, value: "-1" })).toBe(false);
+    expect(isBlankSpellSlotChange(system, { key: "system.saves.death.value", type: "add", value: -1 })).toBe(false);
   });
 });

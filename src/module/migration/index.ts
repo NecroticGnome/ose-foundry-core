@@ -1,8 +1,10 @@
 /**
  * @file Opt-in world migration from typed classes to class items.
  */
+import { worldActors } from "../effects/tweak-effects";
 import { buildClassIndex } from "./class-index";
 import { convertActor, type ReportEntry } from "./convert-actor";
+import { isBlankSpellSlotChange } from "./plan-conversion";
 
 export const CLASS_ITEMS_MIGRATION = "classItems-1";
 
@@ -120,4 +122,29 @@ export const promptClassMigration = async () => {
   if (!entries.some((e) => e.status === "error")) {
     await game.settings.set(game.system.id, "systemMigrationVersion", CLASS_ITEMS_MIGRATION);
   }
+};
+
+// #210: drops the bad spell slot changes 3.2.0-3.3.0 added to Migration Adjustments; runs once.
+export const repairSpellSlotAdjustments = async () => {
+  if (!game.user?.isActiveGM || game.settings.get(game.system.id, "spellSlotsRepaired")) return;
+  const scope = game.system.id;
+  for (const actor of await worldActors()) {
+    if (actor.type !== "character" || !actor.getFlag(scope, "migrations.classItems")) continue;
+    try {
+      const system = actor._source.system;
+      // biome-ignore lint/suspicious/noExplicitAny: v13 and v14 effect shapes
+      for (const effect of actor.effects.filter((e: any) => e.getFlag(scope, "migration"))) {
+        const v14 = Array.isArray(effect._source.system?.changes);
+        const changes = (v14 ? effect._source.system.changes : effect._source.changes) ?? [];
+        // biome-ignore lint/suspicious/noExplicitAny: raw change data
+        const kept = changes.filter((c: any) => !isBlankSpellSlotChange(system, c));
+        if (kept.length === changes.length) continue;
+        await effect.update({ [v14 ? "system.changes" : "changes"]: kept });
+        console.info(`OSE | Removed ${changes.length - kept.length} blank spell slot change(s) from ${actor.uuid}`);
+      }
+    } catch (err) {
+      console.error(`OSE | Spell slot repair failed for ${actor.uuid}`, err);
+    }
+  }
+  await game.settings.set(game.system.id, "spellSlotsRepaired", true);
 };

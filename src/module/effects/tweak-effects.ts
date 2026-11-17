@@ -69,9 +69,8 @@ export const migrateActorTweaks = async (actor: Any) => {
   return true;
 };
 
-// Once per world, for the active GM: world actors, unlinked tokens and unlocked world compendiums.
-export const migrateTweaks = async () => {
-  if (!game.user?.isActiveGM || game.settings.get(game.system.id, "tweaksMigrated")) return;
+// World actors, unlinked token actors and unlocked world pack actors.
+export const worldActors = async (): Promise<Any[]> => {
   const actors: Any[] = [...(game.actors ?? [])];
   for (const scene of game.scenes ?? []) {
     for (const token of scene.tokens) if (!token.actorLink && token.actor) actors.push(token.actor);
@@ -80,6 +79,13 @@ export const migrateTweaks = async () => {
     if (pack.documentName !== "Actor" || pack.metadata.packageType !== "world" || pack.locked) continue;
     actors.push(...((await pack.getDocuments()) as Any[]));
   }
+  return actors;
+};
+
+// Once per world, for the active GM: world actors, unlinked tokens and unlocked world compendiums.
+export const migrateTweaks = async () => {
+  if (!game.user?.isActiveGM || game.settings.get(game.system.id, "tweaksMigrated")) return;
+  const actors = await worldActors();
   let count = 0;
   for (const actor of actors) {
     try {

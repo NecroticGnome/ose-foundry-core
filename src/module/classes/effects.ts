@@ -33,10 +33,8 @@ export const tableDiffChanges = (stored: StoredValues, derived: Derived): Change
   for (const s of SAVE_KEYS) add(`system.saves.${s}.value`, stored.saves?.[s], derived.saves[s]);
   const thac0Delta = add("system.thac0.value", stored.thac0, derived.thac0);
   if (thac0Delta !== null) changes.push({ key: "system.thac0.bba", type: "add", value: -thac0Delta });
-  const levels = new Set([...Object.keys(stored.spells ?? {}), ...Object.keys(derived.spellSlots)]);
-  for (const lvl of stored.spells ? [...levels].sort() : []) {
-    if (lvl === "0") continue;
-    add(`system.spells.${lvl}.max`, num(stored.spells?.[lvl]) ?? 0, derived.spellSlots[lvl] ?? 0);
+  for (const lvl of Object.keys(stored.spells ?? {}).sort()) {
+    if (lvl !== "0") add(`system.spells.${lvl}.max`, stored.spells?.[lvl], derived.spellSlots[lvl] ?? 0);
   }
   if (stored.hd && stored.hd !== derived.hd) changes.push({ key: "system.hp.hd", type: "override", value: stored.hd });
   return changes;

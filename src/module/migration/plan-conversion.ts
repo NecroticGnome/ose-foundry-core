@@ -42,14 +42,14 @@ export const readSource = (system: any): SourceSummary => {
     bonus: Number(s.details?.xp?.bonus) || 0,
     scores: Object.fromEntries(Object.entries(s.scores ?? {}).map(([k, v]) => [k, (v as { value?: number })?.value])),
     stored: {
-      // 0 is the blank default.
+      // 0 is the blank default, here and for spell slots.
       saves: Object.fromEntries(SAVE_KEYS.map((k) => [k, s.saves?.[k]?.value || undefined])),
       thac0: s.thac0?.value,
       spells: s.spells?.enabled
         ? Object.fromEntries(
             Object.entries(s.spells)
               .filter(([k]) => /^\d+$/.test(k))
-              .map(([k, v]) => [k, (v as { max?: number })?.max]),
+              .map(([k, v]) => [k, (v as { max?: number })?.max || undefined]),
           )
         : undefined,
       // template.json default.
@@ -96,3 +96,12 @@ export const adjustmentRows = (changes: Change[]) =>
         .replace(/^hp\.hd$/, "hd"),
       value: c.type === "add" && Number(c.value) > 0 ? `+${c.value}` : String(c.value),
     }));
+
+// #210: a negative spell slot add recorded against a blank stored max.
+type RawChange = { key: string; mode?: number; type?: string; value: unknown };
+// biome-ignore lint/suspicious/noExplicitAny: raw actor source data
+export const isBlankSpellSlotChange = (system: any, c: RawChange) => {
+  const lvl = /^system\.spells\.(\d+)\.max$/.exec(c.key)?.[1];
+  const add = c.type ? c.type === "add" : (c.mode ?? 2) === 2;
+  return !!lvl && add && Number(c.value) < 0 && !Number(system?.spells?.[lvl]?.max);
+};
