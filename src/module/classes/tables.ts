@@ -100,6 +100,20 @@ export const columnHeader = (key: string) => key.replace(/^(\d+)s$/i, "$1*").toU
 // Keys usable in a roll formula like @classTables.thief.skills.hs.
 export const isFormulaKey = (key: string) => /^[\w-]+$/.test(key);
 
+// A dropped ability's link on a class with these tables: its own targetFrom if the class has it, else a
+// column matching the abbreviation in its name, e.g. "Climb sheer surfaces (CS)" → skills.cs.
+export const defaultTarget = (
+  tables: ClassTable[],
+  ability: { name: string; system?: { targetFrom?: string; noTableLink?: boolean } },
+): string => {
+  const own = ability.system?.targetFrom;
+  if (own && findTargetClass([{ key: "", tables }], own)) return own;
+  if (ability.system?.noTableLink) return "";
+  const abbr = /\(([A-Za-z]{2,3})\)\s*$/.exec(ability.name)?.[1]?.toLowerCase();
+  const table = abbr && tables.find((t) => t.columns.some((c) => c.key === abbr));
+  return table ? `${table.key}.${abbr}` : "";
+};
+
 // The character's class whose table has the column, preferring classes the ability's requirements name.
 export const findTargetClass = <T extends { key: string; tables?: ClassTable[] }>(
   classes: T[],
