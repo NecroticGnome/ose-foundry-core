@@ -32,13 +32,12 @@ describe("tableDiffChanges", () => {
       { key: "system.thac0.bba", type: "add", value: 1 },
     ]);
   });
-  it("compares spell slots, missing as zero, ignoring cantrips", () => {
+  it("compares spell slots, ignoring cantrips and unset levels", () => {
     expect(tableDiffChanges({ ...same, spells: { 0: 3, 1: 1, 2: 1 } }, derived)).toEqual([
       { key: "system.spells.2.max", type: "add", value: 1 },
     ]);
-    expect(tableDiffChanges({ ...same, spells: {} }, derived)).toEqual([
-      { key: "system.spells.1.max", type: "add", value: -1 },
-    ]);
+    expect(tableDiffChanges({ ...same, spells: {} }, derived)).toEqual([]);
+    expect(tableDiffChanges({ ...same, spells: { 1: undefined } }, derived)).toEqual([]);
   });
   it("overrides a different HD string", () => {
     expect(tableDiffChanges({ ...same, hd: "1d6+1" }, derived)).toEqual([

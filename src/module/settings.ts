@@ -159,6 +159,12 @@ const registerSettings = () => {
     type: Boolean,
     config: false,
   });
+  game.settings.register(game.system.id, "spellSlotsRepaired", {
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: false,
+  });
   game.settings.register(game.system.id, "systemMigrationVersion", {
     default: "",
     scope: "world",
@@ -184,6 +190,7 @@ declare global {
       "ose.promptAddClassAbilities": boolean;
       "ose.effectsTab": boolean;
       "ose.tweaksMigrated": boolean;
+      "ose.spellSlotsRepaired": boolean;
       "ose.systemMigrationVersion": string;
     }
   }
