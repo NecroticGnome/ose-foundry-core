@@ -41,3 +41,19 @@
     overflow: auto;
   }
 }
+
+.ose-notice {
+  margin: 0.5em 0;
+  padding: 0.25em 0.75em;
+  border: 1px solid var(--color-fieldset-border, currentColor);
+  border-left-width: 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-style: normal;
+  > :first-child {
+    margin-top: 0.25em;
+  }
+  > :last-child {
+    margin-bottom: 0.25em;
+  }
+}
