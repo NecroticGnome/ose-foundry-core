@@ -24,7 +24,7 @@ import * as treasure from "./module/helpers-treasure";
 import { ITEM_DATA_MODELS } from "./module/item/data-models";
 import OseItem from "./module/item/entity";
 import OseItemSheet from "./module/item/item-sheet";
-import { promptClassMigration } from "./module/migration";
+import { promptClassMigration, repairSpellSlotAdjustments } from "./module/migration";
 import { convertSingleActor } from "./module/migration/convert-actor";
 import OsePartySheet from "./module/party/party-sheet";
 import templates from "./module/preloadTemplates";
@@ -148,6 +148,7 @@ Hooks.once("ready", async () => {
 
   await promptTokenRingSelection();
   await migrateTweaks();
+  await repairSpellSlotAdjustments();
   await promptClassMigration();
 });
 
