@@ -19,6 +19,7 @@ export default class OseDataModelAbility extends foundry.abstract.TypeDataModel<
   declare rollType: RollType | "";
   declare rollTarget: number | null;
   declare targetFrom: string;
+  declare noTableLink: boolean;
   declare exploration: string;
   declare blindroll: boolean;
   declare description: string;
@@ -41,6 +42,8 @@ export default class OseDataModelAbility extends foundry.abstract.TypeDataModel<
       rollTarget: new NumberField(),
       // table.column of a class table the target follows on a character, e.g. skills.cs.
       targetFrom: new StringField(),
+      // Never guess a class table link from the name, e.g. point-buy d6 thief skills.
+      noTableLink: new BooleanField(),
       // An exploration skill the roll target raises on a character e.g. ld.
       exploration: new StringField(),
       blindroll: new BooleanField(),

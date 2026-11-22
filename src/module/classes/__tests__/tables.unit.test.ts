@@ -5,6 +5,7 @@ import {
   cellTarget,
   columnHeader,
   currentRows,
+  defaultTarget,
   findTargetClass,
   isFormulaKey,
   legendSuggestions,
@@ -199,5 +200,19 @@ describe("legendSuggestions", () => {
     expect(legendSuggestions({ key: "k", columns: [{ key: "a", name: "" }], rows: [{ a: "" }, { a: "x" }] })).toEqual([
       "x",
     ]);
+  });
+});
+
+describe("defaultTarget", () => {
+  const ability = (name: string, system = {}) => ({ name, system: { targetFrom: "", ...system } });
+  it("uses the ability's own link when the class has it", () => {
+    expect(defaultTarget([skills], ability("Sneak", { targetFrom: "skills.ms" }))).toBe("skills.ms");
+  });
+  it("guesses a column from the name's abbreviation", () => {
+    expect(defaultTarget([skills], ability("Hide in shadows (HS)"))).toBe("skills.hs");
+    expect(defaultTarget([skills], ability("Pick pockets (PP)"))).toBe("");
+  });
+  it("never guesses for an ability that opts out", () => {
+    expect(defaultTarget([skills], ability("Hide In Shadows (HS)", { noTableLink: true }))).toBe("");
   });
 });
