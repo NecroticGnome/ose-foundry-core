@@ -19,6 +19,7 @@ export default class OseDataModelClass extends foundry.abstract.TypeDataModel<an
   declare primeReqs: PrimeReq[];
   declare maxLevel: number;
   declare hitDie: string;
+  declare advancedHitDie: string;
   declare spellList: string;
   declare languages: string[];
   declare titles: string[];
@@ -74,6 +75,7 @@ export default class OseDataModelClass extends foundry.abstract.TypeDataModel<an
       ),
       maxLevel: int(14),
       hitDie: new StringField({ initial: "1d6" }),
+      advancedHitDie: new StringField(),
       spellList: new StringField(),
       languages: new ArrayField(new StringField()),
       titles: new ArrayField(new StringField()),

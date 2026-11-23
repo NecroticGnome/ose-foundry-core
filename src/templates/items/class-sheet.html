@@ -46,6 +46,8 @@
         <input type="text" name="system.requirementsText" value="{{system.requirementsText}}" />
         <label>{{localize 'OSE.classes.HitDie'}}</label>
         <input type="text" name="system.hitDie" value="{{system.hitDie}}" list="ose-hit-dice-{{document.id}}" />
+        <label>{{localize 'OSE.classes.AdvancedHitDie'}}</label>
+        <input type="text" name="system.advancedHitDie" value="{{system.advancedHitDie}}" list="ose-hit-dice-{{document.id}}" />
         <label data-tooltip="OSE.classes.SpellListHint">{{localize 'OSE.classes.SpellList'}}</label>
         <input type="text" name="system.spellList" value="{{system.spellList}}" list="ose-spell-lists-{{document.id}}" />
         <label data-tooltip="OSE.classes.MaxLevelHint">{{localize 'OSE.classes.MaxLevel'}}</label>
@@ -63,6 +65,7 @@
         {{#if system.requirementsText}}<dt>{{localize 'OSE.classes.RequirementsText'}}</dt><dd>{{system.requirementsText}}</dd>{{/if}}
         {{#if primeReqText}}<dt>{{localize 'OSE.classes.PrimeRequisite'}}</dt><dd>{{primeReqText}}</dd>{{/if}}
         <dt>{{localize 'OSE.classes.HitDie'}}</dt><dd>{{system.hitDie}}</dd>
+        {{#if system.advancedHitDie}}<dt>{{localize 'OSE.classes.AdvancedHitDie'}}</dt><dd>{{system.advancedHitDie}}</dd>{{/if}}
         {{#if system.maxLevel}}<dt>{{localize 'OSE.classes.MaxLevel'}}</dt><dd>{{system.maxLevel}}</dd>{{/if}}
         {{#if system.armourText}}<dt>{{localize 'OSE.classes.Armour'}}</dt><dd>{{system.armourText}}</dd>{{/if}}
         {{#if system.weaponsText}}<dt>{{localize 'OSE.classes.Weapons'}}</dt><dd>{{system.weaponsText}}</dd>{{/if}}

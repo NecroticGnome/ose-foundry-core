@@ -171,6 +171,7 @@ export interface ClassItemData {
   primeReqs: PrimeReq[];
   maxLevel: number;
   hitDie: string;
+  advancedHitDie: string;
   spellList: string;
   languages: string[];
   titles: string[];
