@@ -2,7 +2,7 @@
   {{#each effectGroups as |group|}}
   <div class="item-category-title flexrow">
     <div class="category-name">{{localize group.label}}</div>
-    <div class="field-long">{{localize "OSE.effects.Source"}}</div>
+    <div class="field-long effect-source">{{localize "OSE.effects.Source"}}</div>
     <div class="field-long">{{localize "OSE.effects.Duration"}}</div>
     <div class="item-controls">
       {{#if @first}}{{#if @root.editable}}<a class="item-control" data-action="createEffect" data-tooltip="OSE.effects.Create"><i class="fas fa-plus"></i></a>{{/if}}{{/if}}
@@ -16,7 +16,7 @@
           <div class="item-image" style="background-image: url('{{e.img}}')"></div>
           <a data-action="editEffect">{{e.name}}</a>
         </div>
-        <div class="field-long">{{#if e.source}}{{e.source}}{{else}}{{localize "OSE.effects.Actor"}}{{/if}}</div>
+        <div class="field-long effect-source" data-tooltip-text="{{#if e.source}}{{e.source}}{{else}}{{localize 'OSE.effects.Actor'}}{{/if}}">{{#if e.source}}{{e.source}}{{else}}{{localize "OSE.effects.Actor"}}{{/if}}</div>
         <div class="field-long">{{e.duration}}</div>
         <div class="item-controls">
           {{#if e.fixed}}
