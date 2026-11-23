@@ -137,6 +137,15 @@ const registerSettings = () => {
     config: true,
     requiresReload: true,
   });
+  game.settings.register(game.system.id, "advancedHitDice", {
+    name: game.i18n.localize("OSE.Setting.AdvancedHitDice"),
+    hint: game.i18n.localize("OSE.Setting.AdvancedHitDiceHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
   game.settings.register(game.system.id, "promptAddClassAbilities", {
     name: game.i18n.localize("OSE.Setting.PromptAddClassAbilities"),
     hint: game.i18n.localize("OSE.Setting.PromptAddClassAbilitiesHint"),

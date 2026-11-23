@@ -1,11 +1,12 @@
 /**
  * @file Derives a character's base values from its class items.
  */
+import { applyAdvancedHd } from "./hit-dice";
 import { bestOf, type ClassLevelRow, levelRow, type SaveKey } from "./progression";
 
 export interface ClassLike {
   name: string;
-  system: { levels: ClassLevelRow[]; level: number; xp: number; hitDie: string };
+  system: { levels: ClassLevelRow[]; level: number; xp: number; hitDie: string; advancedHitDie?: string };
 }
 
 export interface Derived {
@@ -32,8 +33,11 @@ export const summariseClasses = (classes: ClassLike[]) => {
   };
 };
 
-export const deriveFromClasses = (classes: ClassLike[]): Derived | null => {
-  const rows = classes.flatMap((c) => levelRow(c.system.levels, c.system.level) ?? []);
+export const deriveFromClasses = (classes: ClassLike[], advanced = false): Derived | null => {
+  const rows = classes.flatMap((c) => {
+    const row = levelRow(c.system.levels, c.system.level);
+    return row ? [{ ...row, hd: applyAdvancedHd(row.hd, c.system.advancedHitDie, advanced) }] : [];
+  });
   const best = bestOf(rows);
   const summary = summariseClasses(classes);
   if (!best || !summary) return null;

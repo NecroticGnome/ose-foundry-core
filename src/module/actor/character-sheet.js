@@ -2,6 +2,7 @@
  * @file Extend the basic ActorSheet with some very simple modifications
  */
 import { describeDerivation } from "../classes/derive";
+import { advancedHitDiceOn, applyAdvancedHd } from "../classes/hit-dice";
 import { currentRows } from "../classes/tables";
 import OSE from "../config";
 import OseCharacterCreator from "../dialog/character-creation";
@@ -139,8 +140,11 @@ export default class OseActorSheetCharacter extends OseActorSheet {
       collapsed: this.#collapsedClasses.has(c.id),
     }));
     data.anyCanLevelUp = data.classes.some((c) => c.canLevelUp);
+    const advanced = advancedHitDiceOn();
     const hdParts = system.classes.flatMap((c) =>
-      c.system.currentRow?.hd ? [{ name: c.name, hd: c.system.currentRow.hd }] : [],
+      c.system.currentRow?.hd
+        ? [{ name: c.name, hd: applyAdvancedHd(c.system.currentRow.hd, c.system.advancedHitDie, advanced) }]
+        : [],
     );
     data.hdParts = hdParts.length > 1 ? hdParts : null;
     const race = system.race;

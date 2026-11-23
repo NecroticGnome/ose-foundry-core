@@ -4,6 +4,7 @@
 import { deriveTables } from "../classes/actor-tables";
 import { deriveFromClasses, summariseClasses } from "../classes/derive";
 import { clampRaceModifier, readChanges } from "../classes/effects";
+import { advancedHitDiceOn } from "../classes/hit-dice";
 import { primeReqBonus, SAVE_KEYS, scoreValues } from "../classes/progression";
 import { totalRaceSaveBonus } from "../classes/race-saves";
 import { buildSpellPools } from "../classes/spells";
@@ -40,7 +41,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
         xp: { ...this.details.xp, value: summary.xp, next: summary.xpNext ?? summary.xp },
       };
     }
-    const derived = deriveFromClasses(classes);
+    const derived = deriveFromClasses(classes, advancedHitDiceOn());
     if (!derived) return;
     this.derivedFromClasses = true;
     for (const [key, value] of Object.entries(derived.saves)) this.saves[key].value = value;

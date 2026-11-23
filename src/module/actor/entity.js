@@ -1,6 +1,7 @@
 import { isAbilityOwned } from "../classes/abilities";
 import { statChanges } from "../classes/changes";
 import { abilitiesGrantedBy } from "../classes/granted";
+import { advancedHitDiceOn, applyAdvancedHd } from "../classes/hit-dice";
 import { mergeLanguages } from "../classes/languages";
 import {
   applyXpBonus,
@@ -161,13 +162,13 @@ export default class OseActor extends Actor {
 
   // HP for reaching a level.
   async #rollLevelHp(classItem, level) {
-    const { levels, hitDie } = classItem.system;
+    const { levels, hitDie, advancedHitDie } = classItem.system;
     const row = levels[level - 1];
     if (row && !row.hdcon) {
       const gain = hdFlatBonus(row.hd) - hdFlatBonus(levels[level - 2]?.hd ?? "");
       return { gain, formula: String(gain), fixed: true };
     }
-    const die = hitDie || "1d6";
+    const die = applyAdvancedHd(hitDie || "1d6", advancedHitDie, advancedHitDiceOn());
     const con = this.system.scores.con.mod || 0;
     // At least 1 HP per level, regardless of CON penalty.
     const formula = con ? `max(${die} ${con > 0 ? "+" : "-"} ${Math.abs(con)}, 1)` : die;
