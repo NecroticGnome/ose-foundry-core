@@ -520,6 +520,13 @@
       cursor: help;
     }
   }
+  .item-category-title .effect-source,
+  .item-header .effect-source {
+    flex: 0 0 8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .ose.sheet.actor input.effect-locked {
