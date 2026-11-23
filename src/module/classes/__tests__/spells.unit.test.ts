@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ClassLevelRow } from "../progression";
-import { buildSpellPools, type PoolClass, type PoolSpell } from "../spells";
+import { buildSpellPools, casterLevelOf, monsterCasterLevel, type PoolClass, type PoolSpell } from "../spells";
 
 const row = (spellSlots: Record<string, number>): ClassLevelRow => ({
   xp: 0,
@@ -101,5 +101,34 @@ describe("buildSpellPools", () => {
     const result = buildSpellPools([witch, fighter], [spell("s", 1, "Witch")]);
     expect(result.pools).toEqual([]);
     expect(result.other).toEqual([]);
+  });
+});
+
+describe("casterLevelOf", () => {
+  const fighter6 = cls("f", "Fighter", "fighter", [row({}), row({})], 6);
+  const mage5 = cls("m", "Magic-User", "magic-user", [row({ 1: 1 }), row({ 1: 2 })], 5);
+  const level = (classes: PoolClass[], s: PoolSpell, fallback = 6) => {
+    const { pools, assignment } = buildSpellPools(classes, [s]);
+    return casterLevelOf(classes, pools, assignment, s.id, fallback);
+  };
+  it("uses the level of the class the spell is cast as", () => {
+    expect(level([fighter6, mage5], spell("fb", 3, "Magic-User"))).toBe(5);
+  });
+  it("uses the chosen pool over the spell list", () => {
+    const cleric3 = cls("c", "Cleric", "cleric", [row({ 1: 1 }), row({ 1: 1 }), row({ 1: 2 })], 3);
+    expect(level([cleric3, mage5], spell("x", 1, "Magic-User", { castAs: "cleric" }))).toBe(3);
+  });
+  it("falls back for unallocated spells and characters without classes", () => {
+    expect(level([fighter6, mage5], spell("x", 1, "Druid", { castAs: "none" }))).toBe(6);
+    expect(level([], spell("x", 1, "Magic-User"), 4)).toBe(4);
+  });
+});
+
+describe("monsterCasterLevel", () => {
+  it("uses the set caster level, else the HD count", () => {
+    expect(monsterCasterLevel(18, "11**")).toBe(18);
+    expect(monsterCasterLevel(null, "11**")).toBe(11);
+    expect(monsterCasterLevel("", "3+1*")).toBe(3);
+    expect(monsterCasterLevel(undefined, "")).toBe(0);
   });
 });

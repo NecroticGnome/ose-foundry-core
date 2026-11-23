@@ -46,6 +46,7 @@ export default class OseDataModelSpell extends foundry.abstract.TypeDataModel<an
     const rollFormula = OseTags.rollTagFormula({
       actor: this.parent?.actor,
       data: this._source,
+      casterLevel: this.parent?.casterLevel ?? 0,
     });
 
     return {
