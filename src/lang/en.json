@@ -312,6 +312,7 @@
   "OSE.spells.Cast": "Cast",
   "OSE.spells.Range": "Range",
   "OSE.spells.Slots": "Slots",
+  "OSE.spells.CasterLevel": "Caster level",
   "OSE.spells.Class": "Class",
   "OSE.spells.Duration": "Duration",
   "OSE.spells.Level": "Level",

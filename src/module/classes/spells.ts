@@ -70,3 +70,19 @@ export const buildSpellPools = (classes: PoolClass[], spells: PoolSpell[]) => {
   }
   return { pools, assignment, other };
 };
+
+// The level a spell is cast at as defined by its pool's class level otherwise returns the provided fallback.
+export const casterLevelOf = (
+  classes: { id: string; level: number }[],
+  pools: SpellPool[],
+  assignment: Record<string, string | null>,
+  spellId: string,
+  fallback: number,
+) => {
+  const pool = pools.find((p) => p.key === assignment[spellId]);
+  return classes.find((c) => c.id === pool?.classId)?.level || fallback;
+};
+
+// A monster casts at its set caster level otherwise falling back to the monsters HD count.
+export const monsterCasterLevel = (casterLevel: unknown, hd: string) =>
+  Number(casterLevel) || Number.parseInt(hd, 10) || 0;

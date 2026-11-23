@@ -479,9 +479,24 @@
       &.spells {
         .item-category-title {
           line-height: 1rem;
+          align-items: center;
+          .field-long {
+            align-items: center;
+            input {
+              border-bottom: none;
+              margin: 0;
+              height: 1rem;
+            }
+            input:only-child {
+              flex: 1;
+            }
+          }
+          .caster-level-label {
+            flex: 0 0 auto;
+          }
         }
         .item-controls {
-          flex: 0 0 2.7rem;
+          flex: 0 0 3.2rem;
         }
       }
       #context-menu {

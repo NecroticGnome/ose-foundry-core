@@ -49,6 +49,11 @@ export default class OseItem extends Item {
     };
   }
 
+  // A spell's caster level for @casterLevel
+  get casterLevel(): number {
+    return (this.actor as OwningActor | null)?.casterLevel?.(this) ?? 0;
+  }
+
   // Narrowing these to Item.CreateData / CreateOperation breaks static-side
   // compatibility with Item.create's generic overloads (TS2417).
   // biome-ignore lint/suspicious/noExplicitAny: see above
@@ -206,6 +211,7 @@ export default class OseItem extends Item {
 
     if (this.type === "spell") {
       rollData.description = itemData.description;
+      rollData.casterLevel = this.casterLevel;
     }
 
     // Roll and return
@@ -465,6 +471,7 @@ export default class OseItem extends Item {
       config: CONFIG.OSE,
     };
     const chatItemData = templateData.data as AnyItemSystem;
+    if (itemType === "spell") templateData.casterLevel = this.casterLevel;
     templateData.rollFormula = new Roll(chatItemData.roll ?? "", templateData).formula;
     chatItemData.properties = this.system.autoTags;
 

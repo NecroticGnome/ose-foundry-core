@@ -1,6 +1,8 @@
 /**
  * @file The sheet class for Actors of type Monster
  */
+
+import { monsterCasterLevel } from "../classes/spells";
 import OSE from "../config";
 import OseActorSheet from "./actor-sheet";
 import { addTreasureTable, removeTreasureTable, treasureSummary } from "./treasure-links";
@@ -89,6 +91,9 @@ export default class OseActorSheetMonster extends OseActorSheet {
     if (summary)
       data.treasureMenu = { first: await TextEditor.enrichHTML(summary.first, enrichOptions), more: summary.more };
     data.isNew = this.actor.isNew();
+    // Shown as the placeholder when no caster level is set.
+    data.casterLevelFallback = monsterCasterLevel(null, this.actor.system.hp?.hd ?? "");
+    data.casterLevelValue = this.actor._source.system.spells?.casterLevel ?? "";
 
     data.enrichedBiography = await TextEditor.enrichHTML(this.actor.system.details.biography, enrichOptions);
 

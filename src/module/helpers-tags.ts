@@ -11,10 +11,19 @@ const OseTags = {
    * @param data.roll - The string used to generate a formula
    * @returns tagFormula - The constructed roll formula
    */
-  rollTagFormula({ actor = {}, data = { roll: "" } }: { actor?: unknown; data?: { roll?: string } } = {}) {
+  rollTagFormula({
+    actor = {},
+    data = { roll: "" },
+    casterLevel = 0,
+  }: {
+    actor?: unknown;
+    data?: { roll?: string };
+    casterLevel?: number;
+  } = {}) {
     const formulaData = {
       actor,
       data,
+      casterLevel,
     };
 
     const tagFormula = new Roll(data.roll ?? "", formulaData).formula;

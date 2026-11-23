@@ -14,6 +14,7 @@ import {
   splitXp,
   startingProgress,
 } from "../classes/progression";
+import { casterLevelOf, monsterCasterLevel } from "../classes/spells";
 import { tableRowValues } from "../classes/tables";
 import OSE from "../config";
 import skipRollDialogCheck from "../helpers-behaviour";
@@ -49,6 +50,22 @@ export default class OseActor extends Actor {
   applyActiveEffects(phase) {
     if (phase !== "final") this.system.prepareTables?.();
     return super.applyActiveEffects(phase);
+  }
+
+  // The level a spell is cast at (used by @casterLevel in spell formulas).
+  casterLevel(spell) {
+    const { system } = this;
+    // Prepared monster spells drop extra keys, so read the source.
+    if (this.type === "monster")
+      return monsterCasterLevel(this._source.system.spells?.casterLevel, system.hp?.hd ?? "");
+    const classes = (system.classes ?? []).map((c) => ({ id: c.id, level: c.system.level }));
+    return casterLevelOf(
+      classes,
+      system.spellPools ?? [],
+      system.spellAssignment ?? {},
+      spell.id,
+      system.details?.level || 0,
+    );
   }
 
   // Class table values for formulas, e.g. @classTables.thief.skills.hs.

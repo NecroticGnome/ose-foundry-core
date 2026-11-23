@@ -1,6 +1,12 @@
 <section class="inventory spells resizable" data-base-size="320">
   <div data-action="toggleCategory" class="item-category-title flexrow" style="line-height: 15px">
     <div class="category-name">{{localize "OSE.category.spells"}}</div>
+    {{#if (eq @root.document.type "monster")}}
+    <div class="field-short caster-level-label">{{localize "OSE.spells.CasterLevel"}}</div>
+    <div class="field-long flexrow">
+      <input type="text" data-dtype="Number" name="system.spells.casterLevel" value="{{@root.casterLevelValue}}" placeholder="{{@root.casterLevelFallback}}" />
+    </div>
+    {{/if}}
     {{#if @root.owner}}
     <div class="item-controls">
       <a

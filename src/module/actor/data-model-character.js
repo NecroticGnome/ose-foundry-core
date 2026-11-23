@@ -149,6 +149,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
   // Each casting class has its own slots. Spells get allocated separately.
   #prepareSpellPools() {
     this.spellPools = [];
+    this.spellAssignment = {};
     this.unallocatedSpells = [];
     const { classes } = this;
     if (!classes.length) return;
@@ -190,6 +191,7 @@ export default class OseDataModelCharacter extends foundry.abstract.TypeDataMode
         p.slots,
       ),
     }));
+    this.spellAssignment = assignment;
     this.unallocatedSpells = spells.filter((s) => other.includes(s.id));
     this.otherSpellLevels = byLevel(this.unallocatedSpells);
   }
