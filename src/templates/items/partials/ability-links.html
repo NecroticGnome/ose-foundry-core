@@ -15,7 +15,7 @@
       {{#if @root.editing}}<td class="control handle" data-tooltip="OSE.classes.DragToReorder"><i class="fas fa-grip-vertical"></i></td>{{/if}}
       <td class="name">
         <a data-action="openUuid" data-uuid="{{link.uuid}}">{{#if link.missing}}<i class="fas fa-triangle-exclamation" data-tooltip="OSE.classes.MissingAbility"></i> {{/if}}{{link.name}}</a>
-        <input type="hidden" name="system.abilities.{{i}}.uuid" value="{{link.uuid}}" />
+        {{#if @root.editing}}<input type="hidden" name="system.abilities.{{i}}.uuid" value="{{link.uuid}}" />{{/if}}
       </td>
       <td class="level">{{#if @root.editing}}<input type="number" name="system.abilities.{{i}}.level" value="{{link.level}}" min="1" />{{else}}{{link.level}}{{/if}}</td>
       {{#if @root.isClass}}

@@ -95,6 +95,35 @@ export default ({ describe, it, expect, after, assert }: QuenchMethods) => {
     });
   });
 
+  describe("class abilities", () => {
+    it("keeps ability levels when XP changes outside edit mode (issue #214)", async () => {
+      const [a, b] = (await Item.create([
+        { name: "Shape Change", type: "ability" },
+        { name: "Charm Immunity", type: "ability" },
+      ])) as Item[];
+      const abilities = [
+        { uuid: a.uuid, level: 7, target: "" },
+        { uuid: b.uuid, level: 3, target: "skills.cs" },
+      ];
+      const actor = await Actor.create({ name: "Ability XP test", type: "character" });
+      const [cls] = (await actor?.createEmbeddedDocuments("Item", [
+        { name: "Test Druid", type: "class", system: { key: "test-druid", levels: [{ xp: 0 }], abilities } },
+      ])) as Item[];
+      await cls.sheet?.render(true);
+      await waitFor(() => !!cls.sheet?.element?.querySelector('input[name="system.xp"]'));
+      const input = cls.sheet?.element.querySelector<HTMLInputElement>('input[name="system.xp"]');
+      if (!input) throw new Error("no xp input");
+      input.value = "500";
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      await waitFor(() => cls.system.xp === 500);
+      expect(cls.system.toObject().abilities).deep.equal(abilities);
+      await cls.sheet?.close();
+      await actor?.delete();
+      await a.delete();
+      await b.delete();
+    });
+  });
+
   describe("class and race image", () => {
     const filePickers = () =>
       [...foundry.applications.instances.values()].filter((a) => a instanceof foundry.applications.apps.FilePicker);
